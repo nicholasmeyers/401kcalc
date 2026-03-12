@@ -33,10 +33,17 @@ export const primaryFieldConfigs: CalculatorFieldConfig[] = [
   {
     field: "lifeExpectancy",
     label: "Life expectancy",
-    description: "Age through which retirement withdrawals are modeled.",
+    description: "Last age included in this estimate.",
     kind: "age",
+    tooltip: "The calculator checks whether your savings last through this age.",
+  },
+  {
+    field: "targetRetirementSpending",
+    label: "Annual retirement spending goal",
+    description: "Target spending per year in retirement.",
+    kind: "currency",
     tooltip:
-      "Age the calculator tests your plan through. If savings run out before this age, the plan falls short.",
+      "Annual amount you want to spend in retirement in today's dollars. When inflation adjustment is on, withdrawals grow each year.",
   },
   {
     field: "currentBalance",
@@ -53,7 +60,7 @@ export const primaryFieldConfigs: CalculatorFieldConfig[] = [
   {
     field: "contributionPercent",
     label: "Contribution percent",
-    description: "Annual employee contribution rate.",
+    description: "Percentage of salary you contribute each year.",
     kind: "percent",
     slider: {
       min: 0,
@@ -64,7 +71,7 @@ export const primaryFieldConfigs: CalculatorFieldConfig[] = [
   {
     field: "employerMatchPercent",
     label: "Employer match percent",
-    description: "Simplified flat match as a percent of salary.",
+    description: "Estimated employer contribution as a percentage of salary.",
     kind: "percent",
   },
 ];
@@ -91,7 +98,7 @@ export const advancedFieldConfigs: CalculatorFieldConfig[] = [
   {
     field: "annualReturnPercent",
     label: "Annual return",
-    description: "Expected long-run annual investment return.",
+    description: "Average annual investment return used in the projection.",
     kind: "percent",
     slider: {
       min: -5,
@@ -102,7 +109,7 @@ export const advancedFieldConfigs: CalculatorFieldConfig[] = [
   {
     field: "inflationPercent",
     label: "Inflation",
-    description: "Average yearly inflation assumption.",
+    description: "Average annual inflation used to adjust values to today's dollars.",
     kind: "percent",
     slider: {
       min: -2,
@@ -110,28 +117,48 @@ export const advancedFieldConfigs: CalculatorFieldConfig[] = [
       step: 0.1,
     },
   },
+];
+
+export const ageBasedSpendingFieldConfigs: CalculatorFieldConfig[] = [
   {
-    field: "withdrawalRatePercent",
-    label: "Withdrawal rate",
-    description: "Percent withdrawn annually in retirement.",
+    field: "earlyRetirementSpendingPercent",
+    label: "Early retirement spending",
+    description: "Percent of your base target spending used through age 74.",
     kind: "percent",
-    tooltip:
-      "Percent of your portfolio withdrawn each retirement year in the main projection scenario.",
     slider: {
       min: 0,
-      max: 10,
-      step: 0.1,
+      max: 150,
+      step: 1,
     },
   },
   {
-    field: "targetRetirementSpending",
-    label: "Target retirement spending",
-    description: "Annual spending goal in retirement.",
-    kind: "currency",
-    tooltip: "Annual spending goal tested in the target-spending projection scenario.",
+    field: "midRetirementSpendingPercent",
+    label: "Mid retirement spending",
+    description: "Percent of your base target spending used from ages 75 to 84.",
+    kind: "percent",
+    slider: {
+      min: 0,
+      max: 150,
+      step: 1,
+    },
+  },
+  {
+    field: "lateRetirementSpendingPercent",
+    label: "Late retirement spending",
+    description: "Percent of your base target spending used from age 85 onward.",
+    kind: "percent",
+    slider: {
+      min: 0,
+      max: 150,
+      step: 1,
+    },
   },
 ];
 
-export const allFieldConfigs: CalculatorFieldConfig[] = [...primaryFieldConfigs, ...advancedFieldConfigs];
+export const allFieldConfigs: CalculatorFieldConfig[] = [
+  ...primaryFieldConfigs,
+  ...advancedFieldConfigs,
+  ...ageBasedSpendingFieldConfigs,
+];
 
 export const allInputFields: InputField[] = allFieldConfigs.map((config) => config.field);
