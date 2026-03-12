@@ -1,10 +1,12 @@
 "use client";
 
+import type { ReactNode } from "react";
 import styled from "styled-components";
 
 import { CalculatorField } from "@/components/calculator/calculator-field";
 import {
   advancedFieldConfigs,
+  ageBasedSpendingFieldConfigs,
   primaryFieldConfigs,
   type CalculatorFieldConfig,
 } from "@/components/calculator/field-config";
@@ -15,11 +17,54 @@ import { theme } from "@/styles/theme";
 type CalculatorFormProps = {
   values: Record<InputField, string>;
   errors: Partial<Record<InputField, string>>;
-  fieldNotes?: Partial<Record<InputField, string>>;
+  fieldNotes?: Partial<Record<InputField, ReactNode>>;
+  ageBasedSpendingEnabled: boolean;
+  retirementSpendingInflationAdjusted: boolean;
+  retirementAge: number;
   onFieldChange: (field: InputField, nextValue: string) => void;
+  onAgeBasedSpendingEnabledChange: (enabled: boolean) => void;
+  onRetirementSpendingInflationAdjustedChange: (enabled: boolean) => void;
 };
 
-export function CalculatorForm({ values, errors, fieldNotes, onFieldChange }: CalculatorFormProps) {
+const withPhaseDescriptions = (
+  retirementAge: number,
+  configs: CalculatorFieldConfig[]
+): CalculatorFieldConfig[] =>
+  configs.map((config) => {
+    if (config.field === "earlyRetirementSpendingPercent") {
+      return {
+        ...config,
+        description:
+          retirementAge <= 74
+            ? `Percent of target spending used from age ${retirementAge} through age 74.`
+            : "Used if retirement starts before age 75.",
+      };
+    }
+
+    if (config.field === "midRetirementSpendingPercent") {
+      return {
+        ...config,
+        description:
+          retirementAge <= 84
+            ? `Percent of target spending used from age ${Math.max(75, retirementAge)} through age 84.`
+            : "Used if retirement starts before age 85.",
+      };
+    }
+
+    return config;
+  });
+
+export function CalculatorForm({
+  values,
+  errors,
+  fieldNotes,
+  ageBasedSpendingEnabled,
+  retirementSpendingInflationAdjusted,
+  retirementAge,
+  onFieldChange,
+  onAgeBasedSpendingEnabledChange,
+  onRetirementSpendingInflationAdjustedChange,
+}: CalculatorFormProps) {
   const renderFieldList = (fieldConfigs: CalculatorFieldConfig[]) =>
     fieldConfigs.map((config) => (
       <CalculatorField
@@ -36,7 +81,9 @@ export function CalculatorForm({ values, errors, fieldNotes, onFieldChange }: Ca
     <FormPanel>
       <Header>
         <Title>Assumptions</Title>
-        <Subtitle>Adjust a few inputs to see how your retirement trajectory shifts in real time.</Subtitle>
+        <Subtitle>
+          Adjust inputs to see projected balances and whether your annual retirement spending goal is supported.
+        </Subtitle>
       </Header>
 
       <FieldStack>{renderFieldList(primaryFieldConfigs)}</FieldStack>
@@ -44,9 +91,44 @@ export function CalculatorForm({ values, errors, fieldNotes, onFieldChange }: Ca
       <AdvancedAssumptions>
         <AdvancedSummary>
           <SummaryTitle>Advanced assumptions</SummaryTitle>
-          <SummaryHint>Windfall event, growth, return, inflation, withdrawal rate, and target spending</SummaryHint>
+          <SummaryHint>Windfall, salary growth, investment return, inflation, and spending settings</SummaryHint>
         </AdvancedSummary>
-        <AdvancedFields>{renderFieldList(advancedFieldConfigs)}</AdvancedFields>
+        <AdvancedFields>
+          {renderFieldList(advancedFieldConfigs)}
+
+          <SpendingPatternPanel>
+            <SpendingPatternHeader>
+              <SpendingPatternTitle>Retirement spending pattern</SpendingPatternTitle>
+              <SpendingPatternCopy>
+                Spending can change over time. Use these settings to test different retirement spending phases.
+              </SpendingPatternCopy>
+            </SpendingPatternHeader>
+
+            <ToggleRow>
+              <ToggleCheckbox
+                id="retirement-spending-inflation-adjusted"
+                type="checkbox"
+                checked={retirementSpendingInflationAdjusted}
+                onChange={(event) => onRetirementSpendingInflationAdjustedChange(event.currentTarget.checked)}
+              />
+              <ToggleLabel>Adjust retirement spending for inflation each year</ToggleLabel>
+            </ToggleRow>
+
+            <ToggleRow>
+              <ToggleCheckbox
+                id="age-based-spending-enabled"
+                type="checkbox"
+                checked={ageBasedSpendingEnabled}
+                onChange={(event) => onAgeBasedSpendingEnabledChange(event.currentTarget.checked)}
+              />
+              <ToggleLabel>Use age-based spending changes (early, mid, late retirement)</ToggleLabel>
+            </ToggleRow>
+
+            {ageBasedSpendingEnabled ? (
+              <AgePhaseFields>{renderFieldList(withPhaseDescriptions(retirementAge, ageBasedSpendingFieldConfigs))}</AgePhaseFields>
+            ) : null}
+          </SpendingPatternPanel>
+        </AdvancedFields>
       </AdvancedAssumptions>
     </FormPanel>
   );
@@ -123,4 +205,58 @@ const AdvancedFields = styled.div`
   padding: 8px 16px 16px;
   display: grid;
   gap: 18px;
+`;
+
+const SpendingPatternPanel = styled.section`
+  border: 1px solid ${theme.colors.border};
+  border-radius: ${theme.radii.md};
+  background: ${theme.colors.surface};
+  padding: 14px 14px 15px;
+  display: grid;
+  gap: 12px;
+`;
+
+const SpendingPatternHeader = styled.header`
+  display: grid;
+  gap: 5px;
+`;
+
+const SpendingPatternTitle = styled.h3`
+  font-size: 0.8rem;
+  font-weight: 640;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: ${theme.colors.mutedTextStrong};
+`;
+
+const SpendingPatternCopy = styled.p`
+  font-size: 0.82rem;
+  color: ${theme.colors.mutedText};
+  line-height: 1.45;
+`;
+
+const ToggleRow = styled.label`
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 9px;
+  color: ${theme.colors.textSecondary};
+`;
+
+const ToggleCheckbox = styled.input`
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  accent-color: ${theme.colors.text};
+`;
+
+const ToggleLabel = styled.span`
+  font-size: 0.84rem;
+  line-height: 1.45;
+`;
+
+const AgePhaseFields = styled.div`
+  padding-top: 2px;
+  display: grid;
+  gap: 14px;
 `;

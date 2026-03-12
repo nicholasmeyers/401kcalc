@@ -30,31 +30,73 @@ const compactCurrency = new Intl.NumberFormat("en-US", {
 
 type ProjectionChartProps = {
   data: YearlyProjectionEntry[];
-  targetSpendingData: YearlyProjectionEntry[];
   retirementAge: number;
   onRetirementAgeChange?: (nextRetirementAge: number) => void;
 };
 
-type ChartRow = YearlyProjectionEntry & {
-  targetSpendingEndingBalance: number | null;
+type ChartRow = YearlyProjectionEntry;
+
+type ProjectionTooltipPayloadEntry = {
+  dataKey?: string | number;
+  value?: number | string | null;
 };
 
+type ProjectionTooltipProps = {
+  active?: boolean;
+  label?: string | number;
+  payload?: ProjectionTooltipPayloadEntry[];
+};
+
+type LegendKind = "nominal" | "inflation" | "event";
+
+const chartSeries = [
+  {
+    key: "endingBalance",
+    name: "Projected balance",
+    color: theme.colors.chartMain,
+    strokeWidth: 2.4,
+  },
+  {
+    key: "inflationAdjustedEndingBalance",
+    name: "Projected balance in today's dollars",
+    color: theme.colors.chartInflation,
+    strokeWidth: 2,
+    strokeDasharray: "6 8",
+  },
+] as const;
+
+const [mainSeries, inflationSeries] = chartSeries;
+const legendItems: { kind: LegendKind; label: string; description: string }[] = [
+  {
+    kind: "nominal",
+    label: mainSeries.name,
+    description: "Estimated account balance each year based on your current assumptions.",
+  },
+  {
+    kind: "inflation",
+    label: inflationSeries.name,
+    description: "Same estimate adjusted for inflation to show today's buying power.",
+  },
+  {
+    kind: "event",
+    label: "Retirement age marker",
+    description: "Your selected retirement age on the timeline.",
+  },
+];
+
 const clamp = (value: number, min: number, max: number): number => Math.max(min, Math.min(value, max));
-const chartTooltipContentStyle = {
-  border: `1px solid ${theme.colors.borderStrong}`,
-  borderRadius: "12px",
-  background: "rgba(255, 255, 255, 0.96)",
-  padding: "10px 12px",
-};
-const chartTooltipLabelStyle = {
-  fontSize: "0.78rem",
-  fontWeight: 640,
-  color: theme.colors.mutedText,
-};
-const chartTooltipItemStyle = {
-  fontSize: "0.84rem",
-  color: theme.colors.textSecondary,
-  paddingBlock: "3px",
+
+const toFiniteNumber = (value: number | string | null | undefined): number | null => {
+  if (typeof value === "number") {
+    return Number.isFinite(value) ? value : null;
+  }
+
+  if (typeof value === "string") {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : null;
+  }
+
+  return null;
 };
 
 const toNumericAge = (label: MouseHandlerDataParam["activeLabel"]): number | null => {
@@ -70,7 +112,68 @@ const toNumericAge = (label: MouseHandlerDataParam["activeLabel"]): number | nul
   return null;
 };
 
-export function ProjectionChart({ data, targetSpendingData, retirementAge, onRetirementAgeChange }: ProjectionChartProps) {
+const ProjectionHoverTooltip = ({ active, label, payload }: ProjectionTooltipProps) => {
+  if (!active || !payload || payload.length === 0) {
+    return null;
+  }
+
+  const valuesByKey = new Map<string, number>();
+
+  for (const entry of payload) {
+    if (typeof entry.dataKey !== "string") {
+      continue;
+    }
+
+    const numericValue = toFiniteNumber(entry.value);
+
+    if (numericValue === null) {
+      continue;
+    }
+
+    valuesByKey.set(entry.dataKey, numericValue);
+  }
+
+  const tooltipRows = chartSeries.flatMap((series) => {
+    const value = valuesByKey.get(series.key);
+
+    if (value === undefined) {
+      return [];
+    }
+
+    return [{ ...series, value }];
+  });
+
+  if (tooltipRows.length === 0) {
+    return null;
+  }
+
+  return (
+    <HoverTooltipCard>
+      <HoverTooltipLabel>{label === undefined ? "Age" : `Age ${label}`}</HoverTooltipLabel>
+      {tooltipRows.map((row) => (
+        <HoverTooltipRow key={row.key}>
+          <HoverTooltipSwatch viewBox="0 0 28 8" role="presentation" focusable="false" aria-hidden>
+            <line
+              x1="0"
+              y1="4"
+              x2="28"
+              y2="4"
+              stroke={row.color}
+              strokeWidth={row.strokeWidth}
+              strokeDasharray={"strokeDasharray" in row ? row.strokeDasharray : undefined}
+              strokeLinecap="round"
+            />
+          </HoverTooltipSwatch>
+          <HoverTooltipText>
+            {row.name}: {formatCurrency(row.value)}
+          </HoverTooltipText>
+        </HoverTooltipRow>
+      ))}
+    </HoverTooltipCard>
+  );
+};
+
+export function ProjectionChart({ data, retirementAge, onRetirementAgeChange }: ProjectionChartProps) {
   const [hoveredMarkerId, setHoveredMarkerId] = useState<string | null>(null);
   const [isDraggingRetirementMarker, setIsDraggingRetirementMarker] = useState(false);
   const prefersReducedMotion = usePrefersReducedMotion();
@@ -79,8 +182,6 @@ export function ProjectionChart({ data, targetSpendingData, retirementAge, onRet
     chartRows,
     windfallRows,
     depletionRow,
-    targetSpendingDepletionRow,
-    shouldRenderTargetSpendingDepletion,
     minAge,
     maxAge,
     retirementMarkerBalance,
@@ -90,24 +191,15 @@ export function ProjectionChart({ data, targetSpendingData, retirementAge, onRet
         chartRows: [] as ChartRow[],
         windfallRows: [] as YearlyProjectionEntry[],
         depletionRow: undefined,
-        targetSpendingDepletionRow: undefined,
-        shouldRenderTargetSpendingDepletion: false,
         minAge: retirementAge,
         maxAge: retirementAge,
         retirementMarkerBalance: 0,
       };
     }
 
-    const targetSpendingRowsByAge = new Map(targetSpendingData.map((entry) => [entry.age, entry]));
-    const nextChartRows: ChartRow[] = data.map((entry) => ({
-      ...entry,
-      targetSpendingEndingBalance: targetSpendingRowsByAge.get(entry.age)?.endingBalance ?? null,
-    }));
+    const nextChartRows: ChartRow[] = data;
     const nextWindfallRows = data.filter((entry) => entry.windfallAmount > 0);
-    const nextDepletionRow = data.find((entry) => entry.endingBalance <= 0);
-    const nextTargetSpendingDepletionRow = targetSpendingData.find((entry) => entry.endingBalance <= 0);
-    const nextShouldRenderTargetSpendingDepletion =
-      nextTargetSpendingDepletionRow !== undefined && nextTargetSpendingDepletionRow.age !== nextDepletionRow?.age;
+    const nextDepletionRow = data.find((entry) => entry.isRetired && entry.yearIndex > 0 && entry.endingBalance <= 0);
     const nextMinAge = nextChartRows[0]?.age ?? retirementAge;
     const nextMaxAge = nextChartRows[nextChartRows.length - 1]?.age ?? retirementAge;
     const nearestRetirementRow = nextChartRows.reduce((closest, row) => {
@@ -120,18 +212,14 @@ export function ProjectionChart({ data, targetSpendingData, retirementAge, onRet
       chartRows: nextChartRows,
       windfallRows: nextWindfallRows,
       depletionRow: nextDepletionRow,
-      targetSpendingDepletionRow: nextTargetSpendingDepletionRow,
-      shouldRenderTargetSpendingDepletion: nextShouldRenderTargetSpendingDepletion,
       minAge: nextMinAge,
       maxAge: nextMaxAge,
       retirementMarkerBalance: nearestRetirementRow?.endingBalance ?? 0,
     };
-  }, [data, targetSpendingData, retirementAge]);
+  }, [data, retirementAge]);
 
   const lineAnimationDuration = isDraggingRetirementMarker ? 110 : 240;
   const legendHint = onRetirementAgeChange ? "Drag the retirement marker on the chart to explore ages." : undefined;
-  const legendDescription =
-    "Dark line: main projection in future dollars. Gray dashed line: same path in today's dollars. Teal dashed line: target-spending projection.";
 
   const handleRetirementAgeUpdate = useCallback(
     (activeLabel: MouseHandlerDataParam["activeLabel"]) => {
@@ -241,20 +329,16 @@ export function ProjectionChart({ data, targetSpendingData, retirementAge, onRet
   return (
     <ChartWrapper>
       <LegendRow>
-        <LegendItem>
-          <LegendSwatch $kind="nominal" /> Main projection (future dollars)
-        </LegendItem>
-        <LegendItem>
-          <LegendSwatch $kind="inflation" /> Main projection (today&apos;s dollars)
-        </LegendItem>
-        <LegendItem>
-          <LegendSwatch $kind="target" /> Target-spending projection
-        </LegendItem>
-        <LegendItem>
-          <LegendSwatch $kind="event" /> Timeline markers
-        </LegendItem>
+        {legendItems.map((item) => (
+          <LegendItem key={item.label}>
+            <LegendTitleRow>
+              <LegendSwatch $kind={item.kind} />
+              <LegendTitle>{item.label}</LegendTitle>
+            </LegendTitleRow>
+            <LegendDetail>{item.description}</LegendDetail>
+          </LegendItem>
+        ))}
       </LegendRow>
-      <LegendDescription>{legendDescription}</LegendDescription>
       {legendHint ? <LegendHint>{legendHint}</LegendHint> : null}
       <ChartViewport $dragging={isDraggingRetirementMarker}>
         <ResponsiveContainer width="100%" height="100%" minHeight={286}>
@@ -285,14 +369,7 @@ export function ProjectionChart({ data, targetSpendingData, retirementAge, onRet
               tickFormatter={(value) => compactCurrency.format(value)}
             />
             <Tooltip
-              formatter={(value, name) => {
-                const numericValue = typeof value === "number" ? value : Number(value);
-                return [formatCurrency(Number.isFinite(numericValue) ? numericValue : 0), name];
-              }}
-              labelFormatter={(label) => `Age ${label}`}
-              contentStyle={chartTooltipContentStyle}
-              labelStyle={chartTooltipLabelStyle}
-              itemStyle={chartTooltipItemStyle}
+              content={<ProjectionHoverTooltip />}
               cursor={{ stroke: theme.colors.chartCursor, strokeWidth: 1 }}
             />
             <ReferenceLine
@@ -368,33 +445,17 @@ export function ProjectionChart({ data, targetSpendingData, retirementAge, onRet
                 ifOverflow="visible"
                 tabIndex={0}
                 role="img"
-                aria-label={`Sustainable scenario depletion marker at age ${depletionRow.age}`}
+                aria-label={`Projected balance depletion marker at age ${depletionRow.age}`}
                 label={getDotLabel("depletion", `Portfolio depleted at age ${depletionRow.age}`, "bottom")}
                 {...markerEvents("depletion")}
-              />
-            ) : null}
-            {targetSpendingDepletionRow && shouldRenderTargetSpendingDepletion ? (
-              <ReferenceDot
-                x={targetSpendingDepletionRow.age}
-                y={targetSpendingDepletionRow.endingBalance}
-                r={getMarkerRadius("target-depletion")}
-                fill={theme.colors.chartTarget}
-                stroke={theme.colors.surface}
-                strokeWidth={1.4}
-                ifOverflow="visible"
-                tabIndex={0}
-                role="img"
-                aria-label={`Target-spending scenario depletion marker at age ${targetSpendingDepletionRow.age}`}
-                label={getDotLabel("target-depletion", `Target depleted at age ${targetSpendingDepletionRow.age}`, "top")}
-                {...markerEvents("target-depletion")}
               />
             ) : null}
             <Line
               type="monotone"
               dataKey="endingBalance"
-              name="Main projection (future dollars)"
-              stroke={theme.colors.chartMain}
-              strokeWidth={2.4}
+              name={mainSeries.name}
+              stroke={mainSeries.color}
+              strokeWidth={mainSeries.strokeWidth}
               dot={false}
               activeDot={{ r: 3 }}
               isAnimationActive={!prefersReducedMotion}
@@ -404,26 +465,12 @@ export function ProjectionChart({ data, targetSpendingData, retirementAge, onRet
             <Line
               type="monotone"
               dataKey="inflationAdjustedEndingBalance"
-              name="Main projection (today's dollars)"
-              stroke={theme.colors.chartInflation}
-              strokeWidth={2}
-              strokeDasharray="6 4"
+              name={inflationSeries.name}
+              stroke={inflationSeries.color}
+              strokeWidth={inflationSeries.strokeWidth}
+              strokeDasharray={inflationSeries.strokeDasharray}
               dot={false}
               activeDot={{ r: 3 }}
-              isAnimationActive={!prefersReducedMotion}
-              animationDuration={lineAnimationDuration}
-              animationEasing="ease-out"
-            />
-            <Line
-              type="monotone"
-              dataKey="targetSpendingEndingBalance"
-              name="Target-spending projection"
-              stroke={theme.colors.chartTarget}
-              strokeWidth={2}
-              strokeDasharray="8 4"
-              dot={false}
-              activeDot={{ r: 3 }}
-              connectNulls={false}
               isAnimationActive={!prefersReducedMotion}
               animationDuration={lineAnimationDuration}
               animationEasing="ease-out"
@@ -448,54 +495,100 @@ const ChartViewport = styled.div<{ $dragging: boolean }>`
   height: clamp(286px, 56vw, 336px);
   overflow: visible;
   touch-action: ${(props) => (props.$dragging ? "none" : "pan-y")};
+
+  .recharts-wrapper:focus,
+  .recharts-wrapper:focus-visible,
+  .recharts-surface:focus,
+  .recharts-surface:focus-visible {
+    outline: none;
+  }
 `;
 
 const LegendRow = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 8px;
 `;
 
-const LegendItem = styled.p`
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 0.76rem;
-  color: ${theme.colors.mutedTextStrong};
+const LegendItem = styled.div`
+  display: grid;
+  gap: 6px;
   border: 1px solid ${theme.colors.border};
-  border-radius: ${theme.radii.pill};
-  padding: 5px 10px;
+  border-radius: ${theme.radii.md};
+  padding: 9px 11px;
   background: rgba(255, 255, 255, 0.8);
   min-width: 0;
 `;
 
-const LegendSwatch = styled.span<{ $kind: "nominal" | "inflation" | "target" | "event" }>`
+const LegendTitleRow = styled.p`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+`;
+
+const LegendTitle = styled.span`
+  font-size: 0.8rem;
+  color: ${theme.colors.mutedTextStrong};
+`;
+
+const LegendDetail = styled.p`
+  font-size: 0.76rem;
+  color: ${theme.colors.mutedText};
+  line-height: 1.4;
+`;
+
+const LegendSwatch = styled.span<{ $kind: LegendKind }>`
   width: ${(props) => (props.$kind === "event" ? "8px" : "24px")};
-  height: ${(props) => (props.$kind === "event" ? "8px" : "0")};
-  border-radius: ${(props) => (props.$kind === "event" ? "999px" : "0")};
-  border-top: ${(props) => (props.$kind === "event" ? "none" : "2px solid")};
-  border-top-color: ${(props) =>
-    props.$kind === "nominal"
-      ? theme.colors.chartMain
-      : props.$kind === "inflation"
-        ? theme.colors.chartInflation
-        : props.$kind === "target"
-          ? theme.colors.chartTarget
-          : "transparent"};
-  border-top-style: ${(props) => (props.$kind === "nominal" ? "solid" : "dashed")};
-  background: ${(props) => (props.$kind === "event" ? theme.colors.chartEvent : "transparent")};
+  height: ${(props) => (props.$kind === "event" ? "8px" : "2px")};
+  border-radius: ${(props) => (props.$kind === "event" ? "999px" : "2px")};
+  background-color: ${(props) =>
+    props.$kind === "event"
+      ? theme.colors.chartEvent
+      : props.$kind === "nominal"
+        ? theme.colors.chartMain
+        : "transparent"};
+  background-image: ${(props) =>
+    props.$kind === "inflation"
+      ? `repeating-linear-gradient(to right, ${theme.colors.chartInflation} 0 6px, transparent 6px 14px)`
+      : "none"};
+`;
+
+const HoverTooltipCard = styled.div`
+  border: 1px solid ${theme.colors.borderStrong};
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.96);
+  padding: 10px 12px;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.08);
+`;
+
+const HoverTooltipLabel = styled.p`
+  font-size: 0.78rem;
+  font-weight: 640;
+  color: ${theme.colors.mutedText};
+  margin-bottom: 4px;
+`;
+
+const HoverTooltipRow = styled.p`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-block: 3px;
+`;
+
+const HoverTooltipSwatch = styled.svg`
+  width: 28px;
+  height: 8px;
+  flex-shrink: 0;
+`;
+
+const HoverTooltipText = styled.span`
+  font-size: 0.84rem;
+  color: ${theme.colors.textSecondary};
 `;
 
 const LegendHint = styled.p`
   font-size: 0.77rem;
   color: ${theme.colors.mutedTextStrong};
-  padding-left: 2px;
-`;
-
-const LegendDescription = styled.p`
-  font-size: 0.78rem;
-  color: ${theme.colors.mutedText};
-  line-height: 1.45;
   padding-left: 2px;
 `;
 

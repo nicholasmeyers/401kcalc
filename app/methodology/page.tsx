@@ -10,51 +10,56 @@ import { theme } from "@/styles/theme";
 
 export const metadata: Metadata = {
   title: "401(k) Calculator Methodology",
-  description: "How 401kcalc projects retirement balances, match contributions, and withdrawal readiness with transparent assumptions.",
+  description:
+    "How 401kcalc estimates retirement balances, contribution limits, and retirement spending using editable assumptions.",
   alternates: {
     canonical: "/methodology",
   },
   openGraph: {
     title: "Methodology | 401kcalc",
-    description: "Review the assumptions and projection mechanics used by the 401kcalc retirement calculator.",
+    description: "Review the assumptions and formulas used by the 401kcalc retirement calculator.",
     url: `${siteConfig.url}/methodology`,
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
     title: "401(k) Calculator Methodology",
-    description: "Transparent explanation of projection assumptions and calculation logic.",
+    description: "Clear explanation of projection assumptions and calculation logic.",
   },
 };
 
 const methodologySections = [
   {
     heading: "How the calculator works",
-    body: "The calculator projects yearly 401(k) balances from your current age through life expectancy. It models both a withdrawal-rate retirement path and a fixed target-spending retirement path so you can compare sustainability side by side.",
+    body: "The calculator estimates your 401(k) balance each year from your current age through life expectancy. After retirement age, it models annual withdrawals based on your spending target so you can see whether savings may support your planned lifestyle.",
   },
   {
     heading: "Projection assumptions",
-    body: "Assumptions are explicit, user-editable, and held constant within each scenario unless you change them. The model is intended for directional planning and scenario comparison rather than market prediction.",
+    body: "Every assumption is visible and editable. Unless you change an input, the model keeps that value the same each year. Use it to compare scenarios, not to predict market returns.",
   },
   {
     heading: "Midpoint contribution method",
-    body: "Employee and employer contributions are approximated as arriving throughout the year. To avoid overstating growth from early-year deposits, annual contributions are treated as if they are invested around the middle of each year.",
+    body: "Employee and employer contributions are treated as if they are invested throughout the year. To avoid overstating growth, annual contributions are modeled as arriving around the middle of each year.",
   },
   {
     heading: "Simplified employer match",
-    body: "Employer match is modeled as a simplified formula against salary and contribution rate. Plan-specific rules such as per-paycheck true-up behavior, vesting timelines, and annual cap nuances may differ from your employer plan documents.",
+    body: "Employer match is estimated using a simplified formula based on salary and contribution rate. Plan-specific details such as per-paycheck true-up rules, vesting timelines, and annual cap nuances may differ from your employer plan documents.",
   },
   {
     heading: "Employee contribution cap",
-    body: "Employee contributions are derived from salary and your selected contribution rate, then capped by a configurable annual IRS employee contribution limit in this version. If your selected rate implies a higher annual amount, projections use the capped value.",
+    body: "Employee contributions are calculated from your selected rate, then limited by IRS rules. The model applies the compensation cap, age-based deferral limits (including catch-up and ages 60-63 super catch-up), and the annual combined employee + employer contribution cap.",
   },
   {
-    heading: "Withdrawal rate assumption",
-    body: "Retirement readiness uses an assumed withdrawal rate as a planning heuristic. This is not a guaranteed safe withdrawal level and should be stress-tested against your spending needs, tax context, and retirement timing.",
+    heading: "Retirement spending simulation",
+    body: "After retirement age, the model runs a deterministic year-by-year drawdown. Each retirement year applies portfolio growth first and then subtracts that year’s spending. You can keep spending flat, increase it for inflation each year, and optionally use age-based spending phases (early, mid, and late retirement).",
+  },
+  {
+    heading: "Spending goal durability result",
+    body: "Results are based on your annual retirement spending goal. The calculator reports whether savings last through your selected life expectancy and, if not, the age where the portfolio is projected to run out.",
   },
   {
     heading: "Deterministic projection model",
-    body: "The model is deterministic: each year follows a fixed return and growth path from your selected assumptions. It does not run Monte Carlo simulations or random market paths, so it should be interpreted as a baseline scenario, not a probability forecast.",
+    body: "The calculator assumes the same return and growth pattern each year based on the values you enter. It does not run Monte Carlo simulations or random market paths, so treat the result as a baseline scenario rather than a probability forecast.",
   },
 ];
 
@@ -65,7 +70,7 @@ export default function MethodologyPage() {
     name: "401(k) Calculator Methodology",
     url: `${siteConfig.url}/methodology`,
     description:
-      "How 401kcalc projects retirement balances, match contributions, and withdrawal readiness with transparent assumptions.",
+      "How 401kcalc estimates retirement balances, contribution limits, and spending sustainability using editable assumptions.",
     isPartOf: {
       "@type": "WebSite",
       name: siteConfig.name,
@@ -82,7 +87,7 @@ export default function MethodologyPage() {
           <PageIntro
             eyebrow="Methodology"
             title="How 401kcalc estimates retirement outcomes"
-            description="This page explains the assumptions and formulas used in our calculator. The goal is transparency, not certainty."
+            description="This page explains the assumptions and formulas used in the calculator so you can understand what each estimate is based on."
           />
         </Container>
       </IntroSection>

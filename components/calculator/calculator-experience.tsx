@@ -1,17 +1,19 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import styled from "styled-components";
 
 import { CalculatorForm } from "@/components/calculator/calculator-form";
 import { allInputFields } from "@/components/calculator/field-config";
 import { CalculatorResults } from "@/components/calculator/calculator-results";
-import { defaultCalculatorInputs } from "@/lib/calculator/defaults";
+import {
+  COMPENSATION_LIMIT,
+  defaultCalculatorInputs,
+} from "@/lib/calculator/defaults";
 import { parseLooseNumber } from "@/lib/calculator/input";
 import {
   CalculatorInputError,
   calculateRetirementProjection,
-  getAnnualEmployeeContributionLimit,
   normalizeInputs,
   validateInputs,
 } from "@/lib/calculator/math";
@@ -27,14 +29,14 @@ type DerivedCalculatorState = {
   validationIssues: ValidationIssue[];
   hasFieldErrors: boolean;
   liveResult: RetirementProjectionResult | null;
-  contributionCapNote?: string;
+  salaryCapNote?: string;
   windfallNote?: string;
 };
 
 const fieldMessageMap: Record<string, string> = {
   "currentAge must be a whole number >= 0.": "Use a whole age of 0 or higher.",
   "retirementAge must be a whole number > 0.": "Use a whole retirement age above 0.",
-  "retirementAge must be greater than currentAge.": "Retirement age must be greater than current age.",
+  "retirementAge must be greater than or equal to currentAge.": "Retirement age must be at or after current age.",
   "lifeExpectancy must be a whole number > 0.": "Use a whole life expectancy above 0.",
   "lifeExpectancy must be greater than currentAge.": "Life expectancy must be greater than current age.",
   "lifeExpectancy must be greater than or equal to retirementAge.":
@@ -43,8 +45,11 @@ const fieldMessageMap: Record<string, string> = {
   "annualSalary must be >= 0.": "Salary cannot be negative.",
   "contributionPercent must be between 0 and 100.": "Contribution rate must be between 0% and 100%.",
   "employerMatchPercent must be between 0 and 100.": "Employer match must be between 0% and 100%.",
-  "withdrawalRatePercent must be between 0 and 100.": "Withdrawal rate must be between 0% and 100%.",
   "targetRetirementSpending must be >= 0.": "Target retirement spending cannot be negative.",
+  "earlyRetirementSpendingPercent must be between 0 and 200.": "Early retirement phase must be between 0% and 200%.",
+  "midRetirementSpendingPercent must be between 0 and 200.": "Mid retirement phase must be between 0% and 200%.",
+  "lateRetirementSpendingPercent must be between 0 and 200.": "Late retirement phase must be between 0% and 200%.",
+  "At least one retirement spending phase percent must be above 0.": "Use at least one phase above 0%.",
   "windfallAge must be a whole number >= 0.": "Windfall age must be a whole number of 0 or higher.",
   "windfallAmount must be >= 0.": "Windfall amount cannot be negative.",
   "windfallAge must be greater than currentAge when windfallAmount is > 0.":
@@ -55,6 +60,25 @@ const fieldMessageMap: Record<string, string> = {
   "annualReturnPercent must be greater than -100.": "Annual return must be greater than -100%.",
   "inflationPercent must be greater than -100.": "Inflation must be greater than -100%.",
 };
+
+const CONTRIBUTION_LIMITS_DISCLOSURE = (
+  <details className="calculator-disclosure">
+    <summary>
+      <span>IRS contribution limits apply.</span>
+      <span className="calculator-disclosure-toggle calculator-disclosure-toggle--closed">Show limits</span>
+      <span className="calculator-disclosure-toggle calculator-disclosure-toggle--open">Hide limits</span>
+    </summary>
+    <div className="calculator-disclosure-content">
+      <p>Employee 401(k) contributions are capped by IRS annual limits:</p>
+      <ul>
+        <li>Under 50: $24,500</li>
+        <li>Ages 50-59 and 64+: $32,500</li>
+        <li>Ages 60-63: $35,750</li>
+      </ul>
+      <p>If your selected percentage exceeds the limit, the calculator will cap it automatically.</p>
+    </div>
+  </details>
+);
 
 const initialInputStrings: InputStringState = {
   currentAge: String(defaultCalculatorInputs.currentAge),
@@ -67,8 +91,10 @@ const initialInputStrings: InputStringState = {
   annualSalaryGrowthPercent: String(defaultCalculatorInputs.annualSalaryGrowthPercent),
   annualReturnPercent: String(defaultCalculatorInputs.annualReturnPercent),
   inflationPercent: String(defaultCalculatorInputs.inflationPercent),
-  withdrawalRatePercent: String(defaultCalculatorInputs.withdrawalRatePercent),
   targetRetirementSpending: defaultCalculatorInputs.targetRetirementSpending.toLocaleString("en-US"),
+  earlyRetirementSpendingPercent: String(defaultCalculatorInputs.earlyRetirementSpendingPercent),
+  midRetirementSpendingPercent: String(defaultCalculatorInputs.midRetirementSpendingPercent),
+  lateRetirementSpendingPercent: String(defaultCalculatorInputs.lateRetirementSpendingPercent),
   windfallAge: String(defaultCalculatorInputs.windfallAge),
   windfallAmount: defaultCalculatorInputs.windfallAmount.toLocaleString("en-US"),
 };
@@ -77,6 +103,10 @@ const toFriendlyIssueMessage = (issue: ValidationIssue): string => fieldMessageM
 
 export function CalculatorExperience() {
   const [inputValues, setInputValues] = useState<InputStringState>(initialInputStrings);
+  const [retirementSpendingInflationAdjusted, setRetirementSpendingInflationAdjusted] = useState(
+    defaultCalculatorInputs.retirementSpendingInflationAdjusted
+  );
+  const [ageBasedSpendingEnabled, setAgeBasedSpendingEnabled] = useState(defaultCalculatorInputs.ageBasedSpendingEnabled);
   const lastValidResultRef = useRef<RetirementProjectionResult>(
     calculateRetirementProjection(defaultCalculatorInputs)
   );
@@ -99,7 +129,11 @@ export function CalculatorExperience() {
       numericValues[field] = parsed;
     }
 
-    const normalizedInputs = normalizeInputs(numericValues);
+    const normalizedInputs = normalizeInputs({
+      ...numericValues,
+      retirementSpendingInflationAdjusted,
+      ageBasedSpendingEnabled,
+    });
     const validationIssues = validateInputs(normalizedInputs);
     const fieldErrors: FieldErrorMap = { ...parseErrors };
 
@@ -126,23 +160,16 @@ export function CalculatorExperience() {
       }
     }
 
-    const requestedCurrentYearEmployeeContribution =
-      numericValues.annualSalary !== undefined &&
-      numericValues.contributionPercent !== undefined &&
-      numericValues.annualSalary >= 0 &&
-      numericValues.contributionPercent >= 0
-        ? numericValues.annualSalary * (numericValues.contributionPercent / 100)
-        : null;
-
-    const nextYearAge = Math.floor(normalizedInputs.currentAge) + 1;
-    const currentYearEmployeeContributionLimit = getAnnualEmployeeContributionLimit(nextYearAge);
-    const contributionCapNote =
-      requestedCurrentYearEmployeeContribution !== null &&
-      requestedCurrentYearEmployeeContribution > currentYearEmployeeContributionLimit
-        ? `This contribution rate is above the estimated IRS employee limit for next year (${formatCurrency(
-            currentYearEmployeeContributionLimit
-          )}). Projections cap employee contributions at that amount.`
-        : undefined;
+    const firstCompensationLimitYear = liveResult?.yearlyProjection.find(
+      (entry) => entry.yearIndex > 0 && !entry.isRetired && entry.compensationLimitApplied
+    );
+    const salaryCapNote = firstCompensationLimitYear
+      ? `IRS compensation cap applied at age ${firstCompensationLimitYear.age}: contribution percentages use up to ${formatCurrency(
+          COMPENSATION_LIMIT
+        )} of pay. Your modeled salary of ${formatCurrency(
+          firstCompensationLimitYear.salary
+        )} is adjusted to ${formatCurrency(firstCompensationLimitYear.salaryUsedForContributionCalculations)}.`
+      : undefined;
 
     const windfallNote =
       numericValues.windfallAmount !== undefined &&
@@ -159,17 +186,18 @@ export function CalculatorExperience() {
       validationIssues,
       hasFieldErrors,
       liveResult,
-      contributionCapNote,
+      salaryCapNote,
       windfallNote,
     };
-  }, [inputValues]);
+  }, [ageBasedSpendingEnabled, inputValues, retirementSpendingInflationAdjusted]);
 
-  const fieldNotes = useMemo<Partial<Record<InputField, string>>>(
+  const fieldNotes = useMemo<Partial<Record<InputField, ReactNode>>>(
     () => ({
-      ...(derivedState.contributionCapNote ? { contributionPercent: derivedState.contributionCapNote } : {}),
+      contributionPercent: CONTRIBUTION_LIMITS_DISCLOSURE,
+      ...(derivedState.salaryCapNote ? { annualSalary: derivedState.salaryCapNote } : {}),
       ...(derivedState.windfallNote ? { windfallAmount: derivedState.windfallNote } : {}),
     }),
-    [derivedState.contributionCapNote, derivedState.windfallNote]
+    [derivedState.salaryCapNote, derivedState.windfallNote]
   );
 
   const statusMessage =
@@ -203,9 +231,12 @@ export function CalculatorExperience() {
     const signature = [
       derivedState.liveResult.retirementAge,
       derivedState.liveResult.lifeExpectancy,
-      Math.round(derivedState.liveResult.finalBalance),
-      Math.round(derivedState.liveResult.inflationAdjustedBalance),
+      Math.round(derivedState.liveResult.projectedBalanceAtLifeExpectancy),
+      Math.round(derivedState.liveResult.projectedBalanceAtLifeExpectancyTodayDollars),
       Math.round(derivedState.liveResult.targetRetirementSpending),
+      derivedState.liveResult.supportsSpendingGoal ? 1 : 0,
+      derivedState.liveResult.ageBasedSpendingEnabled ? 1 : 0,
+      derivedState.liveResult.retirementSpendingInflationAdjusted ? 1 : 0,
     ].join("|");
 
     if (!projectionTrackingInitializedRef.current) {
@@ -268,7 +299,7 @@ export function CalculatorExperience() {
       const parsedLifeExpectancy = parseLooseNumber(current.lifeExpectancy);
       const parsedRetirementAge = parseLooseNumber(current.retirementAge);
       const fallbackResult = lastValidResultRef.current;
-      const minimumAge = Math.floor(parsedCurrentAge ?? fallbackResult.currentAge) + 1;
+      const minimumAge = Math.floor(parsedCurrentAge ?? fallbackResult.currentAge);
       const maximumAge = Math.floor(parsedLifeExpectancy ?? fallbackResult.lifeExpectancy);
       const boundedAge = Math.max(minimumAge, Math.min(Math.floor(nextRetirementAge), maximumAge));
       const nextRetirementAgeValue = String(boundedAge);
@@ -294,6 +325,16 @@ export function CalculatorExperience() {
     }
   }, []);
 
+  const handleAgeBasedSpendingEnabledChange = useCallback((enabled: boolean) => {
+    setAgeBasedSpendingEnabled(enabled);
+    trackEvent("calculator_input_change", { field: "ageBasedSpendingEnabled" });
+  }, []);
+
+  const handleRetirementSpendingInflationAdjustedChange = useCallback((enabled: boolean) => {
+    setRetirementSpendingInflationAdjusted(enabled);
+    trackEvent("calculator_input_change", { field: "retirementSpendingInflationAdjusted" });
+  }, []);
+
   return (
     <Layout>
       <FormColumn>
@@ -301,7 +342,12 @@ export function CalculatorExperience() {
           values={inputValues}
           errors={derivedState.fieldErrors}
           fieldNotes={fieldNotes}
+          ageBasedSpendingEnabled={ageBasedSpendingEnabled}
+          retirementSpendingInflationAdjusted={retirementSpendingInflationAdjusted}
+          retirementAge={displayedResult.retirementAge}
           onFieldChange={handleFieldChange}
+          onAgeBasedSpendingEnabledChange={handleAgeBasedSpendingEnabledChange}
+          onRetirementSpendingInflationAdjustedChange={handleRetirementSpendingInflationAdjustedChange}
         />
       </FormColumn>
       <ResultsColumn aria-live="polite">
