@@ -8,6 +8,7 @@ import {
   type ClipboardEvent,
   type FormEvent,
   type KeyboardEvent,
+  type ReactNode,
 } from "react";
 import styled, { css } from "styled-components";
 
@@ -25,7 +26,7 @@ type CalculatorFieldProps = {
   config: CalculatorFieldConfig;
   value: string;
   error?: string;
-  note?: string;
+  note?: ReactNode;
   onValueChange: (field: InputField, nextValue: string) => void;
 };
 
@@ -284,7 +285,7 @@ const SliderScale = styled.p`
   color: ${theme.colors.mutedText};
 `;
 
-const NoteText = styled.p`
+const NoteText = styled.div`
   font-size: 0.8rem;
   line-height: 1.45;
   color: ${theme.colors.mutedTextStrong};

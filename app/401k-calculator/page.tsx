@@ -12,14 +12,14 @@ import { theme } from "@/styles/theme";
 export const metadata: Metadata = {
   title: "401(k) Retirement Calculator",
   description:
-    "Estimate your 401(k) balance, income potential, and retirement timeline with transparent assumptions and dual projection scenarios.",
+    "Estimate how much your 401(k) could grow and whether your annual retirement spending goal may last through life expectancy.",
   alternates: {
     canonical: "/401k-calculator",
   },
   openGraph: {
     title: "401(k) Retirement Calculator | 401kcalc",
     description:
-      "Run a transparent 401(k) projection, compare retirement outcomes, and adjust assumptions in real time.",
+      "Test assumptions and estimate projected balance and retirement spending longevity.",
     url: `${siteConfig.url}/401k-calculator`,
     type: "website",
   },
@@ -27,7 +27,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "401(k) Retirement Calculator",
     description:
-      "Project your 401(k) balance, retirement income, and timeline with adjustable assumptions.",
+      "Estimate projected balance and whether savings may last through retirement spending years.",
   },
 };
 
@@ -40,7 +40,7 @@ export default function CalculatorPage() {
     applicationCategory: "FinanceApplication",
     url: `${siteConfig.url}/401k-calculator`,
     description:
-      "Interactive web calculator for 401(k) retirement projections with editable assumptions and scenario comparisons.",
+      "Interactive 401(k) calculator that estimates projected balance and retirement spending longevity based on your assumptions.",
     offers: {
       "@type": "Offer",
       price: "0",
@@ -52,10 +52,11 @@ export default function CalculatorPage() {
       url: siteConfig.url,
     },
     featureList: [
-      "Dual retirement projection scenarios",
+      "Projected balance over time",
+      "Annual retirement spending goal simulation",
       "Inflation-adjusted balance view",
       "Interactive retirement age marker",
-      "Target retirement spending scenario",
+      "Year-by-year retirement drawdown simulation",
     ],
   };
 
@@ -88,9 +89,9 @@ export default function CalculatorPage() {
           <PageIntro
             eyebrow="Calculator"
             title="401(k) Calculator"
-            description="Model your retirement path with clear assumptions, real-time updates, and projection outputs designed for fast decision-making."
+            description="Enter your assumptions to estimate projected balance and whether your annual retirement spending goal may last through retirement."
           >
-            <MethodologyLink href="/methodology">How we calculate projections {"\u2192"}</MethodologyLink>
+            <MethodologyLink href="/methodology">How these estimates are calculated {"\u2192"}</MethodologyLink>
           </PageIntro>
         </Container>
       </IntroSection>

@@ -5,7 +5,6 @@ import styled from "styled-components";
 
 import { AnimatedNumber } from "@/components/calculator/animated-number";
 import { CalculatorSummaryCard } from "@/components/calculator/calculator-summary-card";
-import { ContextualInfoTooltip } from "@/components/ui/info-tooltip";
 import { SurfaceCard } from "@/components/ui/primitives";
 import { formatCurrency } from "@/lib/calculator/format";
 import type { RetirementProjectionResult } from "@/lib/calculator/types";
@@ -19,17 +18,6 @@ type CalculatorResultsProps = {
 
 type OutcomeState = "positive" | "caution" | "negative";
 type OutcomePalette = { surface: string; border: string; text: string };
-type SummaryHighlightCard = {
-  label: string;
-  value: number;
-  tone?: "default" | "hero";
-  tooltip?: string;
-  supportingCopy?: string;
-};
-type SummaryBreakdownCard = {
-  label: string;
-  value: number;
-};
 
 const formatAge = (value: number) => String(Math.max(0, Math.round(value)));
 const outcomePalettes: Record<OutcomeState, OutcomePalette> = {
@@ -56,10 +44,10 @@ const getOutcomeStateLabel = (state: OutcomeState): string => {
   }
 
   if (state === "caution") {
-    return "Narrow buffer";
+    return "Tight margin";
   }
 
-  return "Runs out early";
+  return "Needs changes";
 };
 
 const getOutcomeState = (isSuccessful: boolean, bufferYears: number): OutcomeState => {
@@ -87,120 +75,110 @@ const ProjectionChart = dynamic(
 export function CalculatorResults({ result, statusMessage, onRetirementAgeChange }: CalculatorResultsProps) {
   const totalContributions =
     result.totalEmployeeContributions + result.totalEmployerContributions + result.totalWindfallContributions;
-  const targetSpendingFinalBalance = result.targetSpendingProjection.at(-1)?.endingBalance ?? 0;
-  const sustainableBufferYears =
-    result.estimatedAnnualRetirementIncome > 0
-      ? result.finalBalance / result.estimatedAnnualRetirementIncome
-      : Number.POSITIVE_INFINITY;
   const targetBufferYears =
     result.targetRetirementSpending > 0
-      ? targetSpendingFinalBalance / result.targetRetirementSpending
+      ? result.projectedBalanceAtLifeExpectancy / result.targetRetirementSpending
       : Number.POSITIVE_INFINITY;
 
-  const sustainableOutcomeState = getOutcomeState(result.retirementSuccessful, sustainableBufferYears);
-  const targetOutcomeState = getOutcomeState(result.targetSpendingRetirementSuccessful, targetBufferYears);
-  const highlightCards: SummaryHighlightCard[] = [
-    {
-      label: `Projected balance at age ${result.lifeExpectancy}`,
-      value: result.finalBalance,
-      tone: "hero",
-      supportingCopy: "Main projection in future dollars.",
-    },
-    {
-      label: `Balance in today's dollars at age ${result.lifeExpectancy}`,
-      value: result.inflationAdjustedBalance,
-      tooltip: "The value of your savings expressed in today's dollars after accounting for inflation.",
-    },
-    {
-      label: "Estimated first-year retirement income from savings",
-      value: result.estimatedAnnualRetirementIncome,
-      tooltip: "Estimated withdrawal amount from savings in your first retirement year under the withdrawal-rate scenario.",
-    },
-  ];
-  const breakdownCards: SummaryBreakdownCard[] = [
-    { label: "Total contributions made", value: totalContributions },
+  const outlookState = getOutcomeState(result.lastsThroughLifeExpectancy, targetBufferYears);
+
+  const additionalDetailCards = [
+    { label: "Employee contributions", value: result.totalEmployeeContributions },
     { label: "Employer match contributions", value: result.totalEmployerContributions },
+    { label: "Total contributions", value: totalContributions },
     { label: "Total investment growth", value: result.totalInvestmentGrowth },
   ];
 
   if (result.totalWindfallContributions > 0) {
-    breakdownCards.splice(2, 0, { label: "Windfall contributions", value: result.totalWindfallContributions });
+    additionalDetailCards.splice(2, 0, { label: "Windfall contributions", value: result.totalWindfallContributions });
   }
 
   return (
     <ResultsStack>
       {statusMessage ? <StatusBanner>{statusMessage}</StatusBanner> : null}
 
-      <OutcomeCard $state={sustainableOutcomeState}>
+      <OutcomeCard $state={outlookState}>
         <OutcomeTitleRow>
-          <OutcomeTitle>Retirement outlook</OutcomeTitle>
-          <OutcomePill $state={sustainableOutcomeState}>{getOutcomeStateLabel(sustainableOutcomeState)}</OutcomePill>
+          <OutcomeTitle>Will your spending goal last through retirement?</OutcomeTitle>
+          <OutcomePill $state={outlookState}>{getOutcomeStateLabel(outlookState)}</OutcomePill>
         </OutcomeTitleRow>
         <OutcomeText>
-          Your savings are projected to {result.retirementSuccessful ? "last through age " : "run out around age "}
-          <AnimatedNumber value={result.portfolioLastsUntilAge} formatValue={formatAge} />.
+          {result.supportsSpendingGoal ? (
+            <>
+              Your plan supports
+              {" "}
+              <AnimatedNumber value={result.targetRetirementSpending} formatValue={formatCurrency} />
+              {" "}
+              per year through age
+              {" "}
+              <AnimatedNumber value={result.lifeExpectancy} formatValue={formatAge} />
+              .
+            </>
+          ) : (
+            <>
+              At
+              {" "}
+              <AnimatedNumber value={result.targetRetirementSpending} formatValue={formatCurrency} />
+              {" "}
+              per year, savings are projected to run out around age
+              {" "}
+              <AnimatedNumber value={result.depletionAge ?? result.portfolioLastsUntilAge} formatValue={formatAge} />
+              .
+            </>
+          )}
         </OutcomeText>
         <OutcomeSubtext>
-          This view uses your withdrawal-rate plan with annual withdrawals estimated at
-          {" "}
-          <AnimatedNumber value={result.estimatedAnnualRetirementIncome} formatValue={formatCurrency} />
-          {" "}
-          in the first retirement year.
+          {result.retirementSpendingInflationAdjusted
+            ? "Spending is modeled in today's dollars and increased with inflation each retirement year."
+            : "Spending is modeled as a flat nominal annual amount in retirement."}
         </OutcomeSubtext>
       </OutcomeCard>
 
-      <OutcomeCard $state={targetOutcomeState}>
-        <OutcomeTitleRow>
-          <OutcomeTitle>Target spending outcome</OutcomeTitle>
-          <OutcomePill $state={targetOutcomeState}>{getOutcomeStateLabel(targetOutcomeState)}</OutcomePill>
-          <ContextualInfoTooltip
-            label="Target spending outcome"
-            content="Shows how long savings last when you withdraw your target annual spending each retirement year."
-          />
-        </OutcomeTitleRow>
-        <OutcomeText>
-          At
-          {" "}
-          <AnimatedNumber value={result.targetRetirementSpending} formatValue={formatCurrency} />
-          {" "}
-          per year, savings are projected to
-          {" "}
-          {result.targetSpendingRetirementSuccessful ? "last through age " : "run out around age "}
-          <AnimatedNumber value={result.targetSpendingPortfolioLastsUntilAge} formatValue={formatAge} />.
-        </OutcomeText>
-        <OutcomeSubtext>
-          This scenario tests a fixed annual spending amount instead of a percentage-based withdrawal.
-        </OutcomeSubtext>
-      </OutcomeCard>
-
-      <PeakSummaryCard>
-        <PeakTitle>Peak portfolio summary</PeakTitle>
-        <PeakValue>
-          <AnimatedNumber value={result.peakBalance} formatValue={formatCurrency} />
-        </PeakValue>
-        <PeakCopy>
-          Main projection peaks near age {result.peakBalanceAge}. Under target spending, the peak is
-          {" "}
-          {formatCurrency(result.targetSpendingPeakBalance)} at age {result.targetSpendingPeakBalanceAge}.
-        </PeakCopy>
-      </PeakSummaryCard>
-
-      <SectionLabel>Key summary</SectionLabel>
       <HighlightsGrid>
-        {highlightCards.map((card) => (
-          <CalculatorSummaryCard
-            key={card.label}
-            tone={card.tone}
-            label={card.label}
-            value={toAnimatedCurrencyValue(card.value)}
-            tooltip={card.tooltip}
-            supportingCopy={card.supportingCopy}
-          />
-        ))}
+        <CalculatorSummaryCard
+          tone="hero"
+          label="Annual retirement spending goal"
+          value={toAnimatedCurrencyValue(result.targetRetirementSpending)}
+          supportingCopy={
+            result.retirementSpendingInflationAdjusted
+              ? "Interpreted in today's dollars and inflated in retirement years."
+              : "Treated as a fixed nominal withdrawal each retirement year."
+          }
+        />
+
+        <CalculatorSummaryCard
+          label={`Projected balance at age ${result.lifeExpectancy}`}
+          value={toAnimatedCurrencyValue(result.projectedBalanceAtLifeExpectancy)}
+          supportingCopy={`≈ ${formatCurrency(
+            result.projectedBalanceAtLifeExpectancyTodayDollars
+          )} in today’s dollars (adjusted for inflation).`}
+          tooltip="Ending projected portfolio value at the end of your planning horizon."
+        />
+
+        <CalculatorSummaryCard
+          label={`Projected balance at retirement age ${result.retirementAge}`}
+          value={toAnimatedCurrencyValue(result.projectedBalanceAtRetirement)}
+          supportingCopy={`Approx. ${formatCurrency(
+            result.inflationAdjustedBalanceAtRetirement
+          )} in today's dollars (adjusted for inflation).`}
+        />
+
+        <CalculatorSummaryCard
+          label={result.supportsSpendingGoal ? "Savings projected to last through age" : "Savings projected to run out around age"}
+          value={<AnimatedNumber value={result.portfolioLastsUntilAge} formatValue={formatAge} />}
+          supportingCopy={
+            result.supportsSpendingGoal
+              ? `${result.retirementYearsFunded} of ${result.totalRetirementYears} retirement years are fully funded. Minimum post-retirement balance: ${formatCurrency(
+                  result.minimumPostRetirementBalance
+                )}.`
+              : `Estimated spending shortfall in depletion year: ${formatCurrency(result.finalShortfallAmount)}.`
+          }
+        />
       </HighlightsGrid>
 
+      <SectionLabel>Breakdown</SectionLabel>
       <BreakdownGrid>
-        {breakdownCards.map((card) => (
+        {additionalDetailCards.map((card) => (
           <CalculatorSummaryCard key={card.label} label={card.label} value={formatCurrency(card.value)} />
         ))}
       </BreakdownGrid>
@@ -209,22 +187,29 @@ export function CalculatorResults({ result, statusMessage, onRetirementAgeChange
         <ChartHeader>
           <ChartTitle>Projection chart</ChartTitle>
           <ChartSubtitle>
-            Compare your main projection, inflation-adjusted purchasing power, and target-spending scenario over time.
+            Shows projected balance and projected balance in today’s dollars year by year through retirement.
           </ChartSubtitle>
         </ChartHeader>
         <ProjectionChart
           data={result.yearlyProjection}
-          targetSpendingData={result.targetSpendingProjection}
           retirementAge={result.retirementAge}
           onRetirementAgeChange={onRetirementAgeChange}
         />
       </ChartCard>
 
       <Methodology>
-        Deterministic annual projection with midpoint contribution timing. Employer match is modeled as a flat percent
-        of salary, employee contributions follow configured IRS limits, and windfalls are applied at the chosen age.
-        Retirement withdrawals start at retirement age under either a withdrawal-rate plan or a fixed target-spending
-        plan. Taxes are not modeled.
+        These estimates assume yearly contributions and investment returns based on your inputs. Employee
+        contributions follow IRS limits (including catch-up limits), and employer match is estimated as a flat
+        percentage of salary up to a compensation cap of {formatCurrency(result.compensationLimit)}.
+        {" "}
+        Spending is simulated year by year from retirement age through age {result.lifeExpectancy}
+        {result.ageBasedSpendingEnabled
+          ? ` using age-based spending phases (${result.spendingPhasePercents.earlyRetirement}% through age 74, ${result.spendingPhasePercents.midRetirement}% ages 75-84, ${result.spendingPhasePercents.lateRetirement}% age 85+).`
+          : " using a fixed annual spending amount."}
+        {result.retirementSpendingInflationAdjusted
+          ? " The annual spending goal is treated in today's dollars and increases with inflation each retirement year."
+          : " Spending stays flat year to year."}
+        {" "}Taxes are not included.
       </Methodology>
     </ResultsStack>
   );
@@ -295,36 +280,6 @@ const OutcomePill = styled.span<{ $state: OutcomeState }>`
   border: 1px solid ${(props) => outcomePalettes[props.$state].border};
   color: ${(props) => outcomePalettes[props.$state].text};
   background: rgba(255, 255, 255, 0.72);
-`;
-
-const PeakSummaryCard = styled(SurfaceCard)`
-  padding: 18px;
-  display: grid;
-  gap: 8px;
-  border-color: ${theme.colors.elevatedBorder};
-  background: ${theme.colors.elevatedGradient};
-`;
-
-const PeakTitle = styled.p`
-  font-size: 0.78rem;
-  font-weight: 640;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: ${theme.colors.mutedTextStrong};
-`;
-
-const PeakValue = styled.p`
-  font-size: clamp(1.75rem, 3.4vw, 2.4rem);
-  line-height: 1.12;
-  letter-spacing: -0.02em;
-  color: ${theme.colors.text};
-  font-weight: 650;
-`;
-
-const PeakCopy = styled.p`
-  font-size: 0.86rem;
-  line-height: 1.5;
-  color: ${theme.colors.mutedTextStrong};
 `;
 
 const SectionLabel = styled.h3`

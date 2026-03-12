@@ -1,12 +1,18 @@
 import {
   CATCH_UP_CONTRIBUTION_LIMIT,
+  COMPENSATION_LIMIT,
   DEFAULT_ANNUAL_EMPLOYEE_CONTRIBUTION_LIMIT,
+  SUPER_CATCH_UP_CONTRIBUTION_LIMIT,
+  TOTAL_CONTRIBUTION_LIMIT,
   defaultCalculatorInputs,
 } from "@/lib/calculator/defaults";
 import type {
   CalculatorInputs,
+  EmployeeContributionCapReason,
+  EmployeeContributionLimitKind,
   InputField,
   NormalizedCalculatorInputs,
+  RetirementWithdrawalEntry,
   RetirementProjectionResult,
   ValidationIssue,
   YearlyProjectionEntry,
@@ -16,6 +22,11 @@ const PERCENT_SCALE = 100;
 const MIDPOINT_CONTRIBUTION_FACTOR = 0.5;
 const MIN_RATE_PERCENT = -100;
 const CATCH_UP_ELIGIBLE_AGE = 50;
+const SUPER_CATCH_UP_MIN_AGE = 60;
+const SUPER_CATCH_UP_MAX_AGE = 63;
+const EARLY_RETIREMENT_PHASE_END_AGE = 74;
+const MID_RETIREMENT_PHASE_END_AGE = 84;
+const CURRENCY_EPSILON = 0.01;
 
 const INPUT_FIELDS: InputField[] = [
   "currentAge",
@@ -28,8 +39,10 @@ const INPUT_FIELDS: InputField[] = [
   "annualSalaryGrowthPercent",
   "annualReturnPercent",
   "inflationPercent",
-  "withdrawalRatePercent",
   "targetRetirementSpending",
+  "earlyRetirementSpendingPercent",
+  "midRetirementSpendingPercent",
+  "lateRetirementSpendingPercent",
   "windfallAge",
   "windfallAmount",
 ];
@@ -46,6 +59,18 @@ export class CalculatorInputError extends Error {
 
 const toFiniteNumber = (value: unknown, fallback: number): number =>
   typeof value === "number" && Number.isFinite(value) ? value : fallback;
+
+const toBoolean = (value: unknown, fallback: boolean): boolean => {
+  if (typeof value === "boolean") {
+    return value;
+  }
+
+  if (typeof value === "number" && Number.isFinite(value)) {
+    return value !== 0;
+  }
+
+  return fallback;
+};
 
 const toRate = (percent: number): number => percent / PERCENT_SCALE;
 
@@ -70,10 +95,26 @@ export const normalizeInputs = (rawInputs: Partial<CalculatorInputs> = {}): Norm
   ),
   annualReturnPercent: toFiniteNumber(rawInputs.annualReturnPercent, defaultCalculatorInputs.annualReturnPercent),
   inflationPercent: toFiniteNumber(rawInputs.inflationPercent, defaultCalculatorInputs.inflationPercent),
-  withdrawalRatePercent: toFiniteNumber(rawInputs.withdrawalRatePercent, defaultCalculatorInputs.withdrawalRatePercent),
   targetRetirementSpending: toFiniteNumber(
     rawInputs.targetRetirementSpending,
     defaultCalculatorInputs.targetRetirementSpending
+  ),
+  retirementSpendingInflationAdjusted: toBoolean(
+    rawInputs.retirementSpendingInflationAdjusted,
+    defaultCalculatorInputs.retirementSpendingInflationAdjusted
+  ),
+  ageBasedSpendingEnabled: toBoolean(rawInputs.ageBasedSpendingEnabled, defaultCalculatorInputs.ageBasedSpendingEnabled),
+  earlyRetirementSpendingPercent: toFiniteNumber(
+    rawInputs.earlyRetirementSpendingPercent,
+    defaultCalculatorInputs.earlyRetirementSpendingPercent
+  ),
+  midRetirementSpendingPercent: toFiniteNumber(
+    rawInputs.midRetirementSpendingPercent,
+    defaultCalculatorInputs.midRetirementSpendingPercent
+  ),
+  lateRetirementSpendingPercent: toFiniteNumber(
+    rawInputs.lateRetirementSpendingPercent,
+    defaultCalculatorInputs.lateRetirementSpendingPercent
   ),
   windfallAge: toFiniteNumber(rawInputs.windfallAge, defaultCalculatorInputs.windfallAge),
   windfallAmount: toFiniteNumber(rawInputs.windfallAmount, defaultCalculatorInputs.windfallAmount),
@@ -96,8 +137,8 @@ export const validateInputs = (inputs: NormalizedCalculatorInputs): ValidationIs
     issues.push({ field: "retirementAge", message: "retirementAge must be a whole number > 0." });
   }
 
-  if (inputs.retirementAge <= inputs.currentAge) {
-    issues.push({ field: "retirementAge", message: "retirementAge must be greater than currentAge." });
+  if (inputs.retirementAge < inputs.currentAge) {
+    issues.push({ field: "retirementAge", message: "retirementAge must be greater than or equal to currentAge." });
   }
 
   if (!Number.isInteger(inputs.lifeExpectancy) || inputs.lifeExpectancy <= 0) {
@@ -128,12 +169,41 @@ export const validateInputs = (inputs: NormalizedCalculatorInputs): ValidationIs
     issues.push({ field: "employerMatchPercent", message: "employerMatchPercent must be between 0 and 100." });
   }
 
-  if (inputs.withdrawalRatePercent < 0 || inputs.withdrawalRatePercent > PERCENT_SCALE) {
-    issues.push({ field: "withdrawalRatePercent", message: "withdrawalRatePercent must be between 0 and 100." });
-  }
-
   if (inputs.targetRetirementSpending < 0) {
     issues.push({ field: "targetRetirementSpending", message: "targetRetirementSpending must be >= 0." });
+  }
+
+  if (inputs.earlyRetirementSpendingPercent < 0 || inputs.earlyRetirementSpendingPercent > 200) {
+    issues.push({
+      field: "earlyRetirementSpendingPercent",
+      message: "earlyRetirementSpendingPercent must be between 0 and 200.",
+    });
+  }
+
+  if (inputs.midRetirementSpendingPercent < 0 || inputs.midRetirementSpendingPercent > 200) {
+    issues.push({
+      field: "midRetirementSpendingPercent",
+      message: "midRetirementSpendingPercent must be between 0 and 200.",
+    });
+  }
+
+  if (inputs.lateRetirementSpendingPercent < 0 || inputs.lateRetirementSpendingPercent > 200) {
+    issues.push({
+      field: "lateRetirementSpendingPercent",
+      message: "lateRetirementSpendingPercent must be between 0 and 200.",
+    });
+  }
+
+  if (
+    inputs.ageBasedSpendingEnabled &&
+    inputs.earlyRetirementSpendingPercent <= 0 &&
+    inputs.midRetirementSpendingPercent <= 0 &&
+    inputs.lateRetirementSpendingPercent <= 0
+  ) {
+    issues.push({
+      field: "lateRetirementSpendingPercent",
+      message: "At least one retirement spending phase percent must be above 0.",
+    });
   }
 
   if (!Number.isInteger(inputs.windfallAge) || inputs.windfallAge < 0) {
@@ -178,11 +248,47 @@ export const validateInputs = (inputs: NormalizedCalculatorInputs): ValidationIs
 
 export const calculateEmployerContribution = (salary: number, employerMatchRate: number): number => salary * employerMatchRate;
 
+type EmployeeContributionLimitDetails = {
+  annualLimit: number;
+  limitKind: EmployeeContributionLimitKind;
+  catchUpAmount: number;
+};
+
+const getEmployeeContributionLimitDetails = (
+  age: number,
+  baseLimit = DEFAULT_ANNUAL_EMPLOYEE_CONTRIBUTION_LIMIT,
+  catchUpLimit = CATCH_UP_CONTRIBUTION_LIMIT,
+  superCatchUpLimit = SUPER_CATCH_UP_CONTRIBUTION_LIMIT
+): EmployeeContributionLimitDetails => {
+  if (age >= SUPER_CATCH_UP_MIN_AGE && age <= SUPER_CATCH_UP_MAX_AGE) {
+    return {
+      annualLimit: baseLimit + superCatchUpLimit,
+      limitKind: "super-catch-up",
+      catchUpAmount: superCatchUpLimit,
+    };
+  }
+
+  if (age >= CATCH_UP_ELIGIBLE_AGE) {
+    return {
+      annualLimit: baseLimit + catchUpLimit,
+      limitKind: "catch-up",
+      catchUpAmount: catchUpLimit,
+    };
+  }
+
+  return {
+    annualLimit: baseLimit,
+    limitKind: "base",
+    catchUpAmount: 0,
+  };
+};
+
 export const getAnnualEmployeeContributionLimit = (
   age: number,
   baseLimit = DEFAULT_ANNUAL_EMPLOYEE_CONTRIBUTION_LIMIT,
-  catchUpLimit = CATCH_UP_CONTRIBUTION_LIMIT
-): number => baseLimit + (age >= CATCH_UP_ELIGIBLE_AGE ? catchUpLimit : 0);
+  catchUpLimit = CATCH_UP_CONTRIBUTION_LIMIT,
+  superCatchUpLimit = SUPER_CATCH_UP_CONTRIBUTION_LIMIT
+): number => getEmployeeContributionLimitDetails(age, baseLimit, catchUpLimit, superCatchUpLimit).annualLimit;
 
 export const calculateEmployeeContribution = (
   salary: number,
@@ -208,29 +314,53 @@ export const calculateInflationAdjustedValue = (value: number, annualInflationRa
   return value / inflationFactor;
 };
 
+const getRetirementSpendingPhaseMultiplier = (inputs: NormalizedCalculatorInputs, age: number): number => {
+  if (!inputs.ageBasedSpendingEnabled) {
+    return 1;
+  }
+
+  if (age <= EARLY_RETIREMENT_PHASE_END_AGE) {
+    return Math.max(0, inputs.earlyRetirementSpendingPercent) / PERCENT_SCALE;
+  }
+
+  if (age <= MID_RETIREMENT_PHASE_END_AGE) {
+    return Math.max(0, inputs.midRetirementSpendingPercent) / PERCENT_SCALE;
+  }
+
+  return Math.max(0, inputs.lateRetirementSpendingPercent) / PERCENT_SCALE;
+};
+
 type ProjectionScenarioResult = {
+  projectedBalanceAtRetirement: number;
+  inflationAdjustedBalanceAtRetirement: number;
   finalBalance: number;
   inflationAdjustedBalance: number;
   employeeContributionCapped: boolean;
   catchUpContributionApplied: boolean;
+  compensationLimitApplied: boolean;
+  totalContributionLimitApplied: boolean;
   totalRequestedEmployeeContributions: number;
   totalEmployeeContributions: number;
   totalEmployerContributions: number;
   totalWindfallContributions: number;
   totalInvestmentGrowth: number;
-  estimatedAnnualRetirementIncome: number;
-  peakBalance: number;
-  peakBalanceAge: number;
-  depletionAge?: number;
+  depletionAge: number | null;
+  lastsThroughLifeExpectancy: boolean;
   portfolioLastsUntilAge: number;
-  retirementSuccessful: boolean;
+  retirementYearsFunded: number;
+  totalRetirementYears: number;
+  minimumPostRetirementBalance: number;
+  finalShortfallAmount: number;
   yearlyProjection: YearlyProjectionEntry[];
+  yearlyRetirementWithdrawals: RetirementWithdrawalEntry[];
 };
 
 type RequestedWithdrawalResolver = (params: {
   age: number;
   isRetired: boolean;
+  retirementYearIndex: number | null;
   preWithdrawalBalance: number;
+  spendingPhaseMultiplier: number;
 }) => number;
 
 const calculateScenarioProjection = (
@@ -249,58 +379,164 @@ const calculateScenarioProjection = (
   let balance = inputs.currentBalance;
   let employeeContributionCapped = false;
   let catchUpContributionApplied = false;
+  let compensationLimitApplied = false;
+  let totalContributionLimitApplied = false;
   let totalRequestedEmployeeContributions = 0;
   let totalEmployeeContributions = 0;
   let totalEmployerContributions = 0;
   let totalWindfallContributions = 0;
   let totalInvestmentGrowth = 0;
-  let estimatedAnnualRetirementIncome: number | undefined;
-  let peakBalance = inputs.currentBalance;
-  let peakBalanceAge = inputs.currentAge;
-  let depletionAge: number | undefined;
+  let projectedBalanceAtRetirement: number | undefined =
+    inputs.retirementAge === inputs.currentAge ? inputs.currentBalance : undefined;
+  let firstSpendingShortfallAge: number | undefined;
+  let firstSpendingShortfallAmount = 0;
+  let firstDepletionAge: number | undefined;
+  const firstRetirementSimulationAge = Math.max(inputs.retirementAge, inputs.currentAge + 1);
 
-  for (let yearIndex = 0; yearIndex < yearsToLifeExpectancy; yearIndex += 1) {
-    const age = inputs.currentAge + yearIndex + 1;
+  const isCurrentlyRetired = inputs.currentAge >= inputs.retirementAge;
+  const baselineContributionLimitDetails = getEmployeeContributionLimitDetails(inputs.currentAge);
+  const baselineSalary = isCurrentlyRetired ? 0 : salary;
+  const baselineSalaryUsedForContributionCalculations = isCurrentlyRetired ? 0 : Math.min(baselineSalary, COMPENSATION_LIMIT);
+  const baselineCompensationLimitApplied =
+    !isCurrentlyRetired && baselineSalary > COMPENSATION_LIMIT + CURRENCY_EPSILON;
+  const baselineSpendingPhaseMultiplier = isCurrentlyRetired
+    ? getRetirementSpendingPhaseMultiplier(inputs, inputs.currentAge)
+    : 0;
+
+  yearlyProjection.push({
+    age: inputs.currentAge,
+    yearIndex: 0,
+    salary: baselineSalary,
+    salaryUsedForContributionCalculations: baselineSalaryUsedForContributionCalculations,
+    compensationLimitApplied: baselineCompensationLimitApplied,
+    startingBalance: inputs.currentBalance,
+    annualEmployeeContributionLimit: baselineContributionLimitDetails.annualLimit,
+    employeeContributionLimitKind: baselineContributionLimitDetails.limitKind,
+    requestedEmployeeContribution: 0,
+    employeeContribution: 0,
+    employeeContributionCapped: false,
+    employeeContributionCapReason: "none",
+    catchUpContributionApplied: false,
+    requestedEmployerContribution: 0,
+    employerContribution: 0,
+    employerContributionCapped: false,
+    totalContributionLimitApplied: false,
+    windfallAmount: 0,
+    totalContribution: 0,
+    investmentGrowth: 0,
+    requestedWithdrawalAmount: 0,
+    withdrawalAmount: 0,
+    spendingShortfall: false,
+    spendingShortfallAmount: 0,
+    spendingPhaseMultiplier: baselineSpendingPhaseMultiplier,
+    retirementYearIndex: null,
+    endingBalance: inputs.currentBalance,
+    inflationAdjustedEndingBalance: inputs.currentBalance,
+    isRetired: isCurrentlyRetired,
+  });
+
+  for (let yearIndex = 1; yearIndex <= yearsToLifeExpectancy; yearIndex += 1) {
+    const age = inputs.currentAge + yearIndex;
     const isRetired = age >= inputs.retirementAge;
+    const retirementYearIndex = isRetired ? Math.max(0, age - firstRetirementSimulationAge) : null;
+    const spendingPhaseMultiplier = isRetired ? getRetirementSpendingPhaseMultiplier(inputs, age) : 0;
     const startingBalance = balance;
-    const annualEmployeeContributionLimit = getAnnualEmployeeContributionLimit(age);
-    const annualCatchUpContributionApplied = !isRetired &&
-      annualEmployeeContributionLimit > DEFAULT_ANNUAL_EMPLOYEE_CONTRIBUTION_LIMIT;
+    const annualEmployeeContributionLimitDetails = getEmployeeContributionLimitDetails(age);
+    const annualEmployeeContributionLimit = annualEmployeeContributionLimitDetails.annualLimit;
+    const annualEmployeeContributionLimitKind = annualEmployeeContributionLimitDetails.limitKind;
+    const annualCatchUpContributionApplied = !isRetired && annualEmployeeContributionLimitDetails.catchUpAmount > 0;
     const salaryForYear = isRetired ? 0 : salary;
+    const salaryUsedForContributionCalculations = isRetired ? 0 : Math.min(salaryForYear, COMPENSATION_LIMIT);
+    const compensationLimitAppliedForYear = !isRetired && salaryForYear > COMPENSATION_LIMIT + CURRENCY_EPSILON;
+    const requestedEmployeeContribution = isRetired ? 0 : salaryForYear * contributionRate;
 
     const employeeContributionDetails = isRetired
       ? { requestedContribution: 0, effectiveContribution: 0, capped: false }
-      : calculateEmployeeContribution(salaryForYear, contributionRate, annualEmployeeContributionLimit);
+      : calculateEmployeeContribution(
+          salaryUsedForContributionCalculations,
+          contributionRate,
+          annualEmployeeContributionLimit
+        );
 
-    const requestedEmployeeContribution = employeeContributionDetails.requestedContribution;
-    const employeeContribution = employeeContributionDetails.effectiveContribution;
-    const annualContributionWasCapped = employeeContributionDetails.capped;
-    const employerContribution = isRetired ? 0 : calculateEmployerContribution(salaryForYear, employerMatchRate);
+    let employeeContribution = employeeContributionDetails.effectiveContribution;
+    const requestedEmployerContribution = isRetired
+      ? 0
+      : calculateEmployerContribution(salaryUsedForContributionCalculations, employerMatchRate);
+    let employerContribution = requestedEmployerContribution;
+    const cappedByAnnualDeferralLimit = employeeContributionDetails.capped;
+    let cappedByTotalContributionLimit = false;
+    let employerContributionCapped = false;
+
+    if (!isRetired && employeeContribution + employerContribution > TOTAL_CONTRIBUTION_LIMIT + CURRENCY_EPSILON) {
+      const employeeAllowedByTotalLimit = Math.max(0, TOTAL_CONTRIBUTION_LIMIT - employerContribution);
+      const adjustedEmployeeContribution = Math.min(employeeContribution, employeeAllowedByTotalLimit);
+
+      cappedByTotalContributionLimit = adjustedEmployeeContribution + CURRENCY_EPSILON < employeeContribution;
+      employeeContribution = adjustedEmployeeContribution;
+
+      const employerAllowedByTotalLimit = Math.max(0, TOTAL_CONTRIBUTION_LIMIT - employeeContribution);
+      const adjustedEmployerContribution = Math.min(employerContribution, employerAllowedByTotalLimit);
+
+      employerContributionCapped = adjustedEmployerContribution + CURRENCY_EPSILON < employerContribution;
+      employerContribution = adjustedEmployerContribution;
+    }
+
+    const annualContributionWasCapped = cappedByAnnualDeferralLimit || cappedByTotalContributionLimit;
+    const annualTotalContributionLimitApplied = cappedByTotalContributionLimit || employerContributionCapped;
+    const annualContributionCapReason: EmployeeContributionCapReason = cappedByTotalContributionLimit
+      ? "total-limit"
+      : cappedByAnnualDeferralLimit
+        ? annualEmployeeContributionLimitKind === "super-catch-up"
+          ? "super-catch-up-limit"
+          : annualEmployeeContributionLimitKind === "catch-up"
+            ? "catch-up-limit"
+            : "base-limit"
+        : "none";
     const windfallAmount = inputs.windfallAmount > 0 && age === inputs.windfallAge ? inputs.windfallAmount : 0;
     const totalContribution = employeeContribution + employerContribution + windfallAmount;
     const growthBase = startingBalance + totalContribution * MIDPOINT_CONTRIBUTION_FACTOR;
     const investmentGrowth = growthBase * annualReturnRate;
     const preWithdrawalBalance = startingBalance + totalContribution + investmentGrowth;
-    const requestedWithdrawal = requestedWithdrawalResolver({ age, isRetired, preWithdrawalBalance });
+    const requestedWithdrawal = requestedWithdrawalResolver({
+      age,
+      isRetired,
+      retirementYearIndex,
+      preWithdrawalBalance,
+      spendingPhaseMultiplier,
+    });
     const withdrawalAmount = Math.min(Math.max(0, requestedWithdrawal), preWithdrawalBalance);
+    const spendingShortfall = isRetired && requestedWithdrawal > withdrawalAmount + CURRENCY_EPSILON;
+    const spendingShortfallAmount = spendingShortfall ? Math.max(0, requestedWithdrawal - withdrawalAmount) : 0;
     const endingBalance = Math.max(0, preWithdrawalBalance - withdrawalAmount);
-    const inflationAdjustedEndingBalance = calculateInflationAdjustedValue(endingBalance, inflationRate, yearIndex + 1);
+    const inflationAdjustedEndingBalance = calculateInflationAdjustedValue(endingBalance, inflationRate, yearIndex);
 
     yearlyProjection.push({
       age,
-      yearIndex: yearIndex + 1,
+      yearIndex,
       salary: salaryForYear,
+      salaryUsedForContributionCalculations,
+      compensationLimitApplied: compensationLimitAppliedForYear,
       startingBalance,
       annualEmployeeContributionLimit,
+      employeeContributionLimitKind: annualEmployeeContributionLimitKind,
       requestedEmployeeContribution,
       employeeContribution,
       employeeContributionCapped: annualContributionWasCapped,
+      employeeContributionCapReason: annualContributionCapReason,
       catchUpContributionApplied: annualCatchUpContributionApplied,
+      requestedEmployerContribution,
       employerContribution,
+      employerContributionCapped,
+      totalContributionLimitApplied: annualTotalContributionLimitApplied,
       windfallAmount,
       totalContribution,
       investmentGrowth,
+      requestedWithdrawalAmount: requestedWithdrawal,
       withdrawalAmount,
+      spendingShortfall,
+      spendingShortfallAmount,
+      spendingPhaseMultiplier,
+      retirementYearIndex,
       endingBalance,
       inflationAdjustedEndingBalance,
       isRetired,
@@ -308,23 +544,25 @@ const calculateScenarioProjection = (
 
     employeeContributionCapped ||= annualContributionWasCapped;
     catchUpContributionApplied ||= annualCatchUpContributionApplied;
+    compensationLimitApplied ||= compensationLimitAppliedForYear;
+    totalContributionLimitApplied ||= annualTotalContributionLimitApplied;
     totalRequestedEmployeeContributions += requestedEmployeeContribution;
     totalEmployeeContributions += employeeContribution;
     totalEmployerContributions += employerContribution;
     totalWindfallContributions += windfallAmount;
     totalInvestmentGrowth += investmentGrowth;
 
-    if (isRetired && estimatedAnnualRetirementIncome === undefined) {
-      estimatedAnnualRetirementIncome = withdrawalAmount;
+    if (isRetired && projectedBalanceAtRetirement === undefined) {
+      projectedBalanceAtRetirement = startingBalance;
     }
 
-    if (endingBalance > peakBalance) {
-      peakBalance = endingBalance;
-      peakBalanceAge = age;
+    if (spendingShortfall && firstSpendingShortfallAge === undefined) {
+      firstSpendingShortfallAge = age;
+      firstSpendingShortfallAmount = spendingShortfallAmount;
     }
 
-    if (isRetired && depletionAge === undefined && endingBalance <= 0) {
-      depletionAge = age;
+    if (isRetired && firstDepletionAge === undefined && endingBalance <= CURRENCY_EPSILON) {
+      firstDepletionAge = age;
     }
 
     if (!isRetired) {
@@ -334,28 +572,60 @@ const calculateScenarioProjection = (
     balance = endingBalance;
   }
 
+  const yearsToRetirement = Math.max(0, inputs.retirementAge - inputs.currentAge);
+  const projectedRetirementBalance = projectedBalanceAtRetirement ?? inputs.currentBalance;
+  const inflationAdjustedBalanceAtRetirement = calculateInflationAdjustedValue(
+    projectedRetirementBalance,
+    inflationRate,
+    yearsToRetirement
+  );
   const finalBalance = yearlyProjection.at(-1)?.endingBalance ?? inputs.currentBalance;
   const inflationAdjustedBalance = calculateInflationAdjustedValue(finalBalance, inflationRate, yearsToLifeExpectancy);
-  const portfolioLastsUntilAge = depletionAge ?? inputs.lifeExpectancy;
-  const retirementSuccessful = depletionAge === undefined || depletionAge >= inputs.lifeExpectancy;
+  const lastsThroughLifeExpectancy = firstSpendingShortfallAge === undefined;
+  const depletionAge = lastsThroughLifeExpectancy ? null : (firstDepletionAge ?? firstSpendingShortfallAge ?? null);
+  const portfolioLastsUntilAge = firstSpendingShortfallAge ?? inputs.lifeExpectancy;
+  const retirementRows = yearlyProjection.filter((entry) => entry.isRetired && entry.yearIndex > 0);
+  const retirementYearsFunded = retirementRows.filter((entry) => !entry.spendingShortfall).length;
+  const totalRetirementYears = retirementRows.length;
+  const minimumPostRetirementBalance =
+    retirementRows.length > 0
+      ? retirementRows.reduce((minimum, entry) => Math.min(minimum, entry.endingBalance), Number.POSITIVE_INFINITY)
+      : projectedRetirementBalance;
+  const finalShortfallAmount = lastsThroughLifeExpectancy ? 0 : firstSpendingShortfallAmount;
+  const yearlyRetirementWithdrawals: RetirementWithdrawalEntry[] = retirementRows.map((entry) => ({
+    age: entry.age,
+    retirementYearIndex: entry.retirementYearIndex ?? 0,
+    requestedWithdrawalAmount: entry.requestedWithdrawalAmount,
+    withdrawalAmount: entry.withdrawalAmount,
+    spendingShortfall: entry.spendingShortfall,
+    spendingShortfallAmount: entry.spendingShortfallAmount,
+  }));
 
   return {
+    projectedBalanceAtRetirement: projectedRetirementBalance,
+    inflationAdjustedBalanceAtRetirement,
     finalBalance,
     inflationAdjustedBalance,
     employeeContributionCapped,
     catchUpContributionApplied,
+    compensationLimitApplied,
+    totalContributionLimitApplied,
     totalRequestedEmployeeContributions,
     totalEmployeeContributions,
     totalEmployerContributions,
     totalWindfallContributions,
     totalInvestmentGrowth,
-    estimatedAnnualRetirementIncome: estimatedAnnualRetirementIncome ?? 0,
-    peakBalance,
-    peakBalanceAge,
     depletionAge,
+    lastsThroughLifeExpectancy,
     portfolioLastsUntilAge,
-    retirementSuccessful,
+    retirementYearsFunded,
+    totalRetirementYears,
+    minimumPostRetirementBalance: Number.isFinite(minimumPostRetirementBalance)
+      ? minimumPostRetirementBalance
+      : projectedRetirementBalance,
+    finalShortfallAmount,
     yearlyProjection,
+    yearlyRetirementWithdrawals,
   };
 };
 
@@ -369,58 +639,75 @@ export const calculateRetirementProjection = (rawInputs: Partial<CalculatorInput
   const salaryGrowthRate = toRate(inputs.annualSalaryGrowthPercent);
   const annualReturnRate = toRate(inputs.annualReturnPercent);
   const inflationRate = toRate(inputs.inflationPercent);
-  const withdrawalRate = toRate(inputs.withdrawalRatePercent);
 
-  const sustainableProjection = calculateScenarioProjection(
-    inputs,
-    yearsToLifeExpectancy,
-    contributionRate,
-    employerMatchRate,
-    salaryGrowthRate,
-    annualReturnRate,
-    inflationRate,
-    ({ isRetired, preWithdrawalBalance }) => (isRetired ? preWithdrawalBalance * withdrawalRate : 0)
-  );
+  const projectForBaseSpending = (annualBaseSpending: number) =>
+    calculateScenarioProjection(
+      inputs,
+      yearsToLifeExpectancy,
+      contributionRate,
+      employerMatchRate,
+      salaryGrowthRate,
+      annualReturnRate,
+      inflationRate,
+      ({ isRetired, retirementYearIndex, spendingPhaseMultiplier }) => {
+        if (!isRetired || retirementYearIndex === null) {
+          return 0;
+        }
 
-  const targetSpendingProjection = calculateScenarioProjection(
-    inputs,
-    yearsToLifeExpectancy,
-    contributionRate,
-    employerMatchRate,
-    salaryGrowthRate,
-    annualReturnRate,
-    inflationRate,
-    ({ isRetired }) => (isRetired ? inputs.targetRetirementSpending : 0)
-  );
+        // The annual spending goal is interpreted in today's dollars.
+        // When enabled, withdrawals grow with inflation to preserve purchasing power.
+        const inflationMultiplier = inputs.retirementSpendingInflationAdjusted
+          ? Math.pow(1 + inflationRate, retirementYearIndex)
+          : 1;
+
+        return Math.max(0, annualBaseSpending) * spendingPhaseMultiplier * inflationMultiplier;
+      }
+    );
+
+  const goalProjection = projectForBaseSpending(inputs.targetRetirementSpending);
 
   return {
     currentAge: inputs.currentAge,
     retirementAge: inputs.retirementAge,
     lifeExpectancy: inputs.lifeExpectancy,
+    retirementStartAge: inputs.retirementAge,
     targetRetirementSpending: inputs.targetRetirementSpending,
-    finalBalance: sustainableProjection.finalBalance,
-    inflationAdjustedBalance: sustainableProjection.inflationAdjustedBalance,
+    retirementSpendingInflationAdjusted: inputs.retirementSpendingInflationAdjusted,
+    ageBasedSpendingEnabled: inputs.ageBasedSpendingEnabled,
+    spendingPhasePercents: {
+      earlyRetirement: inputs.earlyRetirementSpendingPercent,
+      midRetirement: inputs.midRetirementSpendingPercent,
+      lateRetirement: inputs.lateRetirementSpendingPercent,
+    },
+    projectedBalanceAtRetirement: goalProjection.projectedBalanceAtRetirement,
+    inflationAdjustedBalanceAtRetirement: goalProjection.inflationAdjustedBalanceAtRetirement,
+    projectedBalanceAtLifeExpectancy: goalProjection.finalBalance,
+    projectedBalanceAtLifeExpectancyTodayDollars: goalProjection.inflationAdjustedBalance,
+    finalBalance: goalProjection.finalBalance,
+    inflationAdjustedBalance: goalProjection.inflationAdjustedBalance,
     annualEmployeeContributionLimit: DEFAULT_ANNUAL_EMPLOYEE_CONTRIBUTION_LIMIT,
     catchUpContributionLimit: CATCH_UP_CONTRIBUTION_LIMIT,
-    employeeContributionCapped: sustainableProjection.employeeContributionCapped,
-    catchUpContributionApplied: sustainableProjection.catchUpContributionApplied,
-    totalRequestedEmployeeContributions: sustainableProjection.totalRequestedEmployeeContributions,
-    totalEmployeeContributions: sustainableProjection.totalEmployeeContributions,
-    totalEmployerContributions: sustainableProjection.totalEmployerContributions,
-    totalWindfallContributions: sustainableProjection.totalWindfallContributions,
-    totalInvestmentGrowth: sustainableProjection.totalInvestmentGrowth,
-    estimatedAnnualRetirementIncome: sustainableProjection.estimatedAnnualRetirementIncome,
-    peakBalance: sustainableProjection.peakBalance,
-    peakBalanceAge: sustainableProjection.peakBalanceAge,
-    depletionAge: sustainableProjection.depletionAge,
-    portfolioLastsUntilAge: sustainableProjection.portfolioLastsUntilAge,
-    retirementSuccessful: sustainableProjection.retirementSuccessful,
-    yearlyProjection: sustainableProjection.yearlyProjection,
-    targetSpendingProjection: targetSpendingProjection.yearlyProjection,
-    targetSpendingRetirementSuccessful: targetSpendingProjection.retirementSuccessful,
-    targetSpendingDepletionAge: targetSpendingProjection.depletionAge,
-    targetSpendingPortfolioLastsUntilAge: targetSpendingProjection.portfolioLastsUntilAge,
-    targetSpendingPeakBalance: targetSpendingProjection.peakBalance,
-    targetSpendingPeakBalanceAge: targetSpendingProjection.peakBalanceAge,
+    superCatchUpContributionLimit: SUPER_CATCH_UP_CONTRIBUTION_LIMIT,
+    totalContributionLimit: TOTAL_CONTRIBUTION_LIMIT,
+    compensationLimit: COMPENSATION_LIMIT,
+    employeeContributionCapped: goalProjection.employeeContributionCapped,
+    catchUpContributionApplied: goalProjection.catchUpContributionApplied,
+    compensationLimitApplied: goalProjection.compensationLimitApplied,
+    totalContributionLimitApplied: goalProjection.totalContributionLimitApplied,
+    totalRequestedEmployeeContributions: goalProjection.totalRequestedEmployeeContributions,
+    totalEmployeeContributions: goalProjection.totalEmployeeContributions,
+    totalEmployerContributions: goalProjection.totalEmployerContributions,
+    totalWindfallContributions: goalProjection.totalWindfallContributions,
+    totalInvestmentGrowth: goalProjection.totalInvestmentGrowth,
+    supportsSpendingGoal: goalProjection.lastsThroughLifeExpectancy,
+    depletionAge: goalProjection.depletionAge,
+    lastsThroughLifeExpectancy: goalProjection.lastsThroughLifeExpectancy,
+    portfolioLastsUntilAge: goalProjection.portfolioLastsUntilAge,
+    retirementYearsFunded: goalProjection.retirementYearsFunded,
+    totalRetirementYears: goalProjection.totalRetirementYears,
+    minimumPostRetirementBalance: goalProjection.minimumPostRetirementBalance,
+    finalShortfallAmount: goalProjection.finalShortfallAmount,
+    yearlyProjection: goalProjection.yearlyProjection,
+    yearlyRetirementWithdrawals: goalProjection.yearlyRetirementWithdrawals,
   };
 };
