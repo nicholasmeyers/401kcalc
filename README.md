@@ -8,23 +8,11 @@ Next.js 15 + TypeScript retirement planning site with a 401(k) calculator, guide
 npm run dev
 ```
 
-## Analytics configuration
+## Analytics
 
-This project uses Plausible event tracking when configured.
+This project uses [Plausible](https://plausible.io/) for privacy-friendly analytics. The site-specific tracking script is loaded directly — no environment variables are required.
 
-Required for production analytics:
-
-```bash
-NEXT_PUBLIC_PLAUSIBLE_DOMAIN=www.401kcalc.com
-```
-
-Optional for self-hosted Plausible:
-
-```bash
-NEXT_PUBLIC_PLAUSIBLE_API_HOST=https://plausible.yourdomain.com
-```
-
-Tracked launch events:
+Custom events tracked:
 - `calculator_view`
 - `calculator_input_change`
 - `projection_updated`

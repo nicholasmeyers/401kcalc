@@ -1,61 +1,25 @@
 import Script from "next/script";
 
-import { siteConfig } from "@/lib/site";
+const PLAUSIBLE_SCRIPT_URL = "https://plausible.io/js/pa-vnxFw2Tj0I6sEZcvrats_.js";
 
-const plausibleScriptPath = "/js/script.js";
-
-function getPlausibleDomain(): string | undefined {
-  const configuredDomain = process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN?.trim();
-
-  if (configuredDomain) {
-    return configuredDomain;
-  }
-
-  return undefined;
-}
-
-function getPlausibleScriptUrl(): string | undefined {
-  const configuredBaseUrl = process.env.NEXT_PUBLIC_PLAUSIBLE_API_HOST?.trim();
-
-  if (!configuredBaseUrl) {
-    return undefined;
-  }
-
-  try {
-    return new URL(plausibleScriptPath, configuredBaseUrl).toString();
-  } catch {
-    return undefined;
-  }
-}
+const plausibleInitSnippet = `
+  window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};
+  plausible.init()
+`;
 
 export function AnalyticsScript() {
-  const domain = getPlausibleDomain();
-
-  if (!domain) {
-    return null;
-  }
-
-  const scriptSrc = getPlausibleScriptUrl() ?? "https://plausible.io/js/script.js";
-
   return (
-    <Script
-      defer
-      data-domain={domain}
-      src={scriptSrc}
-      data-api={
-        process.env.NEXT_PUBLIC_PLAUSIBLE_API_HOST
-          ? `${process.env.NEXT_PUBLIC_PLAUSIBLE_API_HOST.replace(/\/+$/, "")}/api/event`
-          : undefined
-      }
-      strategy="afterInteractive"
-      crossOrigin="anonymous"
-    />
+    <>
+      <Script
+        async
+        src={PLAUSIBLE_SCRIPT_URL}
+        strategy="afterInteractive"
+      />
+      <Script
+        id="plausible-init"
+        strategy="afterInteractive"
+        dangerouslySetInnerHTML={{ __html: plausibleInitSnippet }}
+      />
+    </>
   );
 }
-
-export const analyticsConfig = {
-  provider: "plausible",
-  domainEnvVar: "NEXT_PUBLIC_PLAUSIBLE_DOMAIN",
-  apiHostEnvVar: "NEXT_PUBLIC_PLAUSIBLE_API_HOST",
-  defaultDomain: new URL(siteConfig.url).hostname,
-} as const;
