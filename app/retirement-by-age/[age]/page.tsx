@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import styled from "styled-components";
 
-import { ButtonLink } from "@/components/ui/button-link";
+import { AgeCheckpointCalculator } from "@/components/retirement-by-age/age-checkpoint-calculator";
 import { Container } from "@/components/layout/container";
 import { Section } from "@/components/layout/section";
 import { SurfaceCard } from "@/components/ui/primitives";
@@ -220,6 +220,10 @@ export default async function RetirementByAgeDetailPage({ params }: RetirementBy
               </OrderedList>
             </ContentBlock>
 
+            <CalculatorBlock>
+              <AgeCheckpointCalculator age={benchmark.age} recommendedMultiple={benchmark.recommendedMultiple} />
+            </CalculatorBlock>
+
             <ContentBlock>
               <Heading>Related planning links</Heading>
               <LinksGrid>
@@ -247,13 +251,6 @@ export default async function RetirementByAgeDetailPage({ params }: RetirementBy
               </LinksGrid>
             </ContentBlock>
 
-            <CalculatorCta>
-              <Heading>Calculator CTA</Heading>
-              <Copy>
-                Use this age benchmark as context, then test your own salary, contribution rate, and retirement age assumptions directly.
-              </Copy>
-              <ButtonLink href="/401k-calculator">Run your own retirement projection {"\u2192"}</ButtonLink>
-            </CalculatorCta>
           </BodyCard>
         </Container>
       </BodySection>
@@ -476,12 +473,11 @@ const InlineLink = styled(Link)`
   }
 `;
 
-const CalculatorCta = styled(SurfaceCard)`
-  padding: 24px;
+const CalculatorBlock = styled.section`
+  padding: 28px;
   border-radius: ${theme.radii.md};
   background:
-    radial-gradient(circle at top right, rgba(37, 99, 235, 0.08), transparent 58%),
+    radial-gradient(circle at top right, rgba(37, 99, 235, 0.06), transparent 60%),
     ${theme.colors.surfaceMuted};
-  display: grid;
-  gap: 12px;
+  border: 1px solid ${theme.colors.border};
 `;

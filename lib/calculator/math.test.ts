@@ -72,6 +72,7 @@ describe("calculateRetirementProjection", () => {
         totalRetirementYears: expect.any(Number),
         minimumPostRetirementBalance: expect.any(Number),
         finalShortfallAmount: expect.any(Number),
+        projectedAnnualSpendAvailable: expect.any(Number),
         yearlyProjection: expect.any(Array),
         yearlyRetirementWithdrawals: expect.any(Array),
       })

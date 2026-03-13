@@ -19,7 +19,6 @@ type CalculatorResultsProps = {
 type OutcomeState = "positive" | "caution" | "negative";
 type OutcomePalette = { surface: string; border: string; text: string };
 
-const formatAge = (value: number) => String(Math.max(0, Math.round(value)));
 const outcomePalettes: Record<OutcomeState, OutcomePalette> = {
   positive: {
     surface: theme.colors.successSurface,
@@ -39,27 +38,47 @@ const outcomePalettes: Record<OutcomeState, OutcomePalette> = {
 };
 
 const getOutcomeStateLabel = (state: OutcomeState): string => {
-  if (state === "positive") {
-    return "On track";
-  }
-
-  if (state === "caution") {
-    return "Tight margin";
-  }
-
+  if (state === "positive") return "On track";
+  if (state === "caution") return "Tight margin";
   return "Needs changes";
 };
 
-const getOutcomeState = (isSuccessful: boolean, bufferYears: number): OutcomeState => {
-  if (!isSuccessful) {
-    return "negative";
+const getOutcomeState = (
+  projectedAnnualSpendAvailable: number,
+  goalAnnualSpend: number
+): OutcomeState => {
+  if (goalAnnualSpend <= 0) return "positive";
+  if (projectedAnnualSpendAvailable >= goalAnnualSpend * 1.05) return "positive";
+  if (projectedAnnualSpendAvailable >= goalAnnualSpend) return "caution";
+  return "negative";
+};
+
+const getHeroSupportingCopy = (
+  state: OutcomeState,
+  projectedAnnualSpendAvailable: number,
+  goalAnnualSpend: number
+): string => {
+  if (goalAnnualSpend <= 0) {
+    return "Set a retirement spending goal to see whether your plan is on track.";
   }
 
-  if (bufferYears < 2) {
-    return "caution";
+  const goalFormatted = formatCurrency(goalAnnualSpend);
+
+  if (state === "positive") {
+    const cushion = Math.round(
+      ((projectedAnnualSpendAvailable - goalAnnualSpend) / goalAnnualSpend) * 100
+    );
+    return `You will meet your goal of ${goalFormatted} a year with a ${cushion}% cushion.`;
   }
 
-  return "positive";
+  if (state === "caution") {
+    return `You are close to your goal of ${goalFormatted} a year, but your plan has limited cushion.`;
+  }
+
+  const shortfall = Math.round(
+    ((goalAnnualSpend - projectedAnnualSpendAvailable) / goalAnnualSpend) * 100
+  );
+  return `Your plan falls ${shortfall}% short of your goal of ${goalFormatted} a year.`;
 };
 
 const toAnimatedCurrencyValue = (value: number) => <AnimatedNumber value={value} formatValue={formatCurrency} />;
@@ -75,12 +94,20 @@ const ProjectionChart = dynamic(
 export function CalculatorResults({ result, statusMessage, onRetirementAgeChange }: CalculatorResultsProps) {
   const totalContributions =
     result.totalEmployeeContributions + result.totalEmployerContributions + result.totalWindfallContributions;
-  const targetBufferYears =
-    result.targetRetirementSpending > 0
-      ? result.projectedBalanceAtLifeExpectancy / result.targetRetirementSpending
-      : Number.POSITIVE_INFINITY;
 
-  const outlookState = getOutcomeState(result.lastsThroughLifeExpectancy, targetBufferYears);
+  const outlookState = getOutcomeState(
+    result.projectedAnnualSpendAvailable,
+    result.targetRetirementSpending
+  );
+
+  const heroSupportingCopy = getHeroSupportingCopy(
+    outlookState,
+    result.projectedAnnualSpendAvailable,
+    result.targetRetirementSpending
+  );
+
+  const endingBalanceSupportingCopy =
+    `${result.retirementYearsFunded} of ${result.totalRetirementYears} retirement years are fully funded.`;
 
   const additionalDetailCards = [
     { label: "Employee contributions", value: result.totalEmployeeContributions },
@@ -97,82 +124,28 @@ export function CalculatorResults({ result, statusMessage, onRetirementAgeChange
     <ResultsStack>
       {statusMessage ? <StatusBanner>{statusMessage}</StatusBanner> : null}
 
-      <OutcomeCard $state={outlookState}>
-        <OutcomeTitleRow>
-          <OutcomeTitle>Will your spending goal last through retirement?</OutcomeTitle>
-          <OutcomePill $state={outlookState}>{getOutcomeStateLabel(outlookState)}</OutcomePill>
-        </OutcomeTitleRow>
-        <OutcomeText>
-          {result.supportsSpendingGoal ? (
-            <>
-              Your plan supports
-              {" "}
-              <AnimatedNumber value={result.targetRetirementSpending} formatValue={formatCurrency} />
-              {" "}
-              per year through age
-              {" "}
-              <AnimatedNumber value={result.lifeExpectancy} formatValue={formatAge} />
-              .
-            </>
-          ) : (
-            <>
-              At
-              {" "}
-              <AnimatedNumber value={result.targetRetirementSpending} formatValue={formatCurrency} />
-              {" "}
-              per year, savings are projected to run out around age
-              {" "}
-              <AnimatedNumber value={result.depletionAge ?? result.portfolioLastsUntilAge} formatValue={formatAge} />
-              .
-            </>
-          )}
-        </OutcomeText>
-        <OutcomeSubtext>
-          {result.retirementSpendingInflationAdjusted
-            ? "Spending is modeled in today's dollars and increased with inflation each retirement year."
-            : "Spending is modeled as a flat nominal annual amount in retirement."}
-        </OutcomeSubtext>
-      </OutcomeCard>
-
       <HighlightsGrid>
+        <HeroCard $state={outlookState}>
+          <HeroLabelRow>
+            <HeroLabel>Projected annual spend available</HeroLabel>
+            <OutcomePill $state={outlookState}>{getOutcomeStateLabel(outlookState)}</OutcomePill>
+          </HeroLabelRow>
+          <HeroValue>
+            <AnimatedNumber value={result.projectedAnnualSpendAvailable} formatValue={formatCurrency} />
+          </HeroValue>
+          <HeroCopy>{heroSupportingCopy}</HeroCopy>
+        </HeroCard>
+
         <CalculatorSummaryCard
-          tone="hero"
-          label="Annual retirement spending goal"
-          value={toAnimatedCurrencyValue(result.targetRetirementSpending)}
-          supportingCopy={
-            result.retirementSpendingInflationAdjusted
-              ? "Interpreted in today's dollars and inflated in retirement years."
-              : "Treated as a fixed nominal withdrawal each retirement year."
-          }
+          label={`Projected balance at retirement age ${result.retirementAge}`}
+          value={toAnimatedCurrencyValue(result.projectedBalanceAtRetirement)}
+          supportingCopy="Estimated portfolio value when you retire."
         />
 
         <CalculatorSummaryCard
           label={`Projected balance at age ${result.lifeExpectancy}`}
           value={toAnimatedCurrencyValue(result.projectedBalanceAtLifeExpectancy)}
-          supportingCopy={`≈ ${formatCurrency(
-            result.projectedBalanceAtLifeExpectancyTodayDollars
-          )} in today’s dollars (adjusted for inflation).`}
-          tooltip="Ending projected portfolio value at the end of your planning horizon."
-        />
-
-        <CalculatorSummaryCard
-          label={`Projected balance at retirement age ${result.retirementAge}`}
-          value={toAnimatedCurrencyValue(result.projectedBalanceAtRetirement)}
-          supportingCopy={`Approx. ${formatCurrency(
-            result.inflationAdjustedBalanceAtRetirement
-          )} in today's dollars (adjusted for inflation).`}
-        />
-
-        <CalculatorSummaryCard
-          label={result.supportsSpendingGoal ? "Savings projected to last through age" : "Savings projected to run out around age"}
-          value={<AnimatedNumber value={result.portfolioLastsUntilAge} formatValue={formatAge} />}
-          supportingCopy={
-            result.supportsSpendingGoal
-              ? `${result.retirementYearsFunded} of ${result.totalRetirementYears} retirement years are fully funded. Minimum post-retirement balance: ${formatCurrency(
-                  result.minimumPostRetirementBalance
-                )}.`
-              : `Estimated spending shortfall in depletion year: ${formatCurrency(result.finalShortfallAmount)}.`
-          }
+          supportingCopy={endingBalanceSupportingCopy}
         />
       </HighlightsGrid>
 
@@ -187,7 +160,7 @@ export function CalculatorResults({ result, statusMessage, onRetirementAgeChange
         <ChartHeader>
           <ChartTitle>Projection chart</ChartTitle>
           <ChartSubtitle>
-            Shows projected balance and projected balance in today’s dollars year by year through retirement.
+            Shows projected balance and projected balance in today's dollars year by year through retirement.
           </ChartSubtitle>
         </ChartHeader>
         <ProjectionChart
@@ -229,13 +202,27 @@ const StatusBanner = styled.p`
   padding: 10px 14px;
 `;
 
-const OutcomeCard = styled(SurfaceCard)<{ $state: OutcomeState }>`
-  padding: 18px;
+const HighlightsGrid = styled.div`
+  display: grid;
+  gap: 14px;
+
+  @media (min-width: ${theme.breakpoints.md}) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+`;
+
+const HeroCard = styled.article<{ $state: OutcomeState }>`
+  border: 1px solid ${(props) => outcomePalettes[props.$state].border};
+  border-radius: ${theme.radii.lg};
+  background: ${(props) => outcomePalettes[props.$state].surface};
+  padding: 22px;
   display: grid;
   gap: 10px;
-  border-color: ${(props) => outcomePalettes[props.$state].border};
-  background: ${(props) => outcomePalettes[props.$state].surface};
   transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+
+  @media (min-width: ${theme.breakpoints.md}) {
+    grid-column: span 2;
+  }
 
   &:hover,
   &:focus-within {
@@ -244,7 +231,14 @@ const OutcomeCard = styled(SurfaceCard)<{ $state: OutcomeState }>`
   }
 `;
 
-const OutcomeTitle = styled.p`
+const HeroLabelRow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+`;
+
+const HeroLabel = styled.p`
   font-size: 0.78rem;
   font-weight: 640;
   letter-spacing: 0.08em;
@@ -252,21 +246,18 @@ const OutcomeTitle = styled.p`
   color: ${theme.colors.mutedTextStrong};
 `;
 
-const OutcomeTitleRow = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  flex-wrap: wrap;
-`;
-
-const OutcomeText = styled.p`
-  font-size: 1rem;
-  font-weight: 620;
+const HeroValue = styled.p`
   color: ${theme.colors.text};
+  font-size: clamp(1.95rem, 4vw, 2.7rem);
+  line-height: 1.12;
+  font-weight: 660;
+  letter-spacing: -0.02em;
 `;
 
-const OutcomeSubtext = styled.p`
-  font-size: 0.88rem;
+const HeroCopy = styled.p`
+  font-size: 0.92rem;
+  font-weight: 500;
+  line-height: 1.45;
   color: ${theme.colors.mutedTextStrong};
 `;
 
@@ -289,15 +280,6 @@ const SectionLabel = styled.h3`
   text-transform: uppercase;
   color: ${theme.colors.mutedTextStrong};
   padding-left: 2px;
-`;
-
-const HighlightsGrid = styled.div`
-  display: grid;
-  gap: 14px;
-
-  @media (min-width: ${theme.breakpoints.md}) {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
 `;
 
 const BreakdownGrid = styled.div`
