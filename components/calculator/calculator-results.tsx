@@ -160,7 +160,7 @@ export function CalculatorResults({ result, statusMessage, onRetirementAgeChange
         <ChartHeader>
           <ChartTitle>Projection chart</ChartTitle>
           <ChartSubtitle>
-            Shows projected balance and projected balance in today's dollars year by year through retirement.
+            Shows projected balance and projected balance in today&apos;s dollars year by year through retirement.
           </ChartSubtitle>
         </ChartHeader>
         <ProjectionChart
