@@ -76,7 +76,7 @@ export default function GuidesPage() {
               <TopicItem>
                 <TopicItemTitle>401(k) Milestones</TopicItemTitle>
                 <TopicItemDescription>
-                  Savings checkpoints by age, how to judge your progress, and what to do if you're behind.
+                  Savings checkpoints by age, how to judge your progress, and what to do if you&apos;re behind.
                 </TopicItemDescription>
               </TopicItem>
               <TopicItem>
