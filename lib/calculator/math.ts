@@ -27,6 +27,8 @@ const SUPER_CATCH_UP_MAX_AGE = 63;
 const EARLY_RETIREMENT_PHASE_END_AGE = 74;
 const MID_RETIREMENT_PHASE_END_AGE = 84;
 const CURRENCY_EPSILON = 0.01;
+const BINARY_SEARCH_PRECISION = 1;
+const MAX_BINARY_SEARCH_ITERATIONS = 50;
 
 const INPUT_FIELDS: InputField[] = [
   "currentAge",
@@ -666,6 +668,37 @@ export const calculateRetirementProjection = (rawInputs: Partial<CalculatorInput
 
   const goalProjection = projectForBaseSpending(inputs.targetRetirementSpending);
 
+  // Binary search for the maximum annual base spending (in the same terms as
+  // targetRetirementSpending) that keeps the portfolio solvent through lifeExpectancy.
+  // This is the "projected annual spend available" shown in the results hero card.
+  const findMaxSustainableSpending = (): number => {
+    const retirementYears = inputs.lifeExpectancy - inputs.retirementAge;
+    if (retirementYears <= 0 || goalProjection.projectedBalanceAtRetirement <= CURRENCY_EPSILON) {
+      return 0;
+    }
+
+    let lo = 0;
+    let hi = Math.max(goalProjection.projectedBalanceAtRetirement, inputs.targetRetirementSpending * 2, 1);
+
+    while (projectForBaseSpending(hi).lastsThroughLifeExpectancy) {
+      hi *= 2;
+      if (hi > 1e15) break;
+    }
+
+    for (let i = 0; i < MAX_BINARY_SEARCH_ITERATIONS && hi - lo > BINARY_SEARCH_PRECISION; i++) {
+      const mid = (lo + hi) / 2;
+      if (projectForBaseSpending(mid).lastsThroughLifeExpectancy) {
+        lo = mid;
+      } else {
+        hi = mid;
+      }
+    }
+
+    return Math.floor(lo);
+  };
+
+  const projectedAnnualSpendAvailable = findMaxSustainableSpending();
+
   return {
     currentAge: inputs.currentAge,
     retirementAge: inputs.retirementAge,
@@ -707,6 +740,7 @@ export const calculateRetirementProjection = (rawInputs: Partial<CalculatorInput
     totalRetirementYears: goalProjection.totalRetirementYears,
     minimumPostRetirementBalance: goalProjection.minimumPostRetirementBalance,
     finalShortfallAmount: goalProjection.finalShortfallAmount,
+    projectedAnnualSpendAvailable,
     yearlyProjection: goalProjection.yearlyProjection,
     yearlyRetirementWithdrawals: goalProjection.yearlyRetirementWithdrawals,
   };

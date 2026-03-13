@@ -137,6 +137,7 @@ export type RetirementProjectionResult = {
   totalRetirementYears: number;
   minimumPostRetirementBalance: number;
   finalShortfallAmount: number;
+  projectedAnnualSpendAvailable: number;
   yearlyProjection: YearlyProjectionEntry[];
   yearlyRetirementWithdrawals: RetirementWithdrawalEntry[];
 };

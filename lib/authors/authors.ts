@@ -10,7 +10,7 @@ export type Author = {
 const authors = {
   founder: {
     id: "founder",
-    name: "Nicholas V.",
+    name: "Nicholas M.",
     title: "Founder / Product Builder of 401kcalc",
     bio: "Builds transparent retirement planning tools focused on practical assumptions, clear methodology, and conservative scenario analysis.",
     credentials: "Product builder focused on retirement planning calculators and educational content design.",

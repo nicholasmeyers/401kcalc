@@ -64,8 +64,10 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
-      <body className={manrope.variable}>
+      <head>
         <AnalyticsScript />
+      </head>
+      <body className={manrope.variable}>
         <RouteAnalyticsTracker />
         <StyledComponentsRegistry>
           <ThemeProvider theme={theme}>
