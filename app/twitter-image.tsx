@@ -1,3 +1,6 @@
+import { readFile } from "node:fs/promises";
+import { join } from "node:path";
+
 import { ImageResponse } from "next/og";
 
 export const alt = "401kcalc retirement planning";
@@ -7,7 +10,10 @@ export const size = {
 };
 export const contentType = "image/png";
 
-export default function TwitterImage() {
+export default async function TwitterImage() {
+  const logoData = await readFile(join(process.cwd(), "public/images/logo.png"));
+  const logoSrc = `data:image/png;base64,${logoData.toString("base64")}`;
+
   return new ImageResponse(
     (
       <div
@@ -23,21 +29,8 @@ export default function TwitterImage() {
           padding: "66px 70px",
         }}
       >
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            border: "1px solid #cbd5e1",
-            borderRadius: "999px",
-            height: "42px",
-            padding: "0 18px",
-            fontSize: "24px",
-            color: "#1e293b",
-            background: "rgba(255, 255, 255, 0.82)",
-          }}
-        >
-          401kcalc
-        </div>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={logoSrc} alt="" width={195} height={30} />
         <div style={{ display: "flex", flexDirection: "column", gap: "22px", maxWidth: "980px" }}>
           <div style={{ fontSize: "66px", fontWeight: 700, lineHeight: 1.1 }}>
             Model your 401(k) path with confidence

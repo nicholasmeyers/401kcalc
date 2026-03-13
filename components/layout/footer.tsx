@@ -1,8 +1,9 @@
+import Image from "next/image";
 import Link from "next/link";
 import styled from "styled-components";
 
 import { Container } from "@/components/layout/container";
-import { navigation } from "@/lib/site";
+import { navigation, siteConfig } from "@/lib/site";
 import { theme } from "@/styles/theme";
 
 const primaryFooterLinks = navigation.filter((item) => item.href !== "/about");
@@ -16,7 +17,9 @@ export function Footer() {
     <Wrapper>
       <Inner as="div">
         <Copy>
-          <Title>401kcalc</Title>
+          <LogoWrap href="/" aria-label={siteConfig.name}>
+            <Image src="/images/logo.png" alt={siteConfig.name} width={0} height={0} sizes="100vw" style={{ width: 'auto', height: 28 }} />
+          </LogoWrap>
           <Text>Structured tools and practical guidance for clearer retirement planning decisions.</Text>
         </Copy>
         <RightColumn>
@@ -74,10 +77,9 @@ const Copy = styled.div`
   gap: 8px;
 `;
 
-const Title = styled.p`
-  font-size: 0.94rem;
-  font-weight: 700;
-  color: ${theme.colors.text};
+const LogoWrap = styled(Link)`
+  display: inline-flex;
+  align-items: center;
 `;
 
 const Text = styled.p`

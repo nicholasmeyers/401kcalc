@@ -15,6 +15,7 @@ import styled, { css } from "styled-components";
 import type { CalculatorFieldConfig } from "@/components/calculator/field-config";
 import { ContextualInfoTooltip } from "@/components/ui/info-tooltip";
 import {
+  formatMoneyInput,
   formatMoneyInputWithCursor,
   isAllowedMoneyInputCharacter,
   parseLooseNumber,
@@ -162,6 +163,25 @@ export function CalculatorField({ config, value, error, note, onValueChange }: C
   }
 
   function handleKeyDown(event: KeyboardEvent<HTMLInputElement>) {
+    if (event.key === "ArrowUp" || event.key === "ArrowDown") {
+      event.preventDefault();
+      const current = parseLooseNumber(value) ?? 0;
+      const delta = event.key === "ArrowUp" ? 1 : -1;
+
+      if (config.kind === "currency") {
+        const next = Math.max(0, current + delta * 1000);
+        const formatted = formatMoneyInput(String(next));
+        onValueChange(config.field, formatted);
+      } else if (config.kind === "age") {
+        const next = Math.max(0, Math.round(current) + delta);
+        onValueChange(config.field, String(next));
+      } else {
+        const next = current + delta;
+        onValueChange(config.field, String(next));
+      }
+      return;
+    }
+
     if (config.kind !== "currency" || event.metaKey || event.ctrlKey || event.altKey || event.key.length !== 1) {
       return;
     }

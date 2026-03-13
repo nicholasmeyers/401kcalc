@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Manrope } from "next/font/google";
 import type { ReactNode } from "react";
 import { ThemeProvider } from "styled-components";
@@ -12,6 +12,12 @@ import { GlobalStyle } from "@/styles/GlobalStyle";
 import { theme } from "@/styles/theme";
 import { siteConfig } from "@/lib/site";
 
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  themeColor: "#2563eb",
+};
+
 const manrope = Manrope({
   subsets: ["latin"],
   display: "swap",
@@ -20,6 +26,10 @@ const manrope = Manrope({
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
+  icons: {
+    icon: "/favicon.ico",
+    apple: "/images/logo-icon-large.png",
+  },
   title: {
     default: "401(k) Calculator and Retirement Planning Guides",
     template: "%s | 401kcalc",
@@ -61,11 +71,32 @@ export const metadata: Metadata = {
   },
 };
 
+const organizationSchema = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: siteConfig.name,
+  url: siteConfig.url,
+  logo: `${siteConfig.url}/images/logo.png`,
+  sameAs: [],
+};
+
+const webSiteSchema = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: siteConfig.name,
+  url: siteConfig.url,
+  description: siteConfig.description,
+  publisher: { "@id": siteConfig.url },
+  inLanguage: "en-US",
+};
+
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
       <head>
         <AnalyticsScript />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }} />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webSiteSchema) }} />
       </head>
       <body className={manrope.variable}>
         <RouteAnalyticsTracker />

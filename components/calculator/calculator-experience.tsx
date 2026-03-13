@@ -1,11 +1,13 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { useSearchParams } from "next/navigation";
 import styled from "styled-components";
 
 import { CalculatorForm } from "@/components/calculator/calculator-form";
 import { allInputFields } from "@/components/calculator/field-config";
 import { CalculatorResults } from "@/components/calculator/calculator-results";
+import { HEADER_HEIGHT } from "@/components/layout/header";
 import {
   COMPENSATION_LIMIT,
   defaultCalculatorInputs,
@@ -21,6 +23,8 @@ import { formatCurrency } from "@/lib/calculator/format";
 import { trackEvent } from "@/lib/analytics";
 import type { CalculatorInputs, InputField, RetirementProjectionResult, ValidationIssue } from "@/lib/calculator/types";
 import { theme } from "@/styles/theme";
+
+type MobileTab = "assumptions" | "projection";
 
 type InputStringState = Record<InputField, string>;
 type FieldErrorMap = Partial<Record<InputField, string>>;
@@ -101,8 +105,33 @@ const initialInputStrings: InputStringState = {
 
 const toFriendlyIssueMessage = (issue: ValidationIssue): string => fieldMessageMap[issue.message] ?? "Check this value.";
 
+const DOLLAR_FIELDS: ReadonlySet<string> = new Set([
+  "currentBalance",
+  "annualSalary",
+  "targetRetirementSpending",
+  "windfallAmount",
+]);
+
+function formatParamValue(field: string, raw: string): string | null {
+  const num = Number(raw);
+  if (!Number.isFinite(num)) return null;
+  if (DOLLAR_FIELDS.has(field)) return Math.round(num).toLocaleString("en-US");
+  return String(num);
+}
+
 export function CalculatorExperience() {
-  const [inputValues, setInputValues] = useState<InputStringState>(initialInputStrings);
+  const searchParams = useSearchParams();
+  const [inputValues, setInputValues] = useState<InputStringState>(() => {
+    const base = { ...initialInputStrings };
+    for (const field of allInputFields) {
+      const raw = searchParams.get(field);
+      if (raw != null) {
+        const formatted = formatParamValue(field, raw);
+        if (formatted !== null) base[field] = formatted;
+      }
+    }
+    return base;
+  });
   const [retirementSpendingInflationAdjusted, setRetirementSpendingInflationAdjusted] = useState(
     defaultCalculatorInputs.retirementSpendingInflationAdjusted
   );
@@ -335,45 +364,116 @@ export function CalculatorExperience() {
     trackEvent("calculator_input_change", { field: "retirementSpendingInflationAdjusted" });
   }, []);
 
+  const [mobileTab, setMobileTab] = useState<MobileTab>("assumptions");
+  const [isMobile, setIsMobile] = useState(false);
+  const tabBarRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const mql = window.matchMedia(`(max-width: ${parseInt(theme.breakpoints.lg) - 1}px)`);
+    setIsMobile(mql.matches);
+    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
+    mql.addEventListener("change", handler);
+    return () => mql.removeEventListener("change", handler);
+  }, []);
+
+  const scrollToTabBar = useCallback(() => {
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        const el = tabBarRef.current;
+        if (!el) return;
+        const top = el.getBoundingClientRect().top + window.scrollY - HEADER_HEIGHT;
+        window.scrollTo({ top, behavior: "smooth" });
+      });
+    });
+  }, []);
+
+  const switchToProjection = useCallback(() => {
+    setMobileTab("projection");
+    scrollToTabBar();
+  }, [scrollToTabBar]);
+
+  const switchToAssumptions = useCallback(() => {
+    setMobileTab("assumptions");
+    scrollToTabBar();
+  }, [scrollToTabBar]);
+
+  const formElement = (
+    <CalculatorForm
+      values={inputValues}
+      errors={derivedState.fieldErrors}
+      fieldNotes={fieldNotes}
+      ageBasedSpendingEnabled={ageBasedSpendingEnabled}
+      retirementSpendingInflationAdjusted={retirementSpendingInflationAdjusted}
+      retirementAge={displayedResult.retirementAge}
+      onFieldChange={handleFieldChange}
+      onAgeBasedSpendingEnabledChange={handleAgeBasedSpendingEnabledChange}
+      onRetirementSpendingInflationAdjustedChange={handleRetirementSpendingInflationAdjustedChange}
+    />
+  );
+
+  const resultsElement = (
+    <CalculatorResults
+      result={displayedResult}
+      statusMessage={statusMessage}
+      onRetirementAgeChange={handleRetirementAgeChange}
+    />
+  );
+
+  if (!isMobile) {
+    return (
+      <DesktopLayout>
+        <FormColumn>{formElement}</FormColumn>
+        <ResultsColumn aria-live="polite">{resultsElement}</ResultsColumn>
+      </DesktopLayout>
+    );
+  }
+
   return (
-    <Layout>
-      <FormColumn>
-        <CalculatorForm
-          values={inputValues}
-          errors={derivedState.fieldErrors}
-          fieldNotes={fieldNotes}
-          ageBasedSpendingEnabled={ageBasedSpendingEnabled}
-          retirementSpendingInflationAdjusted={retirementSpendingInflationAdjusted}
-          retirementAge={displayedResult.retirementAge}
-          onFieldChange={handleFieldChange}
-          onAgeBasedSpendingEnabledChange={handleAgeBasedSpendingEnabledChange}
-          onRetirementSpendingInflationAdjustedChange={handleRetirementSpendingInflationAdjustedChange}
-        />
-      </FormColumn>
-      <ResultsColumn aria-live="polite">
-        <CalculatorResults
-          result={displayedResult}
-          statusMessage={statusMessage}
-          onRetirementAgeChange={handleRetirementAgeChange}
-        />
-      </ResultsColumn>
-    </Layout>
+    <MobileLayout>
+      <MobileTabBar ref={tabBarRef}>
+        <MobileTabButton
+          type="button"
+          $active={mobileTab === "assumptions"}
+          onClick={switchToAssumptions}
+        >
+          Assumptions
+        </MobileTabButton>
+        <MobileTabButton
+          type="button"
+          $active={mobileTab === "projection"}
+          onClick={switchToProjection}
+        >
+          Projection
+        </MobileTabButton>
+      </MobileTabBar>
+
+      {mobileTab === "assumptions" ? (
+        <MobilePanel>
+          {formElement}
+          <SeeProjectionButton type="button" onClick={switchToProjection}>
+            See Retirement Projection &rarr;
+          </SeeProjectionButton>
+        </MobilePanel>
+      ) : (
+        <MobilePanel aria-live="polite">
+          <BackToAssumptions type="button" onClick={switchToAssumptions}>
+            &larr; Edit Assumptions
+          </BackToAssumptions>
+          {resultsElement}
+        </MobilePanel>
+      )}
+    </MobileLayout>
   );
 }
 
-const Layout = styled.div`
-  display: grid;
-  gap: 20px;
-  grid-template-areas:
-    "results"
-    "form";
+/* ---- Desktop layout ---- */
 
-  @media (min-width: ${theme.breakpoints.lg}) {
-    grid-template-columns: minmax(300px, 360px) minmax(0, 1fr);
-    grid-template-areas: "form results";
-    gap: 24px;
-    align-items: start;
-  }
+const DesktopLayout = styled.div`
+  display: grid;
+  grid-template-columns: minmax(300px, 360px) minmax(0, 1fr);
+  grid-template-areas: "form results";
+  gap: 24px;
+  align-items: start;
 `;
 
 const FormColumn = styled.aside`
@@ -384,4 +484,85 @@ const ResultsColumn = styled.section`
   grid-area: results;
   display: grid;
   gap: 18px;
+`;
+
+/* ---- Mobile layout ---- */
+
+const MobileLayout = styled.div`
+  display: grid;
+  gap: 0;
+`;
+
+const MobileTabBar = styled.div`
+  position: sticky;
+  top: ${HEADER_HEIGHT}px;
+  z-index: 30;
+  display: flex;
+  background: rgba(247, 247, 247, 0.94);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid ${theme.colors.border};
+  margin-inline: -${theme.layout.containerXMobile};
+  padding-inline: ${theme.layout.containerXMobile};
+  scroll-margin-top: ${HEADER_HEIGHT}px;
+
+  @media (min-width: ${theme.breakpoints.sm}) {
+    margin-inline: -${theme.layout.containerXTablet};
+    padding-inline: ${theme.layout.containerXTablet};
+  }
+`;
+
+const MobileTabButton = styled.button<{ $active: boolean }>`
+  flex: 1;
+  padding: 12px 0;
+  border: none;
+  background: transparent;
+  font-size: 0.88rem;
+  font-weight: 620;
+  color: ${({ $active }) => ($active ? theme.colors.text : theme.colors.mutedText)};
+  border-bottom: 2px solid ${({ $active }) => ($active ? theme.colors.accent : "transparent")};
+  cursor: pointer;
+  outline: none;
+  transition: color 120ms ease, border-color 120ms ease;
+  -webkit-tap-highlight-color: transparent;
+`;
+
+const MobilePanel = styled.div`
+  display: grid;
+  gap: 18px;
+  padding-top: 18px;
+`;
+
+const SeeProjectionButton = styled.button`
+  width: 100%;
+  padding: 16px;
+  border: none;
+  border-radius: ${theme.radii.md};
+  background: ${theme.colors.accent};
+  color: #ffffff;
+  font-size: 0.95rem;
+  font-weight: 640;
+  cursor: pointer;
+  transition: background 120ms ease;
+  -webkit-tap-highlight-color: transparent;
+
+  &:hover {
+    background: ${theme.colors.accentHover};
+  }
+`;
+
+const BackToAssumptions = styled.button`
+  justify-self: start;
+  padding: 8px 0;
+  border: none;
+  background: transparent;
+  color: ${theme.colors.accent};
+  font-size: 0.88rem;
+  font-weight: 620;
+  cursor: pointer;
+  transition: color 120ms ease;
+  -webkit-tap-highlight-color: transparent;
+
+  &:hover {
+    color: ${theme.colors.accentHover};
+  }
 `;

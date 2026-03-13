@@ -11,7 +11,7 @@ export const theme = {
     accentHover: "#1D4ED8",
     mutedText: "#6B7280",
     mutedTextStrong: "#4B5563",
-    focusRing: "rgba(15, 23, 42, 0.14)",
+    focusRing: "rgba(15, 42, 15, 0.14)",
     infoSurface: "#FFFBEB",
     infoBorder: "#FDE68A",
     infoText: "#92400E",
@@ -34,6 +34,8 @@ export const theme = {
     chartTarget: "#0B7285",
     chartEvent: "#334155",
     chartWindfall: "#0F766E",
+    chartImproved: "#16A34A",
+    chartBenchmark: "#93C5FD",
     chartDepletion: "#8A5858",
   },
   radii: {

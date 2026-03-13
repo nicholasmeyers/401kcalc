@@ -124,17 +124,26 @@ export default function GuidesPage() {
 }
 
 const HeroSection = styled(Section)`
-  padding-top: 52px;
-  padding-bottom: 30px;
+  padding-top: 28px;
+  padding-bottom: 24px;
+
+  @media (min-width: ${theme.breakpoints.md}) {
+    padding-top: 48px;
+    padding-bottom: 30px;
+  }
 `;
 
 const HeroCard = styled(SurfaceCard)`
-  padding: 34px;
+  padding: 22px;
   display: grid;
   gap: 24px;
   background:
     radial-gradient(circle at top right, rgba(37, 99, 235, 0.08), transparent 58%),
     ${theme.colors.surface};
+
+  @media (min-width: ${theme.breakpoints.sm}) {
+    padding: 34px;
+  }
 
   @media (min-width: ${theme.breakpoints.md}) {
     padding: 44px;

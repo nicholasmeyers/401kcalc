@@ -65,6 +65,7 @@ const Actions = styled.div`
 const GuideLink = styled(Link)`
   display: inline-flex;
   align-items: center;
+  min-height: 44px;
   font-size: 0.92rem;
   font-weight: 600;
   color: #374151;
