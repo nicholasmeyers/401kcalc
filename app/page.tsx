@@ -11,7 +11,7 @@ import { formatGuideDate, getAllGuides, getGuideDateObject, getGuideReviewedDate
 import { siteConfig } from "@/lib/site";
 import { theme } from "@/styles/theme";
 
-const utilityPoints = [
+const calculatorUtilityPoints = [
   {
     title: "Projected retirement balance",
     body: "Estimate how your current balance, contributions, and return assumptions may compound through retirement age.",
@@ -27,6 +27,25 @@ const utilityPoints = [
   {
     title: "Estimated retirement income",
     body: "Translate balance projections into an annual income estimate to evaluate readiness instead of only chasing a balance target.",
+  },
+];
+
+const benchmarkUtilityPoints = [
+  {
+    title: "Age-based savings checkpoints",
+    body: "See how your current 401(k) balance compares to common savings benchmarks for your age group.",
+  },
+  {
+    title: "Projected savings path",
+    body: "Model how your balance may grow from today through age 70 based on your contribution rate and return assumptions.",
+  },
+  {
+    title: "Catch-up scenario modeling",
+    body: "Test how increasing your contribution rate each year could close the gap between your balance and the benchmark.",
+  },
+  {
+    title: "Milestone comparison",
+    body: "See projected balances at future checkpoints and whether your current path keeps pace with age-based targets.",
   },
 ];
 
@@ -84,23 +103,39 @@ export const metadata: Metadata = {
 };
 
 export default function HomePage() {
-  const webSiteSchema = {
+  const breadcrumbSchema = {
     "@context": "https://schema.org",
-    "@type": "WebSite",
-    name: siteConfig.name,
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Home",
+        item: siteConfig.url,
+      },
+    ],
+  };
+
+  const webPageSchema = {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    name: "401(k) Calculator for Retirement Projections",
+    description:
+      "Model your 401(k) growth, compare retirement scenarios, and make clearer long-term planning decisions with transparent assumptions.",
     url: siteConfig.url,
-    description: siteConfig.description,
+    isPartOf: { "@type": "WebSite", url: siteConfig.url, name: siteConfig.name },
     publisher: {
       "@type": "Organization",
       name: siteConfig.legalName,
       url: siteConfig.url,
+      logo: { "@type": "ImageObject", url: `${siteConfig.url}/images/logo.png` },
     },
-    inLanguage: "en-US",
   };
 
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webSiteSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageSchema) }} />
 
       <HeroSection>
         <Container>
@@ -113,26 +148,15 @@ export default function HomePage() {
               >
                 <HeroActions>
                   <ButtonLink href="/401k-calculator">Open 401(k) Calculator</ButtonLink>
+                  <ButtonLink href="/retirement-by-age" variant="secondary">
+                    Retirement Age Benchmarks
+                  </ButtonLink>
                   <ButtonLink href="/guides" variant="secondary">
                     Browse Guides
                   </ButtonLink>
                 </HeroActions>
-                <HeroSignals aria-label="Calculator value signals">
-                  <SignalPill>Projection to retirement age</SignalPill>
-                  <SignalPill>Inflation-aware outcomes</SignalPill>
-                  <SignalPill>Assumptions fully visible</SignalPill>
-                </HeroSignals>
               </PageIntro>
             </HeroContent>
-            <HeroSummary>
-              <SummaryLabel>What you can answer quickly</SummaryLabel>
-              <SummaryList>
-                <SummaryItem>How much your 401(k) could grow by retirement</SummaryItem>
-                <SummaryItem>How much employer match adds over time</SummaryItem>
-                <SummaryItem>How inflation changes real retirement value</SummaryItem>
-                <SummaryItem>What annual retirement income the balance may support</SummaryItem>
-              </SummaryList>
-            </HeroSummary>
           </HeroCard>
         </Container>
       </HeroSection>
@@ -144,15 +168,34 @@ export default function HomePage() {
             A focused planning view for key retirement questions, without dashboard noise.
           </SectionSubtitle>
           <UtilityGrid>
-            {utilityPoints.map((point) => (
+            {calculatorUtilityPoints.map((point) => (
               <UtilityCard key={point.title}>
                 <UtilityTitle>{point.title}</UtilityTitle>
                 <UtilityBody>{point.body}</UtilityBody>
               </UtilityCard>
             ))}
           </UtilityGrid>
+          <UtilityLink href="/401k-calculator">Open 401(k) Calculator &rarr;</UtilityLink>
         </Container>
       </UtilitySection>
+
+      <BenchmarkUtilitySection>
+        <Container>
+          <SectionTitle>What the retirement by age simulator helps you understand</SectionTitle>
+          <SectionSubtitle>
+            Age-based checkpoints and projection tools to see whether your savings are keeping pace.
+          </SectionSubtitle>
+          <UtilityGrid>
+            {benchmarkUtilityPoints.map((point) => (
+              <UtilityCard key={point.title}>
+                <UtilityTitle>{point.title}</UtilityTitle>
+                <UtilityBody>{point.body}</UtilityBody>
+              </UtilityCard>
+            ))}
+          </UtilityGrid>
+          <UtilityLink href="/retirement-by-age">Open Retirement Age Benchmarks &rarr;</UtilityLink>
+        </Container>
+      </BenchmarkUtilitySection>
 
       <TrustSection>
         <Container>
@@ -227,93 +270,28 @@ export default function HomePage() {
 }
 
 const HeroSection = styled(Section)`
-  padding-top: 52px;
-  padding-bottom: 34px;
+  padding-top: 24px;
+  padding-bottom: 24px;
+
+  @media (min-width: ${theme.breakpoints.md}) {
+    padding-top: 52px;
+    padding-bottom: 34px;
+  }
 `;
 
 const HeroCard = styled(SurfaceCard)`
-  padding: 34px;
-  display: grid;
-  gap: 28px;
+  padding: 24px;
   background:
     radial-gradient(circle at top right, rgba(37, 99, 235, 0.1), transparent 62%),
     ${theme.colors.surface};
 
-  @media (min-width: ${theme.breakpoints.lg}) {
-    grid-template-columns: minmax(0, 1.5fr) minmax(260px, 1fr);
-    align-items: start;
+  @media (min-width: ${theme.breakpoints.md}) {
+    padding: 34px;
   }
 `;
 
 const HeroContent = styled.div`
   min-width: 0;
-`;
-
-const HeroSignals = styled.ul`
-  margin-top: 18px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-`;
-
-const SignalPill = styled.li`
-  height: 32px;
-  display: inline-flex;
-  align-items: center;
-  padding-inline: 12px;
-  border-radius: ${theme.radii.pill};
-  border: 1px solid ${theme.colors.border};
-  background: rgba(255, 255, 255, 0.86);
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: ${theme.colors.mutedTextStrong};
-`;
-
-const HeroSummary = styled.aside`
-  border: 1px solid ${theme.colors.border};
-  border-radius: ${theme.radii.lg};
-  background: rgba(255, 255, 255, 0.82);
-  padding: 20px;
-  display: grid;
-  gap: 12px;
-
-  @media (min-width: ${theme.breakpoints.lg}) {
-    margin-top: 18px;
-    position: relative;
-    top: 2px;
-  }
-`;
-
-const SummaryLabel = styled.p`
-  font-size: 0.74rem;
-  font-weight: 700;
-  color: ${theme.colors.mutedText};
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-`;
-
-const SummaryList = styled.ul`
-  display: grid;
-  gap: 10px;
-`;
-
-const SummaryItem = styled.li`
-  font-size: 0.9rem;
-  line-height: 1.55;
-  color: ${theme.colors.textSecondary};
-  position: relative;
-  padding-left: 14px;
-
-  &::before {
-    content: "";
-    position: absolute;
-    left: 0;
-    top: 0.5rem;
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: ${theme.colors.accent};
-  }
 `;
 
 const HeroActions = styled.div`
@@ -325,8 +303,37 @@ const HeroActions = styled.div`
 
 const UtilitySection = styled(Section)`
   padding-top: 14px;
-  border-block: 1px solid ${theme.colors.border};
+  border-top: 1px solid ${theme.colors.border};
   background: rgba(255, 255, 255, 0.64);
+
+  @media (min-width: ${theme.breakpoints.md}) {
+    padding-top: 40px;
+  }
+`;
+
+const BenchmarkUtilitySection = styled(Section)`
+  padding-top: 14px;
+  border-bottom: 1px solid ${theme.colors.border};
+  background: rgba(255, 255, 255, 0.64);
+
+  @media (min-width: ${theme.breakpoints.md}) {
+    padding-top: 40px;
+  }
+`;
+
+const UtilityLink = styled(Link)`
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  margin-top: 20px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: ${theme.colors.accent};
+  transition: color 120ms ease;
+
+  &:hover {
+    color: ${theme.colors.accentHover};
+  }
 `;
 
 const UtilityGrid = styled.div`
@@ -388,6 +395,9 @@ const TrustBody = styled.p`
 
 const TrustLink = styled(Link)`
   width: fit-content;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
   font-size: 0.86rem;
   font-weight: 700;
   color: ${theme.colors.accent};

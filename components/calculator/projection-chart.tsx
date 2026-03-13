@@ -496,18 +496,20 @@ const ChartViewport = styled.div<{ $dragging: boolean }>`
   overflow: visible;
   touch-action: ${(props) => (props.$dragging ? "none" : "pan-y")};
 
-  .recharts-wrapper:focus,
-  .recharts-wrapper:focus-visible,
-  .recharts-surface:focus,
-  .recharts-surface:focus-visible {
+  *:focus,
+  *:focus-visible {
     outline: none;
   }
 `;
 
 const LegendRow = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  grid-template-columns: 1fr;
   gap: 8px;
+
+  @media (min-width: ${theme.breakpoints.sm}) {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  }
 `;
 
 const LegendItem = styled.div`

@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import styled from "styled-components";
@@ -50,6 +51,7 @@ export default function CalculatorPage() {
       "@type": "Organization",
       name: siteConfig.legalName,
       url: siteConfig.url,
+      logo: { "@type": "ImageObject", url: `${siteConfig.url}/images/logo.png` },
     },
     featureList: [
       "Projected balance over time",
@@ -98,7 +100,9 @@ export default function CalculatorPage() {
 
       <CalculatorSection>
         <Container>
-          <CalculatorExperience />
+          <Suspense>
+            <CalculatorExperience />
+          </Suspense>
         </Container>
       </CalculatorSection>
     </>
@@ -106,8 +110,13 @@ export default function CalculatorPage() {
 }
 
 const IntroSection = styled(Section)`
-  padding-top: 52px;
-  padding-bottom: 30px;
+  padding-top: 28px;
+  padding-bottom: 24px;
+
+  @media (min-width: ${theme.breakpoints.md}) {
+    padding-top: 48px;
+    padding-bottom: 30px;
+  }
 `;
 
 const MethodologyLink = styled(Link)`

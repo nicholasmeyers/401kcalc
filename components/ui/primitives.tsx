@@ -15,7 +15,6 @@ export const SectionTitle = styled.h2`
 `;
 
 export const SectionSubtitle = styled.p`
-  max-width: 40rem;
   margin-top: 0.75rem;
   font-size: 1rem;
 `;

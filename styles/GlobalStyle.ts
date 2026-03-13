@@ -13,10 +13,13 @@ export const GlobalStyle = createGlobalStyle`
   body {
     margin: 0;
     padding: 0;
+    overflow-x: clip;
   }
 
   body {
-    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
     background: ${theme.colors.background};
     color: ${theme.colors.text};
     font-family: var(--font-sans), "Avenir Next", "Segoe UI", sans-serif;
@@ -54,6 +57,11 @@ export const GlobalStyle = createGlobalStyle`
 
   main {
     display: block;
+    flex: 1 0 auto;
+  }
+
+  footer {
+    flex-shrink: 0;
   }
 
   ::selection {

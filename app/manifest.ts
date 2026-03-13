@@ -8,18 +8,25 @@ export default function manifest(): MetadataRoute.Manifest {
       "Model your 401(k) growth with transparent assumptions, year-by-year retirement drawdown simulation, and practical planning guides.",
     start_url: "/",
     display: "standalone",
-    background_color: "#f8fafc",
+    background_color: "#F7F7F7",
     theme_color: "#2563eb",
     icons: [
       {
-        src: "/icon.svg",
-        sizes: "any",
-        type: "image/svg+xml",
+        src: "/favicon.ico",
+        sizes: "16x16 32x32 48x48",
+        type: "image/x-icon",
       },
       {
-        src: "/apple-icon",
-        sizes: "180x180",
+        src: "/images/logo-icon-192.png",
+        sizes: "192x192",
         type: "image/png",
+        purpose: "any",
+      },
+      {
+        src: "/images/logo-icon-512.png",
+        sizes: "512x512",
+        type: "image/png",
+        purpose: "any",
       },
     ],
   };

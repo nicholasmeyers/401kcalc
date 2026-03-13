@@ -106,6 +106,10 @@ export default async function GuideDetailPage({ params }: GuidePageProps) {
       "@type": "Organization",
       name: siteConfig.legalName,
       url: siteConfig.url,
+      logo: {
+        "@type": "ImageObject",
+        url: `${siteConfig.url}/images/logo.png`,
+      },
     },
     articleSection: guide.category,
     mainEntityOfPage: {
@@ -238,8 +242,13 @@ export default async function GuideDetailPage({ params }: GuidePageProps) {
 }
 
 const IntroSection = styled(Section)`
-  padding-top: 52px;
-  padding-bottom: 26px;
+  padding-top: 24px;
+  padding-bottom: 20px;
+
+  @media (min-width: ${theme.breakpoints.md}) {
+    padding-top: 48px;
+    padding-bottom: 26px;
+  }
 `;
 
 const IntroArticle = styled.article`
