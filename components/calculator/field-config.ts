@@ -82,7 +82,7 @@ export const contributionFieldConfigs: CalculatorFieldConfig[] = [
     slider: {
       min: 0,
       max: 40,
-      step: 0.1,
+      step: 1,
     },
   },
   {
