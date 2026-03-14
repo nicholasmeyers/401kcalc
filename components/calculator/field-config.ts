@@ -17,7 +17,7 @@ export type CalculatorFieldConfig = {
   tooltip?: string;
 };
 
-export const primaryFieldConfigs: CalculatorFieldConfig[] = [
+export const retirementGoalFieldConfigs: CalculatorFieldConfig[] = [
   {
     field: "currentAge",
     label: "Current age",
@@ -45,26 +45,35 @@ export const primaryFieldConfigs: CalculatorFieldConfig[] = [
     tooltip:
       "Annual amount you want to spend in retirement in today's dollars. When inflation adjustment is on, withdrawals grow each year.",
   },
+];
+
+export const balanceFieldConfigs: CalculatorFieldConfig[] = [
   {
     field: "currentBalance",
-    label: "Current 401(k) balance",
-    description: "Current invested account balance.",
+    label: "Total 401(k) balance",
+    description: "Your total current 401(k) balance across all accounts.",
     kind: "currency",
   },
   {
     field: "currentRothBalance",
     label: "Roth 401(k) balance",
-    description: "Portion of your current 401(k) balance that is already in Roth.",
+    description: "Portion of your balance that is already in a Roth 401(k).",
     kind: "currency",
     tooltip:
       "If part of your existing 401(k) is in a Roth account, enter that amount here. The rest is treated as traditional (pre-tax).",
   },
+];
+
+export const incomeFieldConfigs: CalculatorFieldConfig[] = [
   {
     field: "annualSalary",
     label: "Annual salary",
     description: "Pre-tax salary for contribution estimates.",
     kind: "currency",
   },
+];
+
+export const contributionFieldConfigs: CalculatorFieldConfig[] = [
   {
     field: "contributionPercent",
     label: "Contribution percent",
@@ -77,9 +86,18 @@ export const primaryFieldConfigs: CalculatorFieldConfig[] = [
     },
   },
   {
+    field: "employerMatchPercent",
+    label: "Employer match percent",
+    description: "Estimated employer contribution as a percentage of salary.",
+    kind: "percent",
+  },
+];
+
+export const rothStrategyFieldConfigs: CalculatorFieldConfig[] = [
+  {
     field: "rothContributionPercent",
     label: "Roth contribution %",
-    description: "How much of your annual 401(k) contribution goes to Roth instead of traditional.",
+    description: "What percentage of your 401(k) contributions go to Roth instead of traditional.",
     kind: "percent",
     slider: {
       min: 0,
@@ -88,12 +106,6 @@ export const primaryFieldConfigs: CalculatorFieldConfig[] = [
     },
     tooltip:
       "Traditional contributions reduce taxes now; Roth contributions create tax-free income in retirement.",
-  },
-  {
-    field: "employerMatchPercent",
-    label: "Employer match percent",
-    description: "Estimated employer contribution as a percentage of salary.",
-    kind: "percent",
   },
 ];
 
@@ -177,7 +189,11 @@ export const ageBasedSpendingFieldConfigs: CalculatorFieldConfig[] = [
 ];
 
 export const allFieldConfigs: CalculatorFieldConfig[] = [
-  ...primaryFieldConfigs,
+  ...retirementGoalFieldConfigs,
+  ...balanceFieldConfigs,
+  ...incomeFieldConfigs,
+  ...contributionFieldConfigs,
+  ...rothStrategyFieldConfigs,
   ...advancedFieldConfigs,
   ...ageBasedSpendingFieldConfigs,
 ];

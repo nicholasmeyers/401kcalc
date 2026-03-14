@@ -1,15 +1,21 @@
 "use client";
 
-import type { ReactNode } from "react";
+import { useMemo, type ReactNode } from "react";
 import styled from "styled-components";
 
 import { CalculatorField } from "@/components/calculator/calculator-field";
 import {
   advancedFieldConfigs,
   ageBasedSpendingFieldConfigs,
-  primaryFieldConfigs,
+  balanceFieldConfigs,
+  contributionFieldConfigs,
+  incomeFieldConfigs,
+  retirementGoalFieldConfigs,
+  rothStrategyFieldConfigs,
   type CalculatorFieldConfig,
 } from "@/components/calculator/field-config";
+import { formatCurrency } from "@/lib/calculator/format";
+import { parseLooseNumber } from "@/lib/calculator/input";
 import type { InputField } from "@/lib/calculator/types";
 import { SurfaceCard } from "@/components/ui/primitives";
 import { theme } from "@/styles/theme";
@@ -77,6 +83,20 @@ export function CalculatorForm({
       />
     ));
 
+  const totalBalanceDisplay = useMemo(() => {
+    const total = parseLooseNumber(values.currentBalance);
+    const roth = parseLooseNumber(values.currentRothBalance);
+    if (total === null) return null;
+    const rothValue = roth ?? 0;
+    const traditionalValue = Math.max(0, total - rothValue);
+    return {
+      total: formatCurrency(total),
+      traditional: formatCurrency(traditionalValue),
+      roth: formatCurrency(rothValue),
+      hasRoth: rothValue > 0,
+    };
+  }, [values.currentBalance, values.currentRothBalance]);
+
   return (
     <FormPanel>
       <Header>
@@ -86,11 +106,49 @@ export function CalculatorForm({
         </Subtitle>
       </Header>
 
-      <FieldStack>{renderFieldList(primaryFieldConfigs)}</FieldStack>
+      <Section>
+        <SectionLabel>Retirement Goal</SectionLabel>
+        <FieldStack>{renderFieldList(retirementGoalFieldConfigs)}</FieldStack>
+      </Section>
+
+      <Section>
+        <SectionLabel>Current 401(k) Balances</SectionLabel>
+        <FieldStack>
+          {renderFieldList(balanceFieldConfigs)}
+          {totalBalanceDisplay ? (
+            <DerivedRow>
+              {totalBalanceDisplay.hasRoth ? (
+                <>
+                  <span>Traditional: {totalBalanceDisplay.traditional}</span>
+                  <DerivedSeparator>&middot;</DerivedSeparator>
+                  <span>Roth: {totalBalanceDisplay.roth}</span>
+                  <DerivedSeparator>&middot;</DerivedSeparator>
+                </>
+              ) : null}
+              <span>Total 401(k): {totalBalanceDisplay.total}</span>
+            </DerivedRow>
+          ) : null}
+        </FieldStack>
+      </Section>
+
+      <Section>
+        <SectionLabel>Income</SectionLabel>
+        <FieldStack>{renderFieldList(incomeFieldConfigs)}</FieldStack>
+      </Section>
+
+      <Section>
+        <SectionLabel>Contribution Strategy</SectionLabel>
+        <FieldStack>{renderFieldList(contributionFieldConfigs)}</FieldStack>
+      </Section>
+
+      <Section>
+        <SectionLabel>Roth Strategy</SectionLabel>
+        <FieldStack>{renderFieldList(rothStrategyFieldConfigs)}</FieldStack>
+      </Section>
 
       <AdvancedAssumptions>
         <AdvancedSummary>
-          <SummaryTitle>Advanced assumptions</SummaryTitle>
+          <AdvancedSummaryTitle>Advanced assumptions</AdvancedSummaryTitle>
           <SummaryHint>Windfall, salary growth, investment return, inflation, and spending settings</SummaryHint>
         </AdvancedSummary>
         <AdvancedFields>
@@ -137,7 +195,7 @@ export function CalculatorForm({
 const FormPanel = styled(SurfaceCard)`
   padding: 24px;
   display: grid;
-  gap: 20px;
+  gap: 24px;
 
   @media (max-width: ${theme.breakpoints.md}) {
     padding: 20px;
@@ -159,9 +217,39 @@ const Subtitle = styled.p`
   color: ${theme.colors.mutedTextStrong};
 `;
 
+const Section = styled.section`
+  display: grid;
+  gap: 14px;
+`;
+
+const SectionLabel = styled.h3`
+  font-size: 0.8rem;
+  font-weight: 640;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: ${theme.colors.mutedTextStrong};
+  padding-bottom: 2px;
+  border-bottom: 1px solid ${theme.colors.border};
+`;
+
 const FieldStack = styled.div`
   display: grid;
   gap: 18px;
+`;
+
+const DerivedRow = styled.p`
+  font-size: 0.82rem;
+  font-weight: 560;
+  color: ${theme.colors.mutedTextStrong};
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 0;
+`;
+
+const DerivedSeparator = styled.span`
+  margin-inline: 6px;
+  color: ${theme.colors.mutedText};
 `;
 
 const AdvancedAssumptions = styled.details`
@@ -188,7 +276,7 @@ const AdvancedSummary = styled.summary`
   }
 `;
 
-const SummaryTitle = styled.p`
+const AdvancedSummaryTitle = styled.p`
   font-size: 0.84rem;
   font-weight: 640;
   text-transform: uppercase;

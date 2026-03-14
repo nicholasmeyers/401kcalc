@@ -12,6 +12,7 @@ import {
   COMPENSATION_LIMIT,
   defaultCalculatorInputs,
 } from "@/lib/calculator/defaults";
+import { formatCurrency } from "@/lib/calculator/format";
 import { parseLooseNumber } from "@/lib/calculator/input";
 import {
   CalculatorInputError,
@@ -19,7 +20,6 @@ import {
   normalizeInputs,
   validateInputs,
 } from "@/lib/calculator/math";
-import { formatCurrency } from "@/lib/calculator/format";
 import { trackEvent } from "@/lib/analytics";
 import type { CalculatorInputs, InputField, RetirementProjectionResult, ValidationIssue } from "@/lib/calculator/types";
 import { theme } from "@/styles/theme";
@@ -226,30 +226,27 @@ export function CalculatorExperience() {
     };
   }, [ageBasedSpendingEnabled, inputValues, retirementSpendingInflationAdjusted]);
 
-  const rothSplitNote = useMemo(() => {
+  const rothSplitNote = useMemo((): ReactNode | undefined => {
     const rothPct = parseLooseNumber(inputValues.rothContributionPercent);
     if (rothPct === null || rothPct <= 0) return undefined;
     const traditionalPct = Math.round(100 - rothPct);
-    return `Traditional: ${traditionalPct}% · Roth: ${Math.round(rothPct)}% — You\u2019re building tax-free retirement income with Roth contributions.`;
+    return (
+      <>
+        Traditional: {traditionalPct}% &middot; Roth: {Math.round(rothPct)}%
+        <br />
+        You&apos;re building tax-free retirement income with Roth contributions.
+      </>
+    );
   }, [inputValues.rothContributionPercent]);
-
-  const rothBalanceNote = useMemo(() => {
-    const rothBal = parseLooseNumber(inputValues.currentRothBalance);
-    const totalBal = parseLooseNumber(inputValues.currentBalance);
-    if (rothBal === null || totalBal === null || rothBal <= 0) return undefined;
-    const traditionalBal = Math.max(0, totalBal - rothBal);
-    return `Traditional balance: ${formatCurrency(traditionalBal)} · Roth balance: ${formatCurrency(rothBal)}`;
-  }, [inputValues.currentRothBalance, inputValues.currentBalance]);
 
   const fieldNotes = useMemo<Partial<Record<InputField, ReactNode>>>(
     () => ({
       contributionPercent: CONTRIBUTION_LIMITS_DISCLOSURE,
       ...(rothSplitNote ? { rothContributionPercent: rothSplitNote } : {}),
-      ...(rothBalanceNote ? { currentRothBalance: rothBalanceNote } : {}),
       ...(derivedState.salaryCapNote ? { annualSalary: derivedState.salaryCapNote } : {}),
       ...(derivedState.windfallNote ? { windfallAmount: derivedState.windfallNote } : {}),
     }),
-    [rothSplitNote, rothBalanceNote, derivedState.salaryCapNote, derivedState.windfallNote]
+    [rothSplitNote, derivedState.salaryCapNote, derivedState.windfallNote]
   );
 
   const statusMessage =
