@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import React from "react";
 import styled from "styled-components";
 
 import { ButtonLink } from "@/components/ui/button-link";
@@ -17,8 +18,18 @@ import {
   getGuideSlugs,
   getRelatedGuides,
 } from "@/lib/guides/guides";
+import { getRetirementBenchmarkByAge } from "@/lib/retirement-benchmarks/benchmarks";
 import { siteConfig } from "@/lib/site";
 import { theme } from "@/styles/theme";
+
+const MILESTONE_SLUG_RE = /^how-much-should-i-have-in-my-401k-at-(\d+)$/;
+
+function getMilestoneAge(slug: string): number | undefined {
+  const match = MILESTONE_SLUG_RE.exec(slug);
+  if (!match) return undefined;
+  const age = Number.parseInt(match[1], 10);
+  return getRetirementBenchmarkByAge(age) ? age : undefined;
+}
 
 type GuidePageProps = {
   params: Promise<{ slug: string }>;
@@ -78,6 +89,7 @@ export default async function GuideDetailPage({ params }: GuidePageProps) {
   }
 
   const relatedGuides = getRelatedGuides(guide.slug);
+  const milestoneAge = getMilestoneAge(guide.slug);
   const author = getAuthorById(guide.authorId);
   const reviewedSourceDate = getGuideReviewedDate(guide);
   const reviewedDate = formatGuideDate(reviewedSourceDate);
@@ -181,30 +193,43 @@ export default async function GuideDetailPage({ params }: GuidePageProps) {
         <Container>
           <BodyCard as="article">
             {guide.content.map((section, sectionIndex) => (
-              <ContentBlock key={`${guide.slug}-${section.heading}-${sectionIndex}`}>
-                <Heading>{section.heading}</Heading>
-                <ParagraphWrap>
-                  {section.paragraphs.map((paragraph, paragraphIndex) => (
-                    <Copy key={`${guide.slug}-${section.heading}-paragraph-${paragraphIndex}`}>{paragraph}</Copy>
-                  ))}
-                </ParagraphWrap>
-                {section.bullets?.length ? (
-                  <List>
-                    {section.bullets.map((bullet, bulletIndex) => (
-                      <ListItem key={`${guide.slug}-${section.heading}-bullet-${bulletIndex}`}>{bullet}</ListItem>
+              <React.Fragment key={`${guide.slug}-${section.heading}-${sectionIndex}`}>
+                <ContentBlock>
+                  <Heading>{section.heading}</Heading>
+                  <ParagraphWrap>
+                    {section.paragraphs.map((paragraph, paragraphIndex) => (
+                      <Copy key={`${guide.slug}-${section.heading}-paragraph-${paragraphIndex}`}>{paragraph}</Copy>
                     ))}
-                  </List>
-                ) : null}
-                {section.links?.length ? (
-                  <InlineLinkRow>
-                    {section.links.map((sectionLink, linkIndex) => (
-                      <InlineLink key={`${guide.slug}-${section.heading}-link-${linkIndex}`} href={sectionLink.href}>
-                        {sectionLink.label}
-                      </InlineLink>
-                    ))}
-                  </InlineLinkRow>
-                ) : null}
-              </ContentBlock>
+                  </ParagraphWrap>
+                  {section.bullets?.length ? (
+                    <List>
+                      {section.bullets.map((bullet, bulletIndex) => (
+                        <ListItem key={`${guide.slug}-${section.heading}-bullet-${bulletIndex}`}>{bullet}</ListItem>
+                      ))}
+                    </List>
+                  ) : null}
+                  {section.links?.length ? (
+                    <InlineLinkRow>
+                      {section.links.map((sectionLink, linkIndex) => (
+                        <InlineLink key={`${guide.slug}-${section.heading}-link-${linkIndex}`} href={sectionLink.href}>
+                          {sectionLink.label}
+                        </InlineLink>
+                      ))}
+                    </InlineLinkRow>
+                  ) : null}
+                </ContentBlock>
+
+                {sectionIndex === 1 && milestoneAge != null && (
+                  <BenchmarkCta>
+                    <CtaTitle>See the age {milestoneAge} retirement benchmark</CtaTitle>
+                    <CtaText>
+                      Compare your savings against common age-{milestoneAge} milestones, model catch-up strategies, and build a personalized plan with the
+                      retirement benchmark planner.
+                    </CtaText>
+                    <ButtonLink href={`/retirement-by-age/${milestoneAge}`}>Open Age {milestoneAge} Benchmark Planner</ButtonLink>
+                  </BenchmarkCta>
+                )}
+              </React.Fragment>
             ))}
 
             <CalculatorCta>
@@ -437,6 +462,16 @@ const CalculatorCta = styled(SurfaceCard)`
   border-radius: ${theme.radii.md};
   background:
     radial-gradient(circle at top right, rgba(37, 99, 235, 0.08), transparent 58%),
+    ${theme.colors.surfaceMuted};
+  display: grid;
+  gap: 12px;
+`;
+
+const BenchmarkCta = styled(SurfaceCard)`
+  padding: 24px;
+  border-radius: ${theme.radii.md};
+  background:
+    radial-gradient(circle at top right, rgba(22, 163, 74, 0.08), transparent 58%),
     ${theme.colors.surfaceMuted};
   display: grid;
   gap: 12px;

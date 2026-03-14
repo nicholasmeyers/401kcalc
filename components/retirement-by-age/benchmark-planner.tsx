@@ -264,7 +264,7 @@ export function BenchmarkPlanner({ initialAge, onAgeChange }: BenchmarkPlannerPr
     if (suggestion.kind === "increase") {
       setEscalation(String(suggestion.amount));
     } else if (suggestion.kind === "fallback") {
-      setEscalation("5");
+      setEscalation("10");
     }
   }, [suggestion]);
 
@@ -488,12 +488,12 @@ export function BenchmarkPlanner({ initialAge, onAgeChange }: BenchmarkPlannerPr
               <SectionHeading>Projected savings path</SectionHeading>
               {suggestion.kind === "increase" && (
                 <ChartNudge onClick={handleApplySuggestion}>
-                  &#x1f4a1; Apply +{suggestion.amount} pts/yr
+                  &#x1f4a1; Raise your rate by {suggestion.amount} pts/yr to reach the benchmark &mdash; Apply +{suggestion.amount}
                 </ChartNudge>
               )}
               {suggestion.kind === "fallback" && (
                 <ChartNudge onClick={handleApplySuggestion}>
-                  &#x1f4a1; Apply +10 pts/yr
+                  &#x1f4a1; Raising your rate by 10 pts/yr could reach {suggestion.pctOfAge70}% of the age-70 benchmark &mdash; Apply +10
                 </ChartNudge>
               )}
             </ChartHeader>
@@ -767,8 +767,7 @@ const ChartHeader = styled.div`
 `;
 
 const ChartNudge = styled.button`
-  height: 30px;
-  padding-inline: 12px;
+  padding: 6px 12px;
   border: 1px solid ${theme.colors.successBorder};
   border-radius: ${theme.radii.pill};
   background: ${theme.colors.successSurface};
@@ -776,8 +775,10 @@ const ChartNudge = styled.button`
   font-size: 0.76rem;
   font-weight: 600;
   cursor: pointer;
-  white-space: nowrap;
   transition: background 120ms ease, border-color 120ms ease;
+  outline: none;
+  text-align: left;
+  line-height: 1.4;
 
   &:hover {
     background: ${theme.colors.successBorder};
@@ -886,6 +887,7 @@ const ApplyButton = styled.button`
   cursor: pointer;
   white-space: nowrap;
   transition: background 120ms ease;
+  outline: none;
 
   &:hover {
     background: #15803D;
