@@ -178,7 +178,7 @@ const guides: Guide[] = [
           "Portfolio risk still matters, but sequence-of-returns risk starts becoming more relevant as retirement gets closer. A strategy that is too aggressive can create avoidable downside if a major decline hits late in your working years.",
           "Use your allocation as part of the plan, not as a substitute for contribution discipline.",
         ],
-        links: [{ label: "How much should I have in my 401(k) at 60?", href: "/guides/how-much-should-i-have-in-my-401k-at-60" }],
+        links: [{ label: "How Much Should I Have in My 401(k) at 60?", href: "/guides/how-much-should-i-have-in-my-401k-at-60" }],
       },
     ],
   },
