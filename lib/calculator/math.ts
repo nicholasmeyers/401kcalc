@@ -35,8 +35,10 @@ const INPUT_FIELDS: InputField[] = [
   "retirementAge",
   "lifeExpectancy",
   "currentBalance",
+  "currentRothBalance",
   "annualSalary",
   "contributionPercent",
+  "rothContributionPercent",
   "employerMatchPercent",
   "annualSalaryGrowthPercent",
   "annualReturnPercent",
@@ -88,8 +90,13 @@ export const normalizeInputs = (rawInputs: Partial<CalculatorInputs> = {}): Norm
   retirementAge: toFiniteNumber(rawInputs.retirementAge, defaultCalculatorInputs.retirementAge),
   lifeExpectancy: toFiniteNumber(rawInputs.lifeExpectancy, defaultCalculatorInputs.lifeExpectancy),
   currentBalance: toFiniteNumber(rawInputs.currentBalance, defaultCalculatorInputs.currentBalance),
+  currentRothBalance: toFiniteNumber(rawInputs.currentRothBalance, defaultCalculatorInputs.currentRothBalance),
   annualSalary: toFiniteNumber(rawInputs.annualSalary, defaultCalculatorInputs.annualSalary),
   contributionPercent: toFiniteNumber(rawInputs.contributionPercent, defaultCalculatorInputs.contributionPercent),
+  rothContributionPercent: toFiniteNumber(
+    rawInputs.rothContributionPercent,
+    defaultCalculatorInputs.rothContributionPercent
+  ),
   employerMatchPercent: toFiniteNumber(rawInputs.employerMatchPercent, defaultCalculatorInputs.employerMatchPercent),
   annualSalaryGrowthPercent: toFiniteNumber(
     rawInputs.annualSalaryGrowthPercent,
@@ -159,12 +166,30 @@ export const validateInputs = (inputs: NormalizedCalculatorInputs): ValidationIs
     issues.push({ field: "currentBalance", message: "currentBalance must be >= 0." });
   }
 
+  if (inputs.currentRothBalance < 0) {
+    issues.push({ field: "currentRothBalance", message: "currentRothBalance must be >= 0." });
+  }
+
+  if (inputs.currentRothBalance > inputs.currentBalance + CURRENCY_EPSILON) {
+    issues.push({
+      field: "currentRothBalance",
+      message: "currentRothBalance cannot exceed currentBalance.",
+    });
+  }
+
   if (inputs.annualSalary < 0) {
     issues.push({ field: "annualSalary", message: "annualSalary must be >= 0." });
   }
 
   if (inputs.contributionPercent < 0 || inputs.contributionPercent > PERCENT_SCALE) {
     issues.push({ field: "contributionPercent", message: "contributionPercent must be between 0 and 100." });
+  }
+
+  if (inputs.rothContributionPercent < 0 || inputs.rothContributionPercent > PERCENT_SCALE) {
+    issues.push({
+      field: "rothContributionPercent",
+      message: "rothContributionPercent must be between 0 and 100.",
+    });
   }
 
   if (inputs.employerMatchPercent < 0 || inputs.employerMatchPercent > PERCENT_SCALE) {
@@ -334,6 +359,8 @@ const getRetirementSpendingPhaseMultiplier = (inputs: NormalizedCalculatorInputs
 
 type ProjectionScenarioResult = {
   projectedBalanceAtRetirement: number;
+  projectedTraditionalBalanceAtRetirement: number;
+  projectedRothBalanceAtRetirement: number;
   inflationAdjustedBalanceAtRetirement: number;
   finalBalance: number;
   inflationAdjustedBalance: number;
@@ -343,6 +370,8 @@ type ProjectionScenarioResult = {
   totalContributionLimitApplied: boolean;
   totalRequestedEmployeeContributions: number;
   totalEmployeeContributions: number;
+  totalTraditionalEmployeeContributions: number;
+  totalRothEmployeeContributions: number;
   totalEmployerContributions: number;
   totalWindfallContributions: number;
   totalInvestmentGrowth: number;
@@ -377,19 +406,32 @@ const calculateScenarioProjection = (
 ): ProjectionScenarioResult => {
   const yearlyProjection: YearlyProjectionEntry[] = [];
 
+  const rothRate = inputs.rothContributionPercent / PERCENT_SCALE;
+
+  const initialRothBalance = Math.min(Math.max(0, inputs.currentRothBalance), inputs.currentBalance);
+  const initialTraditionalBalance = inputs.currentBalance - initialRothBalance;
+
   let salary = inputs.annualSalary;
   let balance = inputs.currentBalance;
+  let traditionalBalance = initialTraditionalBalance;
+  let rothBalance = initialRothBalance;
   let employeeContributionCapped = false;
   let catchUpContributionApplied = false;
   let compensationLimitApplied = false;
   let totalContributionLimitApplied = false;
   let totalRequestedEmployeeContributions = 0;
   let totalEmployeeContributions = 0;
+  let totalTraditionalEmployeeContributions = 0;
+  let totalRothEmployeeContributions = 0;
   let totalEmployerContributions = 0;
   let totalWindfallContributions = 0;
   let totalInvestmentGrowth = 0;
   let projectedBalanceAtRetirement: number | undefined =
     inputs.retirementAge === inputs.currentAge ? inputs.currentBalance : undefined;
+  let projectedTraditionalBalanceAtRetirement: number | undefined =
+    inputs.retirementAge === inputs.currentAge ? initialTraditionalBalance : undefined;
+  let projectedRothBalanceAtRetirement: number | undefined =
+    inputs.retirementAge === inputs.currentAge ? initialRothBalance : undefined;
   let firstSpendingShortfallAge: number | undefined;
   let firstSpendingShortfallAmount = 0;
   let firstDepletionAge: number | undefined;
@@ -423,6 +465,8 @@ const calculateScenarioProjection = (
     employerContribution: 0,
     employerContributionCapped: false,
     totalContributionLimitApplied: false,
+    traditionalEmployeeContribution: 0,
+    rothEmployeeContribution: 0,
     windfallAmount: 0,
     totalContribution: 0,
     investmentGrowth: 0,
@@ -434,6 +478,8 @@ const calculateScenarioProjection = (
     retirementYearIndex: null,
     endingBalance: inputs.currentBalance,
     inflationAdjustedEndingBalance: inputs.currentBalance,
+    traditionalBalance: initialTraditionalBalance,
+    rothBalance: initialRothBalance,
     isRetired: isCurrentlyRetired,
   });
 
@@ -494,6 +540,9 @@ const calculateScenarioProjection = (
             ? "catch-up-limit"
             : "base-limit"
         : "none";
+    const rothEmployeeContribution = isRetired ? 0 : employeeContribution * rothRate;
+    const traditionalEmployeeContribution = isRetired ? 0 : employeeContribution - rothEmployeeContribution;
+
     const windfallAmount = inputs.windfallAmount > 0 && age === inputs.windfallAge ? inputs.windfallAmount : 0;
     const totalContribution = employeeContribution + employerContribution + windfallAmount;
     const growthBase = startingBalance + totalContribution * MIDPOINT_CONTRIBUTION_FACTOR;
@@ -511,6 +560,19 @@ const calculateScenarioProjection = (
     const spendingShortfallAmount = spendingShortfall ? Math.max(0, requestedWithdrawal - withdrawalAmount) : 0;
     const endingBalance = Math.max(0, preWithdrawalBalance - withdrawalAmount);
     const inflationAdjustedEndingBalance = calculateInflationAdjustedValue(endingBalance, inflationRate, yearIndex);
+
+    const traditionalContribThisYear = traditionalEmployeeContribution + employerContribution + windfallAmount;
+    const rothContribThisYear = rothEmployeeContribution;
+    const traditionalGrowth = (traditionalBalance + traditionalContribThisYear * MIDPOINT_CONTRIBUTION_FACTOR) * annualReturnRate;
+    const rothGrowth = (rothBalance + rothContribThisYear * MIDPOINT_CONTRIBUTION_FACTOR) * annualReturnRate;
+    const preWithdrawalTraditional = traditionalBalance + traditionalContribThisYear + traditionalGrowth;
+    const preWithdrawalRoth = rothBalance + rothContribThisYear + rothGrowth;
+    const preWithdrawalTotal = preWithdrawalTraditional + preWithdrawalRoth;
+    const traditionalShare = preWithdrawalTotal > CURRENCY_EPSILON ? preWithdrawalTraditional / preWithdrawalTotal : 1;
+    const traditionalWithdrawal = withdrawalAmount * traditionalShare;
+    const rothWithdrawal = withdrawalAmount - traditionalWithdrawal;
+    const endingTraditionalBalance = Math.max(0, preWithdrawalTraditional - traditionalWithdrawal);
+    const endingRothBalance = Math.max(0, preWithdrawalRoth - rothWithdrawal);
 
     yearlyProjection.push({
       age,
@@ -530,6 +592,8 @@ const calculateScenarioProjection = (
       employerContribution,
       employerContributionCapped,
       totalContributionLimitApplied: annualTotalContributionLimitApplied,
+      traditionalEmployeeContribution,
+      rothEmployeeContribution,
       windfallAmount,
       totalContribution,
       investmentGrowth,
@@ -541,6 +605,8 @@ const calculateScenarioProjection = (
       retirementYearIndex,
       endingBalance,
       inflationAdjustedEndingBalance,
+      traditionalBalance: endingTraditionalBalance,
+      rothBalance: endingRothBalance,
       isRetired,
     });
 
@@ -550,12 +616,16 @@ const calculateScenarioProjection = (
     totalContributionLimitApplied ||= annualTotalContributionLimitApplied;
     totalRequestedEmployeeContributions += requestedEmployeeContribution;
     totalEmployeeContributions += employeeContribution;
+    totalTraditionalEmployeeContributions += traditionalEmployeeContribution;
+    totalRothEmployeeContributions += rothEmployeeContribution;
     totalEmployerContributions += employerContribution;
     totalWindfallContributions += windfallAmount;
     totalInvestmentGrowth += investmentGrowth;
 
     if (isRetired && projectedBalanceAtRetirement === undefined) {
       projectedBalanceAtRetirement = startingBalance;
+      projectedTraditionalBalanceAtRetirement = traditionalBalance;
+      projectedRothBalanceAtRetirement = rothBalance;
     }
 
     if (spendingShortfall && firstSpendingShortfallAge === undefined) {
@@ -572,10 +642,14 @@ const calculateScenarioProjection = (
     }
 
     balance = endingBalance;
+    traditionalBalance = endingTraditionalBalance;
+    rothBalance = endingRothBalance;
   }
 
   const yearsToRetirement = Math.max(0, inputs.retirementAge - inputs.currentAge);
   const projectedRetirementBalance = projectedBalanceAtRetirement ?? inputs.currentBalance;
+  const projectedTraditionalRetirementBalance = projectedTraditionalBalanceAtRetirement ?? initialTraditionalBalance;
+  const projectedRothRetirementBalance = projectedRothBalanceAtRetirement ?? initialRothBalance;
   const inflationAdjustedBalanceAtRetirement = calculateInflationAdjustedValue(
     projectedRetirementBalance,
     inflationRate,
@@ -605,6 +679,8 @@ const calculateScenarioProjection = (
 
   return {
     projectedBalanceAtRetirement: projectedRetirementBalance,
+    projectedTraditionalBalanceAtRetirement: projectedTraditionalRetirementBalance,
+    projectedRothBalanceAtRetirement: projectedRothRetirementBalance,
     inflationAdjustedBalanceAtRetirement,
     finalBalance,
     inflationAdjustedBalance,
@@ -614,6 +690,8 @@ const calculateScenarioProjection = (
     totalContributionLimitApplied,
     totalRequestedEmployeeContributions,
     totalEmployeeContributions,
+    totalTraditionalEmployeeContributions,
+    totalRothEmployeeContributions,
     totalEmployerContributions,
     totalWindfallContributions,
     totalInvestmentGrowth,
@@ -699,6 +777,11 @@ export const calculateRetirementProjection = (rawInputs: Partial<CalculatorInput
 
   const projectedAnnualSpendAvailable = findMaxSustainableSpending();
 
+  const rothRatio =
+    goalProjection.projectedBalanceAtRetirement > CURRENCY_EPSILON
+      ? goalProjection.projectedRothBalanceAtRetirement / goalProjection.projectedBalanceAtRetirement
+      : 0;
+
   return {
     currentAge: inputs.currentAge,
     retirementAge: inputs.retirementAge,
@@ -712,7 +795,11 @@ export const calculateRetirementProjection = (rawInputs: Partial<CalculatorInput
       midRetirement: inputs.midRetirementSpendingPercent,
       lateRetirement: inputs.lateRetirementSpendingPercent,
     },
+    currentRothBalance: inputs.currentRothBalance,
+    rothContributionPercent: inputs.rothContributionPercent,
     projectedBalanceAtRetirement: goalProjection.projectedBalanceAtRetirement,
+    projectedTraditionalBalanceAtRetirement: goalProjection.projectedTraditionalBalanceAtRetirement,
+    projectedRothBalanceAtRetirement: goalProjection.projectedRothBalanceAtRetirement,
     inflationAdjustedBalanceAtRetirement: goalProjection.inflationAdjustedBalanceAtRetirement,
     projectedBalanceAtLifeExpectancy: goalProjection.finalBalance,
     projectedBalanceAtLifeExpectancyTodayDollars: goalProjection.inflationAdjustedBalance,
@@ -729,6 +816,8 @@ export const calculateRetirementProjection = (rawInputs: Partial<CalculatorInput
     totalContributionLimitApplied: goalProjection.totalContributionLimitApplied,
     totalRequestedEmployeeContributions: goalProjection.totalRequestedEmployeeContributions,
     totalEmployeeContributions: goalProjection.totalEmployeeContributions,
+    totalTraditionalEmployeeContributions: goalProjection.totalTraditionalEmployeeContributions,
+    totalRothEmployeeContributions: goalProjection.totalRothEmployeeContributions,
     totalEmployerContributions: goalProjection.totalEmployerContributions,
     totalWindfallContributions: goalProjection.totalWindfallContributions,
     totalInvestmentGrowth: goalProjection.totalInvestmentGrowth,
@@ -741,6 +830,8 @@ export const calculateRetirementProjection = (rawInputs: Partial<CalculatorInput
     minimumPostRetirementBalance: goalProjection.minimumPostRetirementBalance,
     finalShortfallAmount: goalProjection.finalShortfallAmount,
     projectedAnnualSpendAvailable,
+    projectedAnnualTraditionalIncome: Math.round(projectedAnnualSpendAvailable * (1 - rothRatio)),
+    projectedAnnualRothIncome: Math.round(projectedAnnualSpendAvailable * rothRatio),
     yearlyProjection: goalProjection.yearlyProjection,
     yearlyRetirementWithdrawals: goalProjection.yearlyRetirementWithdrawals,
   };

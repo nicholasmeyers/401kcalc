@@ -52,6 +52,14 @@ export const primaryFieldConfigs: CalculatorFieldConfig[] = [
     kind: "currency",
   },
   {
+    field: "currentRothBalance",
+    label: "Roth 401(k) balance",
+    description: "Portion of your current 401(k) balance that is already in Roth.",
+    kind: "currency",
+    tooltip:
+      "If part of your existing 401(k) is in a Roth account, enter that amount here. The rest is treated as traditional (pre-tax).",
+  },
+  {
     field: "annualSalary",
     label: "Annual salary",
     description: "Pre-tax salary for contribution estimates.",
@@ -67,6 +75,19 @@ export const primaryFieldConfigs: CalculatorFieldConfig[] = [
       max: 40,
       step: 0.1,
     },
+  },
+  {
+    field: "rothContributionPercent",
+    label: "Roth contribution %",
+    description: "How much of your annual 401(k) contribution goes to Roth instead of traditional.",
+    kind: "percent",
+    slider: {
+      min: 0,
+      max: 100,
+      step: 1,
+    },
+    tooltip:
+      "Traditional contributions reduce taxes now; Roth contributions create tax-free income in retirement.",
   },
   {
     field: "employerMatchPercent",
