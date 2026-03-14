@@ -5,6 +5,7 @@ export type CalculatorInputs = {
   currentBalance: number;
   annualSalary: number;
   contributionPercent: number;
+  rothContributionPercent: number;
   employerMatchPercent: number;
   annualSalaryGrowthPercent: number;
   annualReturnPercent: number;
@@ -28,6 +29,7 @@ export type InputField =
   | "currentBalance"
   | "annualSalary"
   | "contributionPercent"
+  | "rothContributionPercent"
   | "employerMatchPercent"
   | "annualSalaryGrowthPercent"
   | "annualReturnPercent"
@@ -71,6 +73,8 @@ export type YearlyProjectionEntry = {
   employerContribution: number;
   employerContributionCapped: boolean;
   totalContributionLimitApplied: boolean;
+  traditionalEmployeeContribution: number;
+  rothEmployeeContribution: number;
   windfallAmount: number;
   totalContribution: number;
   investmentGrowth: number;
@@ -82,6 +86,8 @@ export type YearlyProjectionEntry = {
   retirementYearIndex: number | null;
   endingBalance: number;
   inflationAdjustedEndingBalance: number;
+  traditionalBalance: number;
+  rothBalance: number;
   isRetired: boolean;
 };
 
@@ -109,7 +115,10 @@ export type RetirementProjectionResult = {
   retirementSpendingInflationAdjusted: boolean;
   ageBasedSpendingEnabled: boolean;
   spendingPhasePercents: RetirementSpendingPhasePercents;
+  rothContributionPercent: number;
   projectedBalanceAtRetirement: number;
+  projectedTraditionalBalanceAtRetirement: number;
+  projectedRothBalanceAtRetirement: number;
   inflationAdjustedBalanceAtRetirement: number;
   projectedBalanceAtLifeExpectancy: number;
   projectedBalanceAtLifeExpectancyTodayDollars: number;
@@ -126,6 +135,8 @@ export type RetirementProjectionResult = {
   totalContributionLimitApplied: boolean;
   totalRequestedEmployeeContributions: number;
   totalEmployeeContributions: number;
+  totalTraditionalEmployeeContributions: number;
+  totalRothEmployeeContributions: number;
   totalEmployerContributions: number;
   totalWindfallContributions: number;
   totalInvestmentGrowth: number;
@@ -138,6 +149,8 @@ export type RetirementProjectionResult = {
   minimumPostRetirementBalance: number;
   finalShortfallAmount: number;
   projectedAnnualSpendAvailable: number;
+  projectedAnnualTraditionalIncome: number;
+  projectedAnnualRothIncome: number;
   yearlyProjection: YearlyProjectionEntry[];
   yearlyRetirementWithdrawals: RetirementWithdrawalEntry[];
 };

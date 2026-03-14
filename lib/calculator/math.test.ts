@@ -45,7 +45,10 @@ describe("calculateRetirementProjection", () => {
         retirementSpendingInflationAdjusted: expect.any(Boolean),
         ageBasedSpendingEnabled: expect.any(Boolean),
         spendingPhasePercents: expect.any(Object),
+        rothContributionPercent: expect.any(Number),
         projectedBalanceAtRetirement: expect.any(Number),
+        projectedTraditionalBalanceAtRetirement: expect.any(Number),
+        projectedRothBalanceAtRetirement: expect.any(Number),
         inflationAdjustedBalanceAtRetirement: expect.any(Number),
         projectedBalanceAtLifeExpectancy: expect.any(Number),
         projectedBalanceAtLifeExpectancyTodayDollars: expect.any(Number),
@@ -62,6 +65,8 @@ describe("calculateRetirementProjection", () => {
         totalContributionLimitApplied: expect.any(Boolean),
         totalRequestedEmployeeContributions: expect.any(Number),
         totalEmployeeContributions: expect.any(Number),
+        totalTraditionalEmployeeContributions: expect.any(Number),
+        totalRothEmployeeContributions: expect.any(Number),
         totalEmployerContributions: expect.any(Number),
         totalWindfallContributions: expect.any(Number),
         totalInvestmentGrowth: expect.any(Number),
@@ -73,6 +78,8 @@ describe("calculateRetirementProjection", () => {
         minimumPostRetirementBalance: expect.any(Number),
         finalShortfallAmount: expect.any(Number),
         projectedAnnualSpendAvailable: expect.any(Number),
+        projectedAnnualTraditionalIncome: expect.any(Number),
+        projectedAnnualRothIncome: expect.any(Number),
         yearlyProjection: expect.any(Array),
         yearlyRetirementWithdrawals: expect.any(Array),
       })
@@ -513,6 +520,129 @@ describe("calculateRetirementProjection", () => {
 
     const salaryGrowthError = captureInputError({ annualSalaryGrowthPercent: -100 });
     expect(salaryGrowthError.issues).toEqual(expect.arrayContaining([expect.objectContaining({ field: "annualSalaryGrowthPercent" })]));
+  });
+
+  it("produces identical results when rothContributionPercent is 0", () => {
+    const withoutRoth = calculateRetirementProjection(makeInputs({ rothContributionPercent: 0 }));
+
+    expect(withoutRoth.rothContributionPercent).toBe(0);
+    expect(withoutRoth.projectedRothBalanceAtRetirement).toBe(0);
+    expect(withoutRoth.projectedTraditionalBalanceAtRetirement).toBe(withoutRoth.projectedBalanceAtRetirement);
+    expect(withoutRoth.totalRothEmployeeContributions).toBe(0);
+    expect(withoutRoth.totalTraditionalEmployeeContributions).toBe(withoutRoth.totalEmployeeContributions);
+    expect(withoutRoth.projectedAnnualRothIncome).toBe(0);
+    expect(withoutRoth.projectedAnnualTraditionalIncome).toBe(withoutRoth.projectedAnnualSpendAvailable);
+
+    for (const entry of withoutRoth.yearlyProjection) {
+      expect(entry.rothBalance).toBe(0);
+      expect(entry.traditionalBalance).toBeCloseTo(entry.endingBalance, 2);
+      expect(entry.rothEmployeeContribution).toBe(0);
+      expect(entry.traditionalEmployeeContribution).toBe(entry.employeeContribution);
+    }
+  });
+
+  it("splits employee contributions by roth percentage", () => {
+    const result = calculateRetirementProjection(
+      makeInputs({
+        currentAge: 30,
+        retirementAge: 32,
+        lifeExpectancy: 32,
+        currentBalance: 0,
+        annualSalary: 100_000,
+        contributionPercent: 10,
+        rothContributionPercent: 30,
+        employerMatchPercent: 0,
+        annualSalaryGrowthPercent: 0,
+        annualReturnPercent: 0,
+        inflationPercent: 0,
+        targetRetirementSpending: 0,
+      })
+    );
+
+    expect(result.totalEmployeeContributions).toBe(10_000);
+    expect(result.totalRothEmployeeContributions).toBeCloseTo(3_000, 2);
+    expect(result.totalTraditionalEmployeeContributions).toBeCloseTo(7_000, 2);
+    expect(result.yearlyProjection[1]?.rothEmployeeContribution).toBeCloseTo(3_000, 2);
+    expect(result.yearlyProjection[1]?.traditionalEmployeeContribution).toBeCloseTo(7_000, 2);
+  });
+
+  it("sends all employee contributions to roth when rothContributionPercent is 100", () => {
+    const result = calculateRetirementProjection(
+      makeInputs({
+        currentAge: 30,
+        retirementAge: 32,
+        lifeExpectancy: 32,
+        currentBalance: 0,
+        annualSalary: 100_000,
+        contributionPercent: 10,
+        rothContributionPercent: 100,
+        employerMatchPercent: 5,
+        annualSalaryGrowthPercent: 0,
+        annualReturnPercent: 0,
+        inflationPercent: 0,
+        targetRetirementSpending: 0,
+      })
+    );
+
+    expect(result.totalRothEmployeeContributions).toBe(10_000);
+    expect(result.totalTraditionalEmployeeContributions).toBe(0);
+    expect(result.totalEmployerContributions).toBe(5_000);
+    expect(result.projectedRothBalanceAtRetirement).toBeGreaterThan(0);
+    expect(result.projectedTraditionalBalanceAtRetirement).toBeGreaterThan(0);
+  });
+
+  it("keeps traditional + roth balances consistent with total ending balance", () => {
+    const result = calculateRetirementProjection(
+      makeInputs({
+        currentAge: 30,
+        retirementAge: 65,
+        lifeExpectancy: 90,
+        rothContributionPercent: 40,
+      })
+    );
+
+    for (const entry of result.yearlyProjection) {
+      expect(entry.traditionalBalance + entry.rothBalance).toBeCloseTo(entry.endingBalance, 0);
+    }
+  });
+
+  it("splits retirement income proportionally based on balance ratio at retirement", () => {
+    const result = calculateRetirementProjection(
+      makeInputs({
+        currentAge: 30,
+        retirementAge: 65,
+        lifeExpectancy: 90,
+        currentBalance: 0,
+        annualSalary: 100_000,
+        contributionPercent: 15,
+        rothContributionPercent: 50,
+        employerMatchPercent: 5,
+        annualSalaryGrowthPercent: 3,
+        annualReturnPercent: 7,
+        inflationPercent: 2.5,
+        targetRetirementSpending: 50_000,
+      })
+    );
+
+    expect(result.projectedAnnualSpendAvailable).toBeGreaterThan(0);
+    expect(result.projectedAnnualTraditionalIncome + result.projectedAnnualRothIncome).toBeCloseTo(
+      result.projectedAnnualSpendAvailable,
+      0
+    );
+    expect(result.projectedAnnualRothIncome).toBeGreaterThan(0);
+    expect(result.projectedAnnualTraditionalIncome).toBeGreaterThan(0);
+  });
+
+  it("throws for rothContributionPercent outside 0-100 range", () => {
+    const errorOver = captureInputError({ rothContributionPercent: 101 });
+    expect(errorOver.issues).toEqual(
+      expect.arrayContaining([expect.objectContaining({ field: "rothContributionPercent" })])
+    );
+
+    const errorUnder = captureInputError({ rothContributionPercent: -1 });
+    expect(errorUnder.issues).toEqual(
+      expect.arrayContaining([expect.objectContaining({ field: "rothContributionPercent" })])
+    );
   });
 });
 

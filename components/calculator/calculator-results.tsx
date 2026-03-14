@@ -109,15 +109,24 @@ export function CalculatorResults({ result, statusMessage, onRetirementAgeChange
   const endingBalanceSupportingCopy =
     `${result.retirementYearsFunded} of ${result.totalRetirementYears} retirement years are fully funded.`;
 
+  const hasRoth = result.rothContributionPercent > 0;
+
   const additionalDetailCards = [
     { label: "Employee contributions", value: result.totalEmployeeContributions },
+    ...(hasRoth
+      ? [
+        { label: "Traditional employee contributions", value: result.totalTraditionalEmployeeContributions },
+        { label: "Roth employee contributions", value: result.totalRothEmployeeContributions },
+      ]
+      : []),
     { label: "Employer match contributions", value: result.totalEmployerContributions },
     { label: "Total contributions", value: totalContributions },
     { label: "Total investment growth", value: result.totalInvestmentGrowth },
   ];
 
   if (result.totalWindfallContributions > 0) {
-    additionalDetailCards.splice(2, 0, { label: "Windfall contributions", value: result.totalWindfallContributions });
+    const insertIndex = hasRoth ? 4 : 2;
+    additionalDetailCards.splice(insertIndex, 0, { label: "Windfall contributions", value: result.totalWindfallContributions });
   }
 
   return (
@@ -147,14 +156,22 @@ export function CalculatorResults({ result, statusMessage, onRetirementAgeChange
           value={toAnimatedCurrencyValue(result.projectedBalanceAtLifeExpectancy)}
           supportingCopy={endingBalanceSupportingCopy}
         />
-      </HighlightsGrid>
 
-      <SectionLabel>Breakdown</SectionLabel>
-      <BreakdownGrid>
-        {additionalDetailCards.map((card) => (
-          <CalculatorSummaryCard key={card.label} label={card.label} value={formatCurrency(card.value)} />
-        ))}
-      </BreakdownGrid>
+        {hasRoth ? (
+          <>
+            <CalculatorSummaryCard
+              label="Traditional balance at retirement"
+              value={toAnimatedCurrencyValue(result.projectedTraditionalBalanceAtRetirement)}
+              supportingCopy="Taxable in retirement."
+            />
+            <CalculatorSummaryCard
+              label="Roth balance at retirement"
+              value={toAnimatedCurrencyValue(result.projectedRothBalanceAtRetirement)}
+              supportingCopy="Tax-free in retirement."
+            />
+          </>
+        ) : null}
+      </HighlightsGrid>
 
       <ChartCard>
         <ChartHeader>
@@ -170,6 +187,31 @@ export function CalculatorResults({ result, statusMessage, onRetirementAgeChange
         />
       </ChartCard>
 
+      {hasRoth && result.projectedAnnualSpendAvailable > 0 ? (
+        <>
+          <SectionLabel>Taxable vs tax-free retirement income</SectionLabel>
+          <IncomeGrid>
+            <CalculatorSummaryCard
+              label="Traditional income (taxable)"
+              value={formatCurrency(result.projectedAnnualTraditionalIncome)}
+              supportingCopy="Subject to income tax in retirement."
+            />
+            <CalculatorSummaryCard
+              label="Roth income (tax-free)"
+              value={formatCurrency(result.projectedAnnualRothIncome)}
+              supportingCopy="Withdrawn tax-free in retirement."
+            />
+          </IncomeGrid>
+        </>
+      ) : null}
+
+      <SectionLabel>Contribution and growth breakdown</SectionLabel>
+      <BreakdownGrid>
+        {additionalDetailCards.map((card) => (
+          <CalculatorSummaryCard key={card.label} label={card.label} value={formatCurrency(card.value)} />
+        ))}
+      </BreakdownGrid>
+
       <Methodology>
         These estimates assume yearly contributions and investment returns based on your inputs. Employee
         contributions follow IRS limits (including catch-up limits), and employer match is estimated as a flat
@@ -182,6 +224,9 @@ export function CalculatorResults({ result, statusMessage, onRetirementAgeChange
         {result.retirementSpendingInflationAdjusted
           ? " The annual spending goal is treated in today's dollars and increases with inflation each retirement year."
           : " Spending stays flat year to year."}
+        {hasRoth
+          ? " Employee contributions are split between traditional (pre-tax) and Roth (after-tax) accounts. Employer match is allocated to traditional. Retirement income is split proportionally based on account balances."
+          : null}
         {" "}Taxes are not included.
       </Methodology>
     </ResultsStack>
@@ -283,6 +328,15 @@ const SectionLabel = styled.h3`
 `;
 
 const BreakdownGrid = styled.div`
+  display: grid;
+  gap: 14px;
+
+  @media (min-width: ${theme.breakpoints.md}) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+`;
+
+const IncomeGrid = styled.div`
   display: grid;
   gap: 14px;
 

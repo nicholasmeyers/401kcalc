@@ -6,6 +6,7 @@ export const DEFAULT_LIFE_EXPECTANCY = 90;
 export const DEFAULT_CURRENT_BALANCE = 25_000;
 export const DEFAULT_ANNUAL_SALARY = 90_000;
 export const DEFAULT_CONTRIBUTION_PERCENT = 10;
+export const DEFAULT_ROTH_CONTRIBUTION_PERCENT = 0;
 export const DEFAULT_EMPLOYER_MATCH_PERCENT = 4;
 export const DEFAULT_ANNUAL_SALARY_GROWTH_PERCENT = 3;
 export const DEFAULT_ANNUAL_RETURN_PERCENT = 7;
@@ -35,6 +36,7 @@ export const defaultCalculatorInputs: CalculatorInputs = {
   currentBalance: DEFAULT_CURRENT_BALANCE,
   annualSalary: DEFAULT_ANNUAL_SALARY,
   contributionPercent: DEFAULT_CONTRIBUTION_PERCENT,
+  rothContributionPercent: DEFAULT_ROTH_CONTRIBUTION_PERCENT,
   employerMatchPercent: DEFAULT_EMPLOYER_MATCH_PERCENT,
   annualSalaryGrowthPercent: DEFAULT_ANNUAL_SALARY_GROWTH_PERCENT,
   annualReturnPercent: DEFAULT_ANNUAL_RETURN_PERCENT,

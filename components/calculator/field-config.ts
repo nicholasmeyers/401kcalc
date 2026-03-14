@@ -69,6 +69,19 @@ export const primaryFieldConfigs: CalculatorFieldConfig[] = [
     },
   },
   {
+    field: "rothContributionPercent",
+    label: "Roth contribution %",
+    description: "How much of your annual 401(k) contribution goes to Roth instead of traditional.",
+    kind: "percent",
+    slider: {
+      min: 0,
+      max: 100,
+      step: 1,
+    },
+    tooltip:
+      "Traditional contributions reduce taxes now; Roth contributions create tax-free income in retirement.",
+  },
+  {
     field: "employerMatchPercent",
     label: "Employer match percent",
     description: "Estimated employer contribution as a percentage of salary.",

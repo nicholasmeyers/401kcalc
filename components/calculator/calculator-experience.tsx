@@ -48,6 +48,7 @@ const fieldMessageMap: Record<string, string> = {
   "currentBalance must be >= 0.": "Balance cannot be negative.",
   "annualSalary must be >= 0.": "Salary cannot be negative.",
   "contributionPercent must be between 0 and 100.": "Contribution rate must be between 0% and 100%.",
+  "rothContributionPercent must be between 0 and 100.": "Roth percentage must be between 0% and 100%.",
   "employerMatchPercent must be between 0 and 100.": "Employer match must be between 0% and 100%.",
   "targetRetirementSpending must be >= 0.": "Target retirement spending cannot be negative.",
   "earlyRetirementSpendingPercent must be between 0 and 200.": "Early retirement phase must be between 0% and 200%.",
@@ -91,6 +92,7 @@ const initialInputStrings: InputStringState = {
   currentBalance: defaultCalculatorInputs.currentBalance.toLocaleString("en-US"),
   annualSalary: defaultCalculatorInputs.annualSalary.toLocaleString("en-US"),
   contributionPercent: String(defaultCalculatorInputs.contributionPercent),
+  rothContributionPercent: String(defaultCalculatorInputs.rothContributionPercent),
   employerMatchPercent: String(defaultCalculatorInputs.employerMatchPercent),
   annualSalaryGrowthPercent: String(defaultCalculatorInputs.annualSalaryGrowthPercent),
   annualReturnPercent: String(defaultCalculatorInputs.annualReturnPercent),
@@ -220,13 +222,21 @@ export function CalculatorExperience() {
     };
   }, [ageBasedSpendingEnabled, inputValues, retirementSpendingInflationAdjusted]);
 
+  const rothSplitNote = useMemo(() => {
+    const rothPct = parseLooseNumber(inputValues.rothContributionPercent);
+    if (rothPct === null || rothPct <= 0) return undefined;
+    const traditionalPct = Math.round(100 - rothPct);
+    return `Traditional: ${traditionalPct}% · Roth: ${Math.round(rothPct)}% — You\u2019re building tax-free retirement income with Roth contributions.`;
+  }, [inputValues.rothContributionPercent]);
+
   const fieldNotes = useMemo<Partial<Record<InputField, ReactNode>>>(
     () => ({
       contributionPercent: CONTRIBUTION_LIMITS_DISCLOSURE,
+      ...(rothSplitNote ? { rothContributionPercent: rothSplitNote } : {}),
       ...(derivedState.salaryCapNote ? { annualSalary: derivedState.salaryCapNote } : {}),
       ...(derivedState.windfallNote ? { windfallAmount: derivedState.windfallNote } : {}),
     }),
-    [derivedState.salaryCapNote, derivedState.windfallNote]
+    [rothSplitNote, derivedState.salaryCapNote, derivedState.windfallNote]
   );
 
   const statusMessage =
