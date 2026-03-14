@@ -71,9 +71,9 @@ const fieldMessageMap: Record<string, string> = {
 const CONTRIBUTION_LIMITS_DISCLOSURE = (
   <details className="calculator-disclosure">
     <summary>
-      <span>IRS contribution limits apply.</span>
-      <span className="calculator-disclosure-toggle calculator-disclosure-toggle--closed">Show limits</span>
-      <span className="calculator-disclosure-toggle calculator-disclosure-toggle--open">Hide limits</span>
+      <span>IRS contribution limits apply.</span>{" "}
+      <span className="calculator-disclosure-toggle calculator-disclosure-toggle--closed">Show limits &#9662;</span>
+      <span className="calculator-disclosure-toggle calculator-disclosure-toggle--open">Hide limits &#9652;</span>
     </summary>
     <div className="calculator-disclosure-content">
       <p>Employee 401(k) contributions are capped by IRS annual limits:</p>
