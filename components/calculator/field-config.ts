@@ -52,6 +52,14 @@ export const primaryFieldConfigs: CalculatorFieldConfig[] = [
     kind: "currency",
   },
   {
+    field: "currentRothBalance",
+    label: "Roth 401(k) balance",
+    description: "Portion of your current 401(k) balance that is already in Roth.",
+    kind: "currency",
+    tooltip:
+      "If part of your existing 401(k) is in a Roth account, enter that amount here. The rest is treated as traditional (pre-tax).",
+  },
+  {
     field: "annualSalary",
     label: "Annual salary",
     description: "Pre-tax salary for contribution estimates.",

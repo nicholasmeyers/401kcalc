@@ -35,6 +35,7 @@ const INPUT_FIELDS: InputField[] = [
   "retirementAge",
   "lifeExpectancy",
   "currentBalance",
+  "currentRothBalance",
   "annualSalary",
   "contributionPercent",
   "rothContributionPercent",
@@ -89,6 +90,7 @@ export const normalizeInputs = (rawInputs: Partial<CalculatorInputs> = {}): Norm
   retirementAge: toFiniteNumber(rawInputs.retirementAge, defaultCalculatorInputs.retirementAge),
   lifeExpectancy: toFiniteNumber(rawInputs.lifeExpectancy, defaultCalculatorInputs.lifeExpectancy),
   currentBalance: toFiniteNumber(rawInputs.currentBalance, defaultCalculatorInputs.currentBalance),
+  currentRothBalance: toFiniteNumber(rawInputs.currentRothBalance, defaultCalculatorInputs.currentRothBalance),
   annualSalary: toFiniteNumber(rawInputs.annualSalary, defaultCalculatorInputs.annualSalary),
   contributionPercent: toFiniteNumber(rawInputs.contributionPercent, defaultCalculatorInputs.contributionPercent),
   rothContributionPercent: toFiniteNumber(
@@ -162,6 +164,17 @@ export const validateInputs = (inputs: NormalizedCalculatorInputs): ValidationIs
 
   if (inputs.currentBalance < 0) {
     issues.push({ field: "currentBalance", message: "currentBalance must be >= 0." });
+  }
+
+  if (inputs.currentRothBalance < 0) {
+    issues.push({ field: "currentRothBalance", message: "currentRothBalance must be >= 0." });
+  }
+
+  if (inputs.currentRothBalance > inputs.currentBalance + CURRENCY_EPSILON) {
+    issues.push({
+      field: "currentRothBalance",
+      message: "currentRothBalance cannot exceed currentBalance.",
+    });
   }
 
   if (inputs.annualSalary < 0) {
@@ -395,10 +408,13 @@ const calculateScenarioProjection = (
 
   const rothRate = inputs.rothContributionPercent / PERCENT_SCALE;
 
+  const initialRothBalance = Math.min(Math.max(0, inputs.currentRothBalance), inputs.currentBalance);
+  const initialTraditionalBalance = inputs.currentBalance - initialRothBalance;
+
   let salary = inputs.annualSalary;
   let balance = inputs.currentBalance;
-  let traditionalBalance = inputs.currentBalance;
-  let rothBalance = 0;
+  let traditionalBalance = initialTraditionalBalance;
+  let rothBalance = initialRothBalance;
   let employeeContributionCapped = false;
   let catchUpContributionApplied = false;
   let compensationLimitApplied = false;
@@ -413,9 +429,9 @@ const calculateScenarioProjection = (
   let projectedBalanceAtRetirement: number | undefined =
     inputs.retirementAge === inputs.currentAge ? inputs.currentBalance : undefined;
   let projectedTraditionalBalanceAtRetirement: number | undefined =
-    inputs.retirementAge === inputs.currentAge ? inputs.currentBalance : undefined;
+    inputs.retirementAge === inputs.currentAge ? initialTraditionalBalance : undefined;
   let projectedRothBalanceAtRetirement: number | undefined =
-    inputs.retirementAge === inputs.currentAge ? 0 : undefined;
+    inputs.retirementAge === inputs.currentAge ? initialRothBalance : undefined;
   let firstSpendingShortfallAge: number | undefined;
   let firstSpendingShortfallAmount = 0;
   let firstDepletionAge: number | undefined;
@@ -462,8 +478,8 @@ const calculateScenarioProjection = (
     retirementYearIndex: null,
     endingBalance: inputs.currentBalance,
     inflationAdjustedEndingBalance: inputs.currentBalance,
-    traditionalBalance: inputs.currentBalance,
-    rothBalance: 0,
+    traditionalBalance: initialTraditionalBalance,
+    rothBalance: initialRothBalance,
     isRetired: isCurrentlyRetired,
   });
 
@@ -632,8 +648,8 @@ const calculateScenarioProjection = (
 
   const yearsToRetirement = Math.max(0, inputs.retirementAge - inputs.currentAge);
   const projectedRetirementBalance = projectedBalanceAtRetirement ?? inputs.currentBalance;
-  const projectedTraditionalRetirementBalance = projectedTraditionalBalanceAtRetirement ?? inputs.currentBalance;
-  const projectedRothRetirementBalance = projectedRothBalanceAtRetirement ?? 0;
+  const projectedTraditionalRetirementBalance = projectedTraditionalBalanceAtRetirement ?? initialTraditionalBalance;
+  const projectedRothRetirementBalance = projectedRothBalanceAtRetirement ?? initialRothBalance;
   const inflationAdjustedBalanceAtRetirement = calculateInflationAdjustedValue(
     projectedRetirementBalance,
     inflationRate,
@@ -779,6 +795,7 @@ export const calculateRetirementProjection = (rawInputs: Partial<CalculatorInput
       midRetirement: inputs.midRetirementSpendingPercent,
       lateRetirement: inputs.lateRetirementSpendingPercent,
     },
+    currentRothBalance: inputs.currentRothBalance,
     rothContributionPercent: inputs.rothContributionPercent,
     projectedBalanceAtRetirement: goalProjection.projectedBalanceAtRetirement,
     projectedTraditionalBalanceAtRetirement: goalProjection.projectedTraditionalBalanceAtRetirement,

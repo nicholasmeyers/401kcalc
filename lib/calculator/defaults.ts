@@ -4,6 +4,7 @@ export const DEFAULT_CURRENT_AGE = 30;
 export const DEFAULT_RETIREMENT_AGE = 65;
 export const DEFAULT_LIFE_EXPECTANCY = 90;
 export const DEFAULT_CURRENT_BALANCE = 25_000;
+export const DEFAULT_CURRENT_ROTH_BALANCE = 0;
 export const DEFAULT_ANNUAL_SALARY = 90_000;
 export const DEFAULT_CONTRIBUTION_PERCENT = 10;
 export const DEFAULT_ROTH_CONTRIBUTION_PERCENT = 0;
@@ -34,6 +35,7 @@ export const defaultCalculatorInputs: CalculatorInputs = {
   retirementAge: DEFAULT_RETIREMENT_AGE,
   lifeExpectancy: DEFAULT_LIFE_EXPECTANCY,
   currentBalance: DEFAULT_CURRENT_BALANCE,
+  currentRothBalance: DEFAULT_CURRENT_ROTH_BALANCE,
   annualSalary: DEFAULT_ANNUAL_SALARY,
   contributionPercent: DEFAULT_CONTRIBUTION_PERCENT,
   rothContributionPercent: DEFAULT_ROTH_CONTRIBUTION_PERCENT,

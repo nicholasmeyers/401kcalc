@@ -109,7 +109,7 @@ export function CalculatorResults({ result, statusMessage, onRetirementAgeChange
   const endingBalanceSupportingCopy =
     `${result.retirementYearsFunded} of ${result.totalRetirementYears} retirement years are fully funded.`;
 
-  const hasRoth = result.rothContributionPercent > 0;
+  const hasRoth = result.rothContributionPercent > 0 || result.currentRothBalance > 0;
 
   const additionalDetailCards = [
     { label: "Employee contributions", value: result.totalEmployeeContributions },

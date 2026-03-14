@@ -3,6 +3,7 @@ export type CalculatorInputs = {
   retirementAge: number;
   lifeExpectancy: number;
   currentBalance: number;
+  currentRothBalance: number;
   annualSalary: number;
   contributionPercent: number;
   rothContributionPercent: number;
@@ -27,6 +28,7 @@ export type InputField =
   | "retirementAge"
   | "lifeExpectancy"
   | "currentBalance"
+  | "currentRothBalance"
   | "annualSalary"
   | "contributionPercent"
   | "rothContributionPercent"
@@ -115,6 +117,7 @@ export type RetirementProjectionResult = {
   retirementSpendingInflationAdjusted: boolean;
   ageBasedSpendingEnabled: boolean;
   spendingPhasePercents: RetirementSpendingPhasePercents;
+  currentRothBalance: number;
   rothContributionPercent: number;
   projectedBalanceAtRetirement: number;
   projectedTraditionalBalanceAtRetirement: number;

@@ -46,6 +46,8 @@ const fieldMessageMap: Record<string, string> = {
   "lifeExpectancy must be greater than or equal to retirementAge.":
     "Life expectancy must be at or after retirement age.",
   "currentBalance must be >= 0.": "Balance cannot be negative.",
+  "currentRothBalance must be >= 0.": "Roth balance cannot be negative.",
+  "currentRothBalance cannot exceed currentBalance.": "Roth balance cannot exceed your total 401(k) balance.",
   "annualSalary must be >= 0.": "Salary cannot be negative.",
   "contributionPercent must be between 0 and 100.": "Contribution rate must be between 0% and 100%.",
   "rothContributionPercent must be between 0 and 100.": "Roth percentage must be between 0% and 100%.",
@@ -90,6 +92,7 @@ const initialInputStrings: InputStringState = {
   retirementAge: String(defaultCalculatorInputs.retirementAge),
   lifeExpectancy: String(defaultCalculatorInputs.lifeExpectancy),
   currentBalance: defaultCalculatorInputs.currentBalance.toLocaleString("en-US"),
+  currentRothBalance: defaultCalculatorInputs.currentRothBalance.toLocaleString("en-US"),
   annualSalary: defaultCalculatorInputs.annualSalary.toLocaleString("en-US"),
   contributionPercent: String(defaultCalculatorInputs.contributionPercent),
   rothContributionPercent: String(defaultCalculatorInputs.rothContributionPercent),
@@ -109,6 +112,7 @@ const toFriendlyIssueMessage = (issue: ValidationIssue): string => fieldMessageM
 
 const DOLLAR_FIELDS: ReadonlySet<string> = new Set([
   "currentBalance",
+  "currentRothBalance",
   "annualSalary",
   "targetRetirementSpending",
   "windfallAmount",
@@ -229,14 +233,23 @@ export function CalculatorExperience() {
     return `Traditional: ${traditionalPct}% · Roth: ${Math.round(rothPct)}% — You\u2019re building tax-free retirement income with Roth contributions.`;
   }, [inputValues.rothContributionPercent]);
 
+  const rothBalanceNote = useMemo(() => {
+    const rothBal = parseLooseNumber(inputValues.currentRothBalance);
+    const totalBal = parseLooseNumber(inputValues.currentBalance);
+    if (rothBal === null || totalBal === null || rothBal <= 0) return undefined;
+    const traditionalBal = Math.max(0, totalBal - rothBal);
+    return `Traditional balance: ${formatCurrency(traditionalBal)} · Roth balance: ${formatCurrency(rothBal)}`;
+  }, [inputValues.currentRothBalance, inputValues.currentBalance]);
+
   const fieldNotes = useMemo<Partial<Record<InputField, ReactNode>>>(
     () => ({
       contributionPercent: CONTRIBUTION_LIMITS_DISCLOSURE,
       ...(rothSplitNote ? { rothContributionPercent: rothSplitNote } : {}),
+      ...(rothBalanceNote ? { currentRothBalance: rothBalanceNote } : {}),
       ...(derivedState.salaryCapNote ? { annualSalary: derivedState.salaryCapNote } : {}),
       ...(derivedState.windfallNote ? { windfallAmount: derivedState.windfallNote } : {}),
     }),
-    [rothSplitNote, derivedState.salaryCapNote, derivedState.windfallNote]
+    [rothSplitNote, rothBalanceNote, derivedState.salaryCapNote, derivedState.windfallNote]
   );
 
   const statusMessage =
