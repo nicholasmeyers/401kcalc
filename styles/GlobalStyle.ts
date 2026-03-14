@@ -67,4 +67,25 @@ export const GlobalStyle = createGlobalStyle`
   ::selection {
     background: rgba(37, 99, 235, 0.18);
   }
+
+  .calculator-disclosure > summary {
+    cursor: pointer;
+    list-style: none;
+  }
+
+  .calculator-disclosure > summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .calculator-disclosure .calculator-disclosure-toggle--open {
+    display: none;
+  }
+
+  .calculator-disclosure[open] .calculator-disclosure-toggle--closed {
+    display: none;
+  }
+
+  .calculator-disclosure[open] .calculator-disclosure-toggle--open {
+    display: inline;
+  }
 `;

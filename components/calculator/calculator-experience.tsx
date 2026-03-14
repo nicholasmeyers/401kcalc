@@ -12,6 +12,7 @@ import {
   COMPENSATION_LIMIT,
   defaultCalculatorInputs,
 } from "@/lib/calculator/defaults";
+import { formatCurrency } from "@/lib/calculator/format";
 import { parseLooseNumber } from "@/lib/calculator/input";
 import {
   CalculatorInputError,
@@ -19,7 +20,6 @@ import {
   normalizeInputs,
   validateInputs,
 } from "@/lib/calculator/math";
-import { formatCurrency } from "@/lib/calculator/format";
 import { trackEvent } from "@/lib/analytics";
 import type { CalculatorInputs, InputField, RetirementProjectionResult, ValidationIssue } from "@/lib/calculator/types";
 import { theme } from "@/styles/theme";
@@ -46,8 +46,11 @@ const fieldMessageMap: Record<string, string> = {
   "lifeExpectancy must be greater than or equal to retirementAge.":
     "Life expectancy must be at or after retirement age.",
   "currentBalance must be >= 0.": "Balance cannot be negative.",
+  "currentRothBalance must be >= 0.": "Roth balance cannot be negative.",
+  "currentRothBalance cannot exceed currentBalance.": "Roth balance cannot exceed your total 401(k) balance.",
   "annualSalary must be >= 0.": "Salary cannot be negative.",
   "contributionPercent must be between 0 and 100.": "Contribution rate must be between 0% and 100%.",
+  "rothContributionPercent must be between 0 and 100.": "Roth percentage must be between 0% and 100%.",
   "employerMatchPercent must be between 0 and 100.": "Employer match must be between 0% and 100%.",
   "targetRetirementSpending must be >= 0.": "Target retirement spending cannot be negative.",
   "earlyRetirementSpendingPercent must be between 0 and 200.": "Early retirement phase must be between 0% and 200%.",
@@ -89,8 +92,10 @@ const initialInputStrings: InputStringState = {
   retirementAge: String(defaultCalculatorInputs.retirementAge),
   lifeExpectancy: String(defaultCalculatorInputs.lifeExpectancy),
   currentBalance: defaultCalculatorInputs.currentBalance.toLocaleString("en-US"),
+  currentRothBalance: defaultCalculatorInputs.currentRothBalance.toLocaleString("en-US"),
   annualSalary: defaultCalculatorInputs.annualSalary.toLocaleString("en-US"),
   contributionPercent: String(defaultCalculatorInputs.contributionPercent),
+  rothContributionPercent: String(defaultCalculatorInputs.rothContributionPercent),
   employerMatchPercent: String(defaultCalculatorInputs.employerMatchPercent),
   annualSalaryGrowthPercent: String(defaultCalculatorInputs.annualSalaryGrowthPercent),
   annualReturnPercent: String(defaultCalculatorInputs.annualReturnPercent),
@@ -107,6 +112,7 @@ const toFriendlyIssueMessage = (issue: ValidationIssue): string => fieldMessageM
 
 const DOLLAR_FIELDS: ReadonlySet<string> = new Set([
   "currentBalance",
+  "currentRothBalance",
   "annualSalary",
   "targetRetirementSpending",
   "windfallAmount",
@@ -220,13 +226,27 @@ export function CalculatorExperience() {
     };
   }, [ageBasedSpendingEnabled, inputValues, retirementSpendingInflationAdjusted]);
 
+  const rothSplitNote = useMemo((): ReactNode | undefined => {
+    const rothPct = parseLooseNumber(inputValues.rothContributionPercent);
+    if (rothPct === null || rothPct <= 0) return undefined;
+    const traditionalPct = Math.round(100 - rothPct);
+    return (
+      <>
+        Traditional: {traditionalPct}% &middot; Roth: {Math.round(rothPct)}%
+        <br />
+        You&apos;re building tax-free retirement income with Roth contributions.
+      </>
+    );
+  }, [inputValues.rothContributionPercent]);
+
   const fieldNotes = useMemo<Partial<Record<InputField, ReactNode>>>(
     () => ({
       contributionPercent: CONTRIBUTION_LIMITS_DISCLOSURE,
+      ...(rothSplitNote ? { rothContributionPercent: rothSplitNote } : {}),
       ...(derivedState.salaryCapNote ? { annualSalary: derivedState.salaryCapNote } : {}),
       ...(derivedState.windfallNote ? { windfallAmount: derivedState.windfallNote } : {}),
     }),
-    [derivedState.salaryCapNote, derivedState.windfallNote]
+    [rothSplitNote, derivedState.salaryCapNote, derivedState.windfallNote]
   );
 
   const statusMessage =
