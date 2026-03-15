@@ -49,6 +49,14 @@ const benchmarkUtilityPoints = [
   },
 ];
 
+const heroFeatureChecks = [
+  "Standard assumptions",
+  "Your & employer contributions",
+  "401(k) + Roth balances",
+  "Inflation + IRS age limits",
+  "Future windfalls",
+];
+
 const trustPoints = [
   {
     title: "Transparent methodology",
@@ -141,21 +149,47 @@ export default function HomePage() {
         <Container>
           <HeroCard>
             <HeroContent>
-              <PageIntro
-                eyebrow="401(k) Planning"
-                title="See how today’s 401(k) choices can shape your retirement income."
-                description="401kcalc helps you model long-term outcomes with assumptions you can inspect, adjust, and compare in minutes."
-              >
-                <HeroActions>
-                  <ButtonLink href="/401k-calculator">Open 401(k) Calculator</ButtonLink>
-                  <ButtonLink href="/retirement-by-age" variant="secondary">
-                    Retirement Age Benchmarks
-                  </ButtonLink>
-                  <ButtonLink href="/guides" variant="secondary">
-                    Browse Guides
-                  </ButtonLink>
-                </HeroActions>
-              </PageIntro>
+              <HeroText>
+                <PageIntro
+                  eyebrow="401(k) Planning"
+                  title="See how today’s 401(k) choices can shape your retirement income."
+                  description="401kcalc helps you model long-term outcomes with assumptions you can inspect, adjust, and compare in minutes."
+                >
+                  <HeroActions>
+                    <ButtonLink href="/401k-calculator">Open 401(k) Calculator</ButtonLink>
+                    <ButtonLink href="/retirement-by-age" variant="secondary">
+                      Retirement Age Benchmarks
+                    </ButtonLink>
+                    <ButtonLink href="/guides" variant="secondary">
+                      Browse Guides
+                    </ButtonLink>
+                  </HeroActions>
+                </PageIntro>
+              </HeroText>
+
+              <HeroVisualCard>
+                <HeroVisualBody>
+                  <CalculatorSnapshotPrimary>
+                    <CalculatorSnapshotTop>
+                      <CalculatorSnapshotLabel>Projected annual spend available</CalculatorSnapshotLabel>
+                      <CalculatorSnapshotStatus>On track</CalculatorSnapshotStatus>
+                    </CalculatorSnapshotTop>
+                    <CalculatorSnapshotValue>$137,501</CalculatorSnapshotValue>
+                    <CalculatorSnapshotMeta>
+                      You will meet your goal of $85,000 a year, with about $52,500 above your target.
+                    </CalculatorSnapshotMeta>
+                  </CalculatorSnapshotPrimary>
+
+                  <HeroFeatureList aria-label="Calculator features">
+                    {heroFeatureChecks.map((feature) => (
+                      <HeroFeatureItem key={feature}>
+                        <HeroFeatureCheck aria-hidden="true" />
+                        <span>{feature}</span>
+                      </HeroFeatureItem>
+                    ))}
+                  </HeroFeatureList>
+                </HeroVisualBody>
+              </HeroVisualCard>
             </HeroContent>
           </HeroCard>
         </Container>
@@ -181,19 +215,105 @@ export default function HomePage() {
 
       <BenchmarkUtilitySection>
         <Container>
-          <SectionTitle>What the retirement by age simulator helps you understand</SectionTitle>
-          <SectionSubtitle>
-            Age-based checkpoints and projection tools to see whether your savings are keeping pace.
-          </SectionSubtitle>
-          <UtilityGrid>
-            {benchmarkUtilityPoints.map((point) => (
-              <UtilityCard key={point.title}>
-                <UtilityTitle>{point.title}</UtilityTitle>
-                <UtilityBody>{point.body}</UtilityBody>
-              </UtilityCard>
-            ))}
-          </UtilityGrid>
-          <UtilityLink href="/retirement-by-age">Open Retirement Age Benchmarks &rarr;</UtilityLink>
+          <BenchmarkUtilityLayout>
+            <BenchmarkUtilityIntro>
+              <SectionTitle>What the retirement by age simulator helps you understand</SectionTitle>
+              <SectionSubtitle>
+                Age-based checkpoints and projection tools to see whether your savings are keeping pace.
+              </SectionSubtitle>
+            </BenchmarkUtilityIntro>
+
+            <BenchmarkUtilityText>
+              <BenchmarkUtilityStack>
+                {benchmarkUtilityPoints.map((point) => (
+                  <UtilityCard key={point.title}>
+                    <UtilityTitle>{point.title}</UtilityTitle>
+                    <UtilityBody>{point.body}</UtilityBody>
+                  </UtilityCard>
+                ))}
+              </BenchmarkUtilityStack>
+              <UtilityLink href="/retirement-by-age">Open Retirement Age Benchmarks &rarr;</UtilityLink>
+            </BenchmarkUtilityText>
+
+            <BenchmarkSnapshotCard>
+              <HeroVisualTop>
+                <HeroPill>Retirement by age snapshot</HeroPill>
+              </HeroVisualTop>
+
+              <HeroVisualBody>
+                <HeroVisualTitle>Compare your current path with a stronger one.</HeroVisualTitle>
+                <HeroVisualSubtitle>
+                  A simplified planning view for benchmark gaps and contribution changes.
+                </HeroVisualSubtitle>
+
+                <HeroChartCard>
+                  <HeroLegendRow>
+                    <HeroLegendItem>
+                      <HeroLegendSwatch $kind="benchmark" />
+                      <span>Benchmark</span>
+                    </HeroLegendItem>
+                    <HeroLegendItem>
+                      <HeroLegendSwatch $kind="current" />
+                      <span>Current path</span>
+                    </HeroLegendItem>
+                    <HeroLegendItem>
+                      <HeroLegendSwatch $kind="improved" />
+                      <span>Improved path</span>
+                    </HeroLegendItem>
+                  </HeroLegendRow>
+
+                  <HeroChartFrame aria-hidden="true">
+                    <HeroChartSvg viewBox="0 0 320 190" preserveAspectRatio="none">
+                      <line x1="18" y1="26" x2="302" y2="26" stroke={theme.colors.chartGrid} strokeDasharray="4 6" />
+                      <line x1="18" y1="78" x2="302" y2="78" stroke={theme.colors.chartGrid} strokeDasharray="4 6" />
+                      <line x1="18" y1="130" x2="302" y2="130" stroke={theme.colors.chartGrid} strokeDasharray="4 6" />
+                      <line x1="18" y1="174" x2="302" y2="174" stroke={theme.colors.chartGrid} />
+                      <line x1="18" y1="18" x2="18" y2="174" stroke={theme.colors.chartGrid} />
+
+                      <path
+                        d="M18 128 C60 118, 92 106, 134 96 S214 78, 302 62"
+                        stroke={theme.colors.chartBenchmark}
+                        strokeWidth="3"
+                        strokeDasharray="8 7"
+                        fill="none"
+                        strokeLinecap="round"
+                      />
+                      <path
+                        d="M18 144 C58 140, 96 132, 134 124 S216 112, 302 102"
+                        stroke={theme.colors.chartMain}
+                        strokeWidth="4"
+                        fill="none"
+                        strokeLinecap="round"
+                      />
+                      <path
+                        d="M18 144 C56 136, 92 124, 134 110 S220 86, 302 72"
+                        stroke={theme.colors.chartImproved}
+                        strokeWidth="4"
+                        fill="none"
+                        strokeLinecap="round"
+                      />
+
+                      <circle cx="220" cy="86" r="5" fill={theme.colors.chartImproved} />
+                      <circle cx="220" cy="112" r="5" fill={theme.colors.chartMain} />
+                      <circle cx="220" cy="78" r="5" fill={theme.colors.chartBenchmark} />
+                    </HeroChartSvg>
+
+                    <HeroAxisLabel style={{ left: 16, bottom: 8 }}>Today</HeroAxisLabel>
+                    <HeroAxisLabel style={{ left: "42%", bottom: 8 }}>Age 50</HeroAxisLabel>
+                    <HeroAxisLabel style={{ right: 14, bottom: 8 }}>Age 60</HeroAxisLabel>
+                  </HeroChartFrame>
+                </HeroChartCard>
+
+                <HeroCalloutRow>
+                  <HeroCallout>
+                    Benchmark gap closes faster when contribution increases are modeled year by year.
+                  </HeroCallout>
+                  <HeroMetricPill>Current 78%</HeroMetricPill>
+                  <HeroMetricPill $improved>Improved 96%</HeroMetricPill>
+                </HeroCalloutRow>
+              </HeroVisualBody>
+            </BenchmarkSnapshotCard>
+          </BenchmarkUtilityLayout>
         </Container>
       </BenchmarkUtilitySection>
 
@@ -292,6 +412,18 @@ const HeroCard = styled(SurfaceCard)`
 
 const HeroContent = styled.div`
   min-width: 0;
+  display: grid;
+  gap: 24px;
+
+  @media (min-width: ${theme.breakpoints.lg}) {
+    grid-template-columns: minmax(0, 1.1fr) minmax(320px, 420px);
+    align-items: start;
+    gap: 30px;
+  }
+`;
+
+const HeroText = styled.div`
+  min-width: 0;
 `;
 
 const HeroActions = styled.div`
@@ -299,6 +431,254 @@ const HeroActions = styled.div`
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
+`;
+
+const HeroVisualCard = styled(SurfaceCard)`
+  padding: 16px;
+  display: grid;
+  gap: 14px;
+  min-width: 0;
+  background:
+    radial-gradient(circle at top right, rgba(22, 163, 74, 0.06), transparent 45%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(250, 252, 255, 0.92)),
+    ${theme.colors.surface};
+  border-color: ${theme.colors.elevatedBorder};
+
+  @media (min-width: ${theme.breakpoints.sm}) {
+    padding: 20px;
+  }
+`;
+
+const HeroVisualTop = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 10px;
+`;
+
+const HeroPill = styled.span`
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding-inline: 10px;
+  border-radius: ${theme.radii.pill};
+  background: ${theme.colors.successSurface};
+  border: 1px solid ${theme.colors.successBorder};
+  color: ${theme.colors.successText};
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+`;
+
+const HeroVisualBody = styled.div`
+  display: grid;
+  gap: 10px;
+`;
+
+const HeroVisualTitle = styled.h2`
+  font-size: clamp(1.1rem, 2vw, 1.32rem);
+  font-weight: 640;
+  line-height: 1.28;
+`;
+
+const HeroVisualSubtitle = styled.p`
+  font-size: 0.9rem;
+  line-height: 1.62;
+  color: ${theme.colors.mutedTextStrong};
+`;
+
+const HeroChartCard = styled.div`
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid ${theme.colors.border};
+  border-radius: ${theme.radii.md};
+  background: rgba(255, 255, 255, 0.88);
+`;
+
+const HeroLegendRow = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 14px;
+`;
+
+const HeroLegendItem = styled.span`
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.76rem;
+  color: ${theme.colors.mutedTextStrong};
+`;
+
+const HeroLegendSwatch = styled.span<{ $kind: "benchmark" | "current" | "improved" | "inflation" }>`
+  width: ${({ $kind }) => ($kind === "benchmark" ? "18px" : "16px")};
+  height: 3px;
+  border-radius: 999px;
+  background: ${({ $kind }) =>
+    $kind === "benchmark"
+      ? `repeating-linear-gradient(to right, ${theme.colors.chartBenchmark} 0 8px, transparent 8px 13px)`
+      : $kind === "current"
+        ? theme.colors.chartMain
+        : $kind === "improved"
+          ? theme.colors.chartImproved
+          : theme.colors.chartInflation};
+`;
+
+const HeroChartFrame = styled.div`
+  position: relative;
+  min-height: 154px;
+  border-radius: ${theme.radii.md};
+  background:
+    linear-gradient(180deg, rgba(248, 250, 252, 0.92), rgba(255, 255, 255, 0.96)),
+    ${theme.colors.surface};
+  border: 1px solid ${theme.colors.border};
+  overflow: hidden;
+`;
+
+const HeroChartSvg = styled.svg`
+  display: block;
+  width: 100%;
+  height: 154px;
+`;
+
+const HeroAxisLabel = styled.span`
+  position: absolute;
+  font-size: 0.72rem;
+  color: ${theme.colors.mutedText};
+`;
+
+const HeroCalloutRow = styled.div`
+  display: grid;
+  gap: 10px;
+
+  @media (min-width: ${theme.breakpoints.sm}) {
+    grid-template-columns: 1fr auto auto;
+    align-items: center;
+  }
+`;
+
+const HeroCallout = styled.p`
+  font-size: 0.84rem;
+  line-height: 1.56;
+  color: ${theme.colors.mutedTextStrong};
+`;
+
+const HeroMetricPill = styled.span<{ $improved?: boolean }>`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 32px;
+  padding-inline: 12px;
+  border-radius: ${theme.radii.pill};
+  border: 1px solid ${({ $improved }) => ($improved ? theme.colors.successBorder : theme.colors.border)};
+  background: ${({ $improved }) => ($improved ? theme.colors.successSurface : "rgba(255, 255, 255, 0.9)")};
+  color: ${({ $improved }) => ($improved ? theme.colors.successText : theme.colors.text)};
+  font-size: 0.78rem;
+  font-weight: 700;
+  white-space: nowrap;
+`;
+
+const CalculatorSnapshotPrimary = styled.div`
+  padding: 14px;
+  border: 1px solid ${theme.colors.successBorder};
+  border-radius: ${theme.radii.md};
+  background:
+    radial-gradient(circle at top right, rgba(22, 163, 74, 0.06), transparent 55%),
+    ${theme.colors.successSurface};
+  display: grid;
+  gap: 8px;
+`;
+
+const CalculatorSnapshotTop = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+`;
+
+const CalculatorSnapshotLabel = styled.span`
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: ${theme.colors.mutedTextStrong};
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+`;
+
+const CalculatorSnapshotStatus = styled.span`
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding-inline: 10px;
+  border-radius: ${theme.radii.pill};
+  background: rgba(255, 255, 255, 0.88);
+  border: 1px solid ${theme.colors.successBorder};
+  color: ${theme.colors.successText};
+  font-size: 0.74rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+`;
+
+const CalculatorSnapshotValue = styled.div`
+  font-size: clamp(1.8rem, 3.4vw, 2.2rem);
+  font-weight: 670;
+  line-height: 1.05;
+`;
+
+const CalculatorSnapshotMeta = styled.p`
+  font-size: 0.86rem;
+  line-height: 1.5;
+  color: ${theme.colors.mutedTextStrong};
+`;
+
+const HeroFeatureList = styled.ul`
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  @media (min-width: ${theme.breakpoints.sm}) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+`;
+
+const HeroFeatureItem = styled.li`
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  min-width: 0;
+  padding: 10px 12px;
+  border: 1px solid ${theme.colors.border};
+  border-radius: ${theme.radii.md};
+  background: rgba(255, 255, 255, 0.72);
+  font-size: 0.83rem;
+  line-height: 1.4;
+  color: ${theme.colors.mutedTextStrong};
+`;
+
+const HeroFeatureCheck = styled.span`
+  position: relative;
+  flex: 0 0 18px;
+  width: 18px;
+  height: 18px;
+  margin-top: 1px;
+  border-radius: 999px;
+  border: 1px solid ${theme.colors.successBorder};
+  background: ${theme.colors.successSurface};
+
+  &::after {
+    content: "";
+    position: absolute;
+    left: 5px;
+    top: 2px;
+    width: 5px;
+    height: 9px;
+    border-right: 2px solid ${theme.colors.successText};
+    border-bottom: 2px solid ${theme.colors.successText};
+    transform: rotate(40deg);
+  }
 `;
 
 const UtilitySection = styled(Section)`
@@ -318,6 +698,43 @@ const BenchmarkUtilitySection = styled(Section)`
 
   @media (min-width: ${theme.breakpoints.md}) {
     padding-top: 40px;
+  }
+`;
+
+const BenchmarkUtilityLayout = styled.div`
+  display: grid;
+  gap: 24px;
+
+  @media (min-width: ${theme.breakpoints.lg}) {
+    grid-template-columns: minmax(0, 1fr) minmax(320px, 420px);
+    align-items: start;
+    gap: 28px;
+  }
+`;
+
+const BenchmarkUtilityIntro = styled.div`
+  min-width: 0;
+
+  @media (min-width: ${theme.breakpoints.lg}) {
+    grid-column: 1 / -1;
+  }
+`;
+
+const BenchmarkUtilityText = styled.div`
+  min-width: 0;
+`;
+
+const BenchmarkUtilityStack = styled.div`
+  margin-top: 32px;
+  display: grid;
+  gap: 14px;
+`;
+
+const BenchmarkSnapshotCard = styled(HeroVisualCard)`
+  align-self: start;
+
+  @media (min-width: ${theme.breakpoints.lg}) {
+    margin-top: 32px;
   }
 `;
 
