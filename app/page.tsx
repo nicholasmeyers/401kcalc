@@ -293,9 +293,6 @@ export default function HomePage() {
                         strokeLinecap="round"
                       />
 
-                      <circle cx="220" cy="86" r="5" fill={theme.colors.chartImproved} />
-                      <circle cx="220" cy="112" r="5" fill={theme.colors.chartMain} />
-                      <circle cx="220" cy="78" r="5" fill={theme.colors.chartBenchmark} />
                     </HeroChartSvg>
 
                     <HeroAxisLabel style={{ left: 16, bottom: 8 }}>Today</HeroAxisLabel>
@@ -391,11 +388,11 @@ export default function HomePage() {
 
 const HeroSection = styled(Section)`
   padding-top: 24px;
-  padding-bottom: 24px;
+  padding-bottom: 16px;
 
   @media (min-width: ${theme.breakpoints.md}) {
     padding-top: 52px;
-    padding-bottom: 34px;
+    padding-bottom: 24px;
   }
 `;
 
@@ -434,8 +431,8 @@ const HeroActions = styled.div`
 `;
 
 const HeroVisualCard = styled(SurfaceCard)`
+  display: none;
   padding: 16px;
-  display: grid;
   gap: 14px;
   min-width: 0;
   background:
@@ -444,7 +441,8 @@ const HeroVisualCard = styled(SurfaceCard)`
     ${theme.colors.surface};
   border-color: ${theme.colors.elevatedBorder};
 
-  @media (min-width: ${theme.breakpoints.sm}) {
+  @media (min-width: ${theme.breakpoints.lg}) {
+    display: grid;
     padding: 20px;
   }
 `;
@@ -476,12 +474,14 @@ const HeroVisualBody = styled.div`
 `;
 
 const HeroVisualTitle = styled.h2`
+  margin: 0;
   font-size: clamp(1.1rem, 2vw, 1.32rem);
   font-weight: 640;
   line-height: 1.28;
 `;
 
 const HeroVisualSubtitle = styled.p`
+  margin: 0;
   font-size: 0.9rem;
   line-height: 1.62;
   color: ${theme.colors.mutedTextStrong};
@@ -558,6 +558,7 @@ const HeroCalloutRow = styled.div`
 `;
 
 const HeroCallout = styled.p`
+  margin: 0;
   font-size: 0.84rem;
   line-height: 1.56;
   color: ${theme.colors.mutedTextStrong};
@@ -627,6 +628,7 @@ const CalculatorSnapshotValue = styled.div`
 `;
 
 const CalculatorSnapshotMeta = styled.p`
+  margin: 0;
   font-size: 0.86rem;
   line-height: 1.5;
   color: ${theme.colors.mutedTextStrong};
@@ -682,22 +684,22 @@ const HeroFeatureCheck = styled.span`
 `;
 
 const UtilitySection = styled(Section)`
-  padding-top: 14px;
+  padding-block: 28px;
   border-top: 1px solid ${theme.colors.border};
   background: rgba(255, 255, 255, 0.64);
 
   @media (min-width: ${theme.breakpoints.md}) {
-    padding-top: 40px;
+    padding-block: 40px;
   }
 `;
 
 const BenchmarkUtilitySection = styled(Section)`
-  padding-top: 14px;
+  padding-block: 28px;
   border-bottom: 1px solid ${theme.colors.border};
   background: rgba(255, 255, 255, 0.64);
 
   @media (min-width: ${theme.breakpoints.md}) {
-    padding-top: 40px;
+    padding-block: 40px;
   }
 `;
 
@@ -771,21 +773,27 @@ const UtilityCard = styled(SurfaceCard)`
 `;
 
 const UtilityTitle = styled.h3`
+  margin: 0;
   font-size: 1.04rem;
   font-weight: 630;
 `;
 
 const UtilityBody = styled.p`
+  margin: 0;
   font-size: 0.94rem;
   line-height: 1.68;
 `;
 
 const TrustSection = styled(Section)`
-  padding-top: 36px;
+  padding-block: 28px;
+
+  @media (min-width: ${theme.breakpoints.md}) {
+    padding-block: 40px;
+  }
 `;
 
 const TrustGrid = styled.div`
-  margin-top: 34px;
+  margin-top: 32px;
   display: grid;
   gap: 16px;
 
@@ -801,11 +809,13 @@ const TrustItem = styled(SurfaceCard)`
 `;
 
 const TrustTitle = styled.h3`
+  margin: 0;
   font-size: 1.06rem;
   font-weight: 630;
 `;
 
 const TrustBody = styled.p`
+  margin: 0;
   font-size: 0.93rem;
   line-height: 1.7;
 `;
@@ -826,7 +836,11 @@ const TrustLink = styled(Link)`
 `;
 
 const GuidesSection = styled(Section)`
-  padding-top: 28px;
+  padding-block: 28px;
+
+  @media (min-width: ${theme.breakpoints.md}) {
+    padding-block: 40px;
+  }
 `;
 
 const GuideGrid = styled.div`
@@ -860,6 +874,7 @@ const GuideMeta = styled.div`
 `;
 
 const GuideCategory = styled.p`
+  margin: 0;
   font-size: 0.72rem;
   font-weight: 700;
   color: ${theme.colors.mutedText};
@@ -868,17 +883,20 @@ const GuideCategory = styled.p`
 `;
 
 const GuideDate = styled.p`
+  margin: 0;
   font-size: 0.82rem;
   color: ${theme.colors.mutedText};
 `;
 
 const GuideTitle = styled.h3`
+  margin: 0;
   font-size: 1.12rem;
   font-weight: 630;
   line-height: 1.34;
 `;
 
 const GuideSummary = styled.p`
+  margin: 0;
   font-size: 0.94rem;
   line-height: 1.66;
 `;
@@ -892,11 +910,13 @@ const GuideFooter = styled.div`
 `;
 
 const GuideRead = styled.p`
+  margin: 0;
   font-size: 0.84rem;
   color: ${theme.colors.mutedText};
 `;
 
 const GuideReadLink = styled.p`
+  margin: 0;
   font-size: 0.85rem;
   font-weight: 700;
   color: ${theme.colors.accent};
@@ -907,7 +927,13 @@ const GuidesActions = styled.div`
 `;
 
 const ClosingSection = styled(Section)`
-  padding-top: 18px;
+  padding-top: 28px;
+  padding-bottom: 40px;
+
+  @media (min-width: ${theme.breakpoints.md}) {
+    padding-top: 40px;
+    padding-bottom: 56px;
+  }
 `;
 
 const ClosingCard = styled(SurfaceCard)`
@@ -920,11 +946,13 @@ const ClosingCard = styled(SurfaceCard)`
 `;
 
 const ClosingTitle = styled.h2`
+  margin: 0;
   font-size: clamp(1.5rem, 2.8vw, 1.95rem);
   font-weight: 640;
 `;
 
 const ClosingBody = styled.p`
+  margin: 0;
   max-width: 64ch;
   font-size: 0.98rem;
   line-height: 1.72;
