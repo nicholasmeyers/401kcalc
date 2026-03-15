@@ -22,6 +22,12 @@ Custom events tracked:
 - `retirement_by_age_view`
 - `methodology_view`
 
+## Planning docs
+
+- [Future Roadmap](./docs/planning/FUTURE_ROADMAP.md)
+- [Growth And Monetization](./docs/planning/GROWTH_AND_MONETIZATION.md)
+- [Guide Images](./docs/GUIDE_IMAGES.md)
+
 ## Launch checklist
 
 See [LAUNCH_CHECKLIST.md](./LAUNCH_CHECKLIST.md).
