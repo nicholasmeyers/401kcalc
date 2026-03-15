@@ -32,6 +32,7 @@ const DEFAULT_CONTRIBUTION = 10;
 const DEFAULT_MATCH = 4;
 const DEFAULT_RETURN = 7;
 const DEFAULT_ESCALATION = 0;
+const MAX_SUGGESTED_ESCALATION = 10;
 const MAX_MILESTONES = 3;
 
 const AGE_DEFAULTS: Record<number, { salary: number; balance: number }> = {
@@ -70,6 +71,10 @@ function parseNum(value: string): number {
 
 function formatDollarDisplay(value: number): string {
   return Math.round(Math.max(0, value)).toLocaleString("en-US");
+}
+
+function formatPointValue(value: number): string {
+  return Number.isInteger(value) ? String(value) : value.toFixed(1);
 }
 
 
@@ -227,44 +232,67 @@ export function BenchmarkPlanner({ initialAge, onAgeChange }: BenchmarkPlannerPr
     : [];
 
   type SuggestionState =
-    | { kind: "on-track" }
-    | { kind: "increase"; amount: number }
-    | { kind: "fallback"; pctOfAge70: number }
+    | { kind: "on-track"; targetAge: number; currentAmount: number }
+    | { kind: "increase"; targetAge: number; currentAmount: number; recommendedAmount: number; delta: number }
+    | { kind: "fallback"; targetAge: number; currentAmount: number; recommendedAmount: number; delta: number; pctOfAge70: number }
+    | { kind: "maxed"; targetAge: number; currentAmount: number; pctOfAge70: number }
     | { kind: "none" };
 
   const suggestion = useMemo<SuggestionState>(() => {
-    if (!inputs) return { kind: "none" };
+    if (!inputs || !result) return { kind: "none" };
     if (inputs.currentAge >= 70) return { kind: "none" };
 
+    const currentAmount = Math.max(0, Math.min(MAX_SUGGESTED_ESCALATION, Math.round(inputs.annualContributionIncreasePercent)));
     const targetAge = inputs.currentAge < 60 ? 60 : 70;
     const targetMultiple = targetAge === 60 ? 8 : 12;
     const benchmark = inputs.annualSalary * targetMultiple;
 
-    const baseResult = calculatePlannerProjection({ ...inputs, annualContributionIncreasePercent: 0 });
-    const baseEntry = baseResult.currentPath.find((e) => e.age === targetAge);
-    if (baseEntry && baseEntry.balance >= benchmark) return { kind: "on-track" };
+    const activePath = currentAmount > 0 ? result.adjustedPath : result.currentPath;
+    const activeEntry = activePath.find((e) => e.age === targetAge);
+    if (activeEntry && activeEntry.balance >= benchmark) {
+      return { kind: "on-track", targetAge, currentAmount };
+    }
 
-    for (let inc = 1; inc <= 10; inc++) {
+    for (let inc = Math.max(1, currentAmount + 1); inc <= MAX_SUGGESTED_ESCALATION; inc++) {
       const trial = calculatePlannerProjection({ ...inputs, annualContributionIncreasePercent: inc });
       const entry = trial.adjustedPath.find((e) => e.age === targetAge);
-      if (entry && entry.balance >= benchmark) return { kind: "increase", amount: inc };
+      if (entry && entry.balance >= benchmark) {
+        return {
+          kind: "increase",
+          targetAge,
+          currentAmount,
+          recommendedAmount: inc,
+          delta: inc - currentAmount,
+        };
+      }
     }
 
     const benchmarkAt70 = inputs.annualSalary * 12;
-    const maxTrial = calculatePlannerProjection({ ...inputs, annualContributionIncreasePercent: 10 });
+    const maxTrial = calculatePlannerProjection({ ...inputs, annualContributionIncreasePercent: MAX_SUGGESTED_ESCALATION });
     const entryAt70 = maxTrial.adjustedPath.find((e) => e.age === 70);
     const pct = entryAt70 && benchmarkAt70 > 0
       ? Math.round((entryAt70.balance / benchmarkAt70) * 100)
       : 0;
 
-    return { kind: "fallback", pctOfAge70: pct };
-  }, [inputs]);
+    if (currentAmount >= MAX_SUGGESTED_ESCALATION) {
+      return { kind: "maxed", targetAge, currentAmount, pctOfAge70: pct };
+    }
+
+    return {
+      kind: "fallback",
+      targetAge,
+      currentAmount,
+      recommendedAmount: MAX_SUGGESTED_ESCALATION,
+      delta: MAX_SUGGESTED_ESCALATION - currentAmount,
+      pctOfAge70: pct,
+    };
+  }, [inputs, result]);
 
   const handleApplySuggestion = useCallback(() => {
     if (suggestion.kind === "increase") {
-      setEscalation(String(suggestion.amount));
+      setEscalation(String(suggestion.recommendedAmount));
     } else if (suggestion.kind === "fallback") {
-      setEscalation("10");
+      setEscalation(String(suggestion.recommendedAmount));
     }
   }, [suggestion]);
 
@@ -405,7 +433,9 @@ export function BenchmarkPlanner({ initialAge, onAgeChange }: BenchmarkPlannerPr
             {suggestion.kind === "on-track" && (
               <SuggestionBlock>
                 <SuggestionText>
-                  &#x1f4a1; You&apos;re on track for the age-{inputs && inputs.currentAge < 60 ? 60 : 70} benchmark at your current rate.
+                  &#x1f4a1; {suggestion.currentAmount > 0
+                    ? `You're now modeling a ${formatPointValue(suggestion.currentAmount)}-point yearly increase and you're on track for the age-${suggestion.targetAge} benchmark.`
+                    : `You're on track for the age-${suggestion.targetAge} benchmark at your current rate.`}
                 </SuggestionText>
               </SuggestionBlock>
             )}
@@ -413,10 +443,12 @@ export function BenchmarkPlanner({ initialAge, onAgeChange }: BenchmarkPlannerPr
             {suggestion.kind === "increase" && (
               <SuggestionBlock>
                 <SuggestionText>
-                  &#x1f4a1; Raise your rate by <strong>{suggestion.amount} points</strong>/yr to reach the age-{inputs && inputs.currentAge < 60 ? 60 : 70} benchmark.
+                  &#x1f4a1; {suggestion.currentAmount > 0
+                    ? <>Add <strong>{formatPointValue(suggestion.delta)} more points</strong>/yr to reach the age-{suggestion.targetAge} benchmark. That would set your yearly increase to <strong>{formatPointValue(suggestion.recommendedAmount)}%</strong>.</>
+                    : <>Raise your rate by <strong>{formatPointValue(suggestion.recommendedAmount)} points</strong>/yr to reach the age-{suggestion.targetAge} benchmark.</>}
                 </SuggestionText>
                 <ApplyButton type="button" onClick={handleApplySuggestion}>
-                  Apply +{suggestion.amount}
+                  {suggestion.currentAmount > 0 ? `Set to ${formatPointValue(suggestion.recommendedAmount)}%` : `Apply +${formatPointValue(suggestion.recommendedAmount)}`}
                 </ApplyButton>
               </SuggestionBlock>
             )}
@@ -424,11 +456,21 @@ export function BenchmarkPlanner({ initialAge, onAgeChange }: BenchmarkPlannerPr
             {suggestion.kind === "fallback" && (
               <SuggestionBlock>
                 <SuggestionText>
-                  &#x1f4a1; Raising your rate by 10 points/yr could reach <strong>{suggestion.pctOfAge70}%</strong> of the age-70 benchmark.
+                  &#x1f4a1; {suggestion.currentAmount > 0
+                    ? <>Try <strong>{formatPointValue(suggestion.delta)} more points</strong>/yr and set your yearly increase to <strong>{formatPointValue(suggestion.recommendedAmount)}%</strong>. You may still miss the age-{suggestion.targetAge} benchmark, but you could reach <strong>{suggestion.pctOfAge70}%</strong> of the age-70 benchmark.</>
+                    : <>Raising your rate by <strong>{formatPointValue(suggestion.recommendedAmount)} points</strong>/yr may still miss the age-{suggestion.targetAge} benchmark, but it could reach <strong>{suggestion.pctOfAge70}%</strong> of the age-70 benchmark.</>}
                 </SuggestionText>
                 <ApplyButton type="button" onClick={handleApplySuggestion}>
-                  Apply +10
+                  {suggestion.currentAmount > 0 ? `Set to ${formatPointValue(suggestion.recommendedAmount)}%` : `Apply +${formatPointValue(suggestion.recommendedAmount)}`}
                 </ApplyButton>
+              </SuggestionBlock>
+            )}
+
+            {suggestion.kind === "maxed" && (
+              <SuggestionBlock>
+                <SuggestionText>
+                  &#x1f4a1; You&apos;re already modeling a <strong>{formatPointValue(suggestion.currentAmount)}-point</strong> yearly increase. Compare the green path below to see how much ground that closes by age 70: about <strong>{suggestion.pctOfAge70}%</strong> of the age-70 benchmark.
+                </SuggestionText>
               </SuggestionBlock>
             )}
           </EscalationRow>
@@ -488,13 +530,27 @@ export function BenchmarkPlanner({ initialAge, onAgeChange }: BenchmarkPlannerPr
               <SectionHeading>Projected savings path</SectionHeading>
               {suggestion.kind === "increase" && (
                 <ChartNudge onClick={handleApplySuggestion}>
-                  &#x1f4a1; Raise your rate by {suggestion.amount} pts/yr to reach the benchmark &mdash; Apply +{suggestion.amount}
+                  &#x1f4a1; {suggestion.currentAmount > 0
+                    ? `Add ${formatPointValue(suggestion.delta)} more pts/yr to reach age-${suggestion.targetAge} — set to ${formatPointValue(suggestion.recommendedAmount)}%`
+                    : `Raise your rate by ${formatPointValue(suggestion.recommendedAmount)} pts/yr to reach age-${suggestion.targetAge} — Apply +${formatPointValue(suggestion.recommendedAmount)}`}
                 </ChartNudge>
               )}
               {suggestion.kind === "fallback" && (
                 <ChartNudge onClick={handleApplySuggestion}>
-                  &#x1f4a1; Raising your rate by 10 pts/yr could reach {suggestion.pctOfAge70}% of the age-70 benchmark &mdash; Apply +10
+                  &#x1f4a1; {suggestion.currentAmount > 0
+                    ? `Set to ${formatPointValue(suggestion.recommendedAmount)}% to test a stronger path — up to ${suggestion.pctOfAge70}% of age-70 benchmark`
+                    : `Raise your rate by ${formatPointValue(suggestion.recommendedAmount)} pts/yr to test a stronger path — up to ${suggestion.pctOfAge70}% of age-70 benchmark`}
                 </ChartNudge>
+              )}
+              {suggestion.kind === "on-track" && suggestion.currentAmount > 0 && (
+                <ChartStatus>
+                  &#x1f4a1; Your current increase is already modeled and puts you on track for age-{suggestion.targetAge}.
+                </ChartStatus>
+              )}
+              {suggestion.kind === "maxed" && (
+                <ChartStatus>
+                  &#x1f4a1; You&apos;re already modeling the strongest yearly increase shown here. Compare the green path against your current path.
+                </ChartStatus>
               )}
             </ChartHeader>
             <PlannerChart
@@ -786,6 +842,18 @@ const ChartNudge = styled.button`
   }
 `;
 
+const ChartStatus = styled.div`
+  padding: 6px 12px;
+  border: 1px solid ${theme.colors.successBorder};
+  border-radius: ${theme.radii.pill};
+  background: ${theme.colors.successSurface};
+  color: ${theme.colors.successText};
+  font-size: 0.76rem;
+  font-weight: 600;
+  text-align: left;
+  line-height: 1.4;
+`;
+
 // ---------------------------------------------------------------------------
 // Milestone section
 // ---------------------------------------------------------------------------
@@ -858,7 +926,10 @@ const EscalationRow = styled.div`
   }
 `;
 
-const SuggestionBlock = styled.div`
+const SuggestionBlock = styled.div.attrs({
+  role: "status",
+  "aria-live": "polite",
+})`
   display: grid;
   gap: 8px;
   padding: 10px 12px;

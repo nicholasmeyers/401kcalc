@@ -307,16 +307,23 @@ function generateRecommendations(
     });
   }
 
+  if (inputs.annualContributionIncreasePercent === 0 && next && next.currentPercentOfTarget < 100) {
+    recs.push({
+      text: `Try modeling a 1% to 3% annual contribution increase to see how much of the age-${next.age} gap you can close before making bigger changes.`,
+      kind: "action",
+    });
+  }
+
   if (inputs.annualContributionIncreasePercent > 0 && next) {
     const adjPct = Math.round(next.adjustedPercentOfTarget);
     if (adjPct >= 100) {
       recs.push({
-        text: `Raising contributions by ${inputs.annualContributionIncreasePercent}% per year could put you on track to reach the age-${next.age} benchmark.`,
+        text: `With contributions rising by ${inputs.annualContributionIncreasePercent}% per year, your modeled path reaches the age-${next.age} benchmark.`,
         kind: "on-track",
       });
     } else {
       recs.push({
-        text: `Even with a ${inputs.annualContributionIncreasePercent}% annual increase, you may reach about ${adjPct}% of the age-${next.age} benchmark. A higher increase or additional savings may help close the gap.`,
+        text: `With a ${inputs.annualContributionIncreasePercent}% annual increase, your modeled path reaches about ${adjPct}% of the age-${next.age} benchmark. Try testing a higher increase if you want to close more of the gap.`,
         kind: "action",
       });
     }

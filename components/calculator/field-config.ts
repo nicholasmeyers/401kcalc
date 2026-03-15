@@ -21,19 +21,19 @@ export const retirementGoalFieldConfigs: CalculatorFieldConfig[] = [
   {
     field: "currentAge",
     label: "Current age",
-    description: "Age today.",
+    description: "",
     kind: "age",
   },
   {
     field: "retirementAge",
     label: "Retirement age",
-    description: "Target age to stop full-time work.",
+    description: "",
     kind: "age",
   },
   {
     field: "lifeExpectancy",
     label: "Life expectancy",
-    description: "Last age included in this estimate.",
+    description: "",
     kind: "age",
     tooltip: "The calculator checks whether your savings last through this age.",
   },
@@ -51,13 +51,13 @@ export const balanceFieldConfigs: CalculatorFieldConfig[] = [
   {
     field: "currentBalance",
     label: "Total 401(k) balance",
-    description: "Your total current 401(k) balance across all accounts.",
+    description: "Total current 401(k) balance across all accounts.",
     kind: "currency",
   },
   {
     field: "currentRothBalance",
     label: "Roth 401(k) balance",
-    description: "Portion of your balance that is already in a Roth 401(k).",
+    description: "Portion of total that is already in a Roth 401(k).",
     kind: "currency",
     tooltip:
       "If part of your existing 401(k) is in a Roth account, enter that amount here. The rest is treated as traditional (pre-tax).",
@@ -88,7 +88,7 @@ export const contributionFieldConfigs: CalculatorFieldConfig[] = [
   {
     field: "employerMatchPercent",
     label: "Employer match percent",
-    description: "Estimated employer contribution as a percentage of salary.",
+    description: "Estimated employer contribution as a % of salary.",
     kind: "percent",
   },
 ];

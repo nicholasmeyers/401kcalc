@@ -5,6 +5,7 @@ import Link from "next/link";
 import styled from "styled-components";
 
 import { Container } from "@/components/layout/container";
+import { HEADER_HEIGHT } from "@/components/layout/header";
 import { Section } from "@/components/layout/section";
 import { theme } from "@/styles/theme";
 
@@ -20,10 +21,16 @@ type GuideEntry = {
 type GuidesFilteredListProps = {
   guides: GuideEntry[];
   categories: string[];
+  /** Controlled: topic to highlight (e.g. from hero section click) */
+  activeTopic?: string | null;
+  /** Controlled: called when user changes topic via chips */
+  onTopicChange?: (topic: string | null) => void;
 };
 
-export function GuidesFilteredList({ guides, categories }: GuidesFilteredListProps) {
-  const [activeTopic, setActiveTopic] = useState<string | null>(null);
+export function GuidesFilteredList({ guides, categories, activeTopic: controlledTopic, onTopicChange }: GuidesFilteredListProps) {
+  const [internalTopic, setInternalTopic] = useState<string | null>(null);
+  const activeTopic = controlledTopic !== undefined ? controlledTopic : internalTopic;
+  const setActiveTopic = onTopicChange ?? setInternalTopic;
 
   const sortedGuides = useMemo(() => {
     if (!activeTopic) return guides;
@@ -34,7 +41,7 @@ export function GuidesFilteredList({ guides, categories }: GuidesFilteredListPro
 
   return (
     <>
-      <TopicsSection>
+      <TopicsSection id="browse-by-topic">
         <Container>
           <TopicsLabel>Browse by topic</TopicsLabel>
           <TopicChips aria-label="Filter guides by topic">
@@ -43,7 +50,7 @@ export function GuidesFilteredList({ guides, categories }: GuidesFilteredListPro
                 key={category}
                 type="button"
                 $active={activeTopic === category}
-                onClick={() => setActiveTopic((prev) => (prev === category ? null : category))}
+                onClick={() => setActiveTopic(activeTopic === category ? null : category)}
               >
                 {category}
               </TopicChipButton>
@@ -86,6 +93,7 @@ export function GuidesFilteredList({ guides, categories }: GuidesFilteredListPro
 const TopicsSection = styled(Section)`
   padding-top: 16px;
   padding-bottom: 12px;
+  scroll-margin-top: ${HEADER_HEIGHT}px;
 `;
 
 const TopicsLabel = styled.h2`

@@ -107,7 +107,7 @@ export const parseLooseNumber = (rawValue: string): number | null => {
   const trimmedValue = rawValue.trim();
 
   if (trimmedValue === "" || trimmedValue === "-" || trimmedValue === "." || trimmedValue === "-.") {
-    return null;
+    return 0;
   }
 
   const normalizedValue = trimmedValue.replace(/[\s,$%]/g, "");

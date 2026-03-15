@@ -54,6 +54,8 @@ describe("money input helpers", () => {
   it("parses loosely formatted numeric strings", () => {
     expect(parseLooseNumber(" 200,000.5 ")).toBe(200000.5);
     expect(parseLooseNumber("12.3%")).toBe(12.3);
-    expect(parseLooseNumber(".")).toBeNull();
+    expect(parseLooseNumber(".")).toBe(0);
+    expect(parseLooseNumber("")).toBe(0);
+    expect(parseLooseNumber("  ")).toBe(0);
   });
 });

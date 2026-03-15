@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import React from "react";
@@ -23,6 +24,14 @@ import { siteConfig } from "@/lib/site";
 import { theme } from "@/styles/theme";
 
 const MILESTONE_SLUG_RE = /^how-much-should-i-have-in-my-401k-at-(\d+)$/;
+
+const IMAGE_POSITION_MAP: Record<string, string> = {
+  "top-left": "top left",
+  "top-right": "top right",
+  "bottom-left": "bottom left",
+  "bottom-right": "bottom right",
+  center: "center",
+};
 
 function getMilestoneAge(slug: string): number | undefined {
   const match = MILESTONE_SLUG_RE.exec(slug);
@@ -57,6 +66,10 @@ export async function generateMetadata({ params }: GuidePageProps): Promise<Meta
   const publishedTime = getGuideDateObject(guide.publishedAt ?? getGuideReviewedDate(guide))?.toISOString();
   const modifiedTime = getGuideDateObject(getGuideModifiedDate(guide))?.toISOString();
 
+  const ogImages = guide.imageUrl
+    ? [{ url: `${siteConfig.url}${guide.imageUrl}`, width: 1200, height: 630, alt: guide.title }]
+    : undefined;
+
   return {
     title: guide.title,
     description: guide.description,
@@ -71,11 +84,13 @@ export async function generateMetadata({ params }: GuidePageProps): Promise<Meta
       publishedTime,
       modifiedTime,
       authors: [author.name],
+      ...(ogImages && { images: ogImages }),
     },
     twitter: {
       card: "summary_large_image",
       title: guide.title,
       description: guide.description,
+      ...(guide.imageUrl && { images: [`${siteConfig.url}${guide.imageUrl}`] }),
     },
   };
 }
@@ -102,12 +117,17 @@ export default async function GuideDetailPage({ params }: GuidePageProps) {
     getGuideDateObject(getGuideModifiedDate(guide))?.toISOString();
   const modifiedDateIso = getGuideDateObject(getGuideModifiedDate(guide))?.toISOString() ?? publishedDateIso;
 
+  const articleImageUrl = guide.imageUrl
+    ? `${siteConfig.url}${guide.imageUrl}`
+    : `${siteConfig.url}/guides/${guide.slug}/opengraph-image`;
+
   const articleSchema = {
     "@context": "https://schema.org",
     "@type": "Article",
     headline: guide.title,
     description: guide.description,
     url: guideUrl,
+    image: articleImageUrl,
     author: {
       "@type": "Person",
       name: author.name,
@@ -168,6 +188,20 @@ export default async function GuideDetailPage({ params }: GuidePageProps) {
               <BreadCrumbDivider>/</BreadCrumbDivider>
               <BreadCrumb href="/guides">Guides</BreadCrumb>
             </BreadCrumbRow>
+            {guide.imageUrl ? (
+              <HeroImageWrapper>
+                <Image
+                  src={guide.imageUrl}
+                  alt={guide.title}
+                  fill
+                  sizes="(max-width: 768px) 100vw, 760px"
+                  style={{
+                    objectFit: "cover",
+                    objectPosition: IMAGE_POSITION_MAP[guide.imagePosition ?? "center"] ?? "center",
+                  }}
+                />
+              </HeroImageWrapper>
+            ) : null}
             <Title>{guide.title}</Title>
             <Summary>{guide.description}</Summary>
             <MetaRow>
@@ -278,8 +312,25 @@ const IntroSection = styled(Section)`
 
 const IntroArticle = styled.article`
   max-width: 760px;
+  margin-inline: auto;
   display: grid;
   gap: 14px;
+`;
+
+const HeroImageWrapper = styled.div`
+  position: relative;
+  width: 100%;
+  height: 400px;
+  max-height: 400px;
+  margin-bottom: 4px;
+  border-radius: ${theme.radii.lg};
+  overflow: hidden;
+  border: 1px solid ${theme.colors.border};
+
+  @media (min-width: ${theme.breakpoints.lg}) {
+    height: 500px;
+    max-height: 500px;
+  }
 `;
 
 const BreadCrumbRow = styled.nav`
@@ -391,6 +442,7 @@ const BodySection = styled(Section)`
 
 const BodyCard = styled(SurfaceCard)`
   max-width: 780px;
+  margin-inline: auto;
   padding: 30px;
   display: grid;
   gap: 34px;

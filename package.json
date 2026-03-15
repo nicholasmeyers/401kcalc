@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "vitest run"
+    "test": "vitest run",
+    "convert-guide-images": "node scripts/convert-guide-images.mjs"
   },
   "dependencies": {
     "next": "^15.0.0",
@@ -23,6 +24,7 @@
     "@types/styled-components": "^5.1.36",
     "eslint": "^8.57.1",
     "eslint-config-next": "^15.0.0",
+    "sharp": "^0.34.5",
     "typescript": "^5.7.2",
     "vitest": "^4.0.18"
   }

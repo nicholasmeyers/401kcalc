@@ -18,6 +18,7 @@ import styled from "styled-components";
 
 import { formatCurrency } from "@/lib/calculator/format";
 import type { YearlyProjectionEntry } from "@/lib/calculator/types";
+import { useHasMounted } from "@/lib/use-has-mounted";
 import { usePrefersReducedMotion } from "@/lib/use-prefers-reduced-motion";
 import { theme } from "@/styles/theme";
 
@@ -176,6 +177,7 @@ const ProjectionHoverTooltip = ({ active, label, payload }: ProjectionTooltipPro
 export function ProjectionChart({ data, retirementAge, onRetirementAgeChange }: ProjectionChartProps) {
   const [hoveredMarkerId, setHoveredMarkerId] = useState<string | null>(null);
   const [isDraggingRetirementMarker, setIsDraggingRetirementMarker] = useState(false);
+  const hasMounted = useHasMounted();
   const prefersReducedMotion = usePrefersReducedMotion();
 
   const {
@@ -341,142 +343,146 @@ export function ProjectionChart({ data, retirementAge, onRetirementAgeChange }: 
       </LegendRow>
       {legendHint ? <LegendHint>{legendHint}</LegendHint> : null}
       <ChartViewport $dragging={isDraggingRetirementMarker}>
-        <ResponsiveContainer width="100%" height="100%" minHeight={286}>
-          <LineChart
-            data={chartRows}
-            margin={{ top: 12, right: 8, left: 0, bottom: 8 }}
-            onMouseMove={handleChartPointerMove}
-            onMouseUp={stopDraggingRetirementMarker}
-            onMouseLeave={stopDraggingRetirementMarker}
-            onTouchMove={handleChartPointerMove}
-            onTouchEnd={stopDraggingRetirementMarker}
-            onClick={(nextState) => handleRetirementAgeUpdate(nextState.activeLabel)}
-          >
-            <CartesianGrid stroke={theme.colors.chartGrid} strokeDasharray="3 6" vertical={false} />
-            <XAxis
-              dataKey="age"
-              tickLine={false}
-              axisLine={false}
-              tickMargin={10}
-              tick={{ fill: theme.colors.mutedTextStrong, fontSize: 12 }}
-            />
-            <YAxis
-              tickLine={false}
-              axisLine={false}
-              tickMargin={10}
-              width={66}
-              tick={{ fill: theme.colors.mutedTextStrong, fontSize: 12 }}
-              tickFormatter={(value) => compactCurrency.format(value)}
-            />
-            <Tooltip
-              content={<ProjectionHoverTooltip />}
-              cursor={{ stroke: theme.colors.chartCursor, strokeWidth: 1 }}
-            />
-            <ReferenceLine
-              x={retirementAge}
-              stroke={theme.colors.chartEvent}
-              strokeDasharray="4 4"
-              strokeWidth={1.2}
-              ifOverflow="visible"
-            />
-            <ReferenceDot
-              x={retirementAge}
-              y={retirementMarkerBalance}
-              r={getMarkerRadius("retirement", 7)}
-              fill={theme.colors.chartMain}
-              stroke={theme.colors.surface}
-              strokeWidth={2}
-              cursor={onRetirementAgeChange ? (isDraggingRetirementMarker ? "grabbing" : "grab") : "default"}
-              ifOverflow="visible"
-              tabIndex={onRetirementAgeChange ? 0 : -1}
-              role={onRetirementAgeChange ? "slider" : undefined}
-              aria-valuemin={onRetirementAgeChange ? minAge : undefined}
-              aria-valuemax={onRetirementAgeChange ? maxAge : undefined}
-              aria-valuenow={onRetirementAgeChange ? retirementAge : undefined}
-              aria-valuetext={onRetirementAgeChange ? `Age ${retirementAge}` : undefined}
-              aria-label={
-                onRetirementAgeChange
-                  ? "Retirement age marker. Drag left or right, tap chart to reposition, or use arrow keys."
-                  : undefined
-              }
-              label={getDotLabel("retirement", "Retirement age", "top")}
-              onMouseDown={(dotProps: DotProps, event) => {
-                void dotProps;
-                event.preventDefault();
-                startDraggingRetirementMarker();
-              }}
-              onTouchStart={(dotProps: DotProps, event) => {
-                void dotProps;
-                event.preventDefault();
-                startDraggingRetirementMarker();
-              }}
-              onKeyDown={handleRetirementMarkerKeyDown}
-              {...markerEvents("retirement")}
-            />
-            {windfallRows.map((entry) => {
-              const markerId = `windfall-${entry.yearIndex}`;
+        {hasMounted ? (
+          <ResponsiveContainer width="100%" height="100%" minHeight={286}>
+            <LineChart
+              data={chartRows}
+              margin={{ top: 12, right: 8, left: 0, bottom: 8 }}
+              onMouseMove={handleChartPointerMove}
+              onMouseUp={stopDraggingRetirementMarker}
+              onMouseLeave={stopDraggingRetirementMarker}
+              onTouchMove={handleChartPointerMove}
+              onTouchEnd={stopDraggingRetirementMarker}
+              onClick={(nextState) => handleRetirementAgeUpdate(nextState.activeLabel)}
+            >
+              <CartesianGrid stroke={theme.colors.chartGrid} strokeDasharray="3 6" vertical={false} />
+              <XAxis
+                dataKey="age"
+                tickLine={false}
+                axisLine={false}
+                tickMargin={10}
+                tick={{ fill: theme.colors.mutedTextStrong, fontSize: 12 }}
+              />
+              <YAxis
+                tickLine={false}
+                axisLine={false}
+                tickMargin={10}
+                width={66}
+                tick={{ fill: theme.colors.mutedTextStrong, fontSize: 12 }}
+                tickFormatter={(value) => compactCurrency.format(value)}
+              />
+              <Tooltip
+                content={<ProjectionHoverTooltip />}
+                cursor={{ stroke: theme.colors.chartCursor, strokeWidth: 1 }}
+              />
+              <ReferenceLine
+                x={retirementAge}
+                stroke={theme.colors.chartEvent}
+                strokeDasharray="4 4"
+                strokeWidth={1.2}
+                ifOverflow="visible"
+              />
+              <ReferenceDot
+                x={retirementAge}
+                y={retirementMarkerBalance}
+                r={getMarkerRadius("retirement", 7)}
+                fill={theme.colors.chartMain}
+                stroke={theme.colors.surface}
+                strokeWidth={2}
+                cursor={onRetirementAgeChange ? (isDraggingRetirementMarker ? "grabbing" : "grab") : "default"}
+                ifOverflow="visible"
+                tabIndex={onRetirementAgeChange ? 0 : -1}
+                role={onRetirementAgeChange ? "slider" : undefined}
+                aria-valuemin={onRetirementAgeChange ? minAge : undefined}
+                aria-valuemax={onRetirementAgeChange ? maxAge : undefined}
+                aria-valuenow={onRetirementAgeChange ? retirementAge : undefined}
+                aria-valuetext={onRetirementAgeChange ? `Age ${retirementAge}` : undefined}
+                aria-label={
+                  onRetirementAgeChange
+                    ? "Retirement age marker. Drag left or right, tap chart to reposition, or use arrow keys."
+                    : undefined
+                }
+                label={getDotLabel("retirement", "Retirement age", "top")}
+                onMouseDown={(dotProps: DotProps, event) => {
+                  void dotProps;
+                  event.preventDefault();
+                  startDraggingRetirementMarker();
+                }}
+                onTouchStart={(dotProps: DotProps, event) => {
+                  void dotProps;
+                  event.preventDefault();
+                  startDraggingRetirementMarker();
+                }}
+                onKeyDown={handleRetirementMarkerKeyDown}
+                {...markerEvents("retirement")}
+              />
+              {windfallRows.map((entry) => {
+                const markerId = `windfall-${entry.yearIndex}`;
 
-              return (
+                return (
+                  <ReferenceDot
+                    key={markerId}
+                    x={entry.age}
+                    y={entry.endingBalance}
+                    r={getMarkerRadius(markerId)}
+                    fill={theme.colors.chartWindfall}
+                    stroke={theme.colors.surface}
+                    strokeWidth={1.4}
+                    ifOverflow="visible"
+                    tabIndex={0}
+                    role="img"
+                    aria-label={`Windfall contribution marker at age ${entry.age}`}
+                    label={getDotLabel(markerId, `Windfall at age ${entry.age}`, "top")}
+                    {...markerEvents(markerId)}
+                  />
+                );
+              })}
+              {depletionRow ? (
                 <ReferenceDot
-                  key={markerId}
-                  x={entry.age}
-                  y={entry.endingBalance}
-                  r={getMarkerRadius(markerId)}
-                  fill={theme.colors.chartWindfall}
+                  x={depletionRow.age}
+                  y={depletionRow.endingBalance}
+                  r={getMarkerRadius("depletion")}
+                  fill={theme.colors.chartDepletion}
                   stroke={theme.colors.surface}
                   strokeWidth={1.4}
                   ifOverflow="visible"
                   tabIndex={0}
                   role="img"
-                  aria-label={`Windfall contribution marker at age ${entry.age}`}
-                  label={getDotLabel(markerId, `Windfall at age ${entry.age}`, "top")}
-                  {...markerEvents(markerId)}
+                  aria-label={`Projected balance depletion marker at age ${depletionRow.age}`}
+                  label={getDotLabel("depletion", `Portfolio depleted at age ${depletionRow.age}`, "bottom")}
+                  {...markerEvents("depletion")}
                 />
-              );
-            })}
-            {depletionRow ? (
-              <ReferenceDot
-                x={depletionRow.age}
-                y={depletionRow.endingBalance}
-                r={getMarkerRadius("depletion")}
-                fill={theme.colors.chartDepletion}
-                stroke={theme.colors.surface}
-                strokeWidth={1.4}
-                ifOverflow="visible"
-                tabIndex={0}
-                role="img"
-                aria-label={`Projected balance depletion marker at age ${depletionRow.age}`}
-                label={getDotLabel("depletion", `Portfolio depleted at age ${depletionRow.age}`, "bottom")}
-                {...markerEvents("depletion")}
+              ) : null}
+              <Line
+                type="monotone"
+                dataKey="endingBalance"
+                name={mainSeries.name}
+                stroke={mainSeries.color}
+                strokeWidth={mainSeries.strokeWidth}
+                dot={false}
+                activeDot={{ r: 3 }}
+                isAnimationActive={!prefersReducedMotion}
+                animationDuration={lineAnimationDuration}
+                animationEasing="ease-out"
               />
-            ) : null}
-            <Line
-              type="monotone"
-              dataKey="endingBalance"
-              name={mainSeries.name}
-              stroke={mainSeries.color}
-              strokeWidth={mainSeries.strokeWidth}
-              dot={false}
-              activeDot={{ r: 3 }}
-              isAnimationActive={!prefersReducedMotion}
-              animationDuration={lineAnimationDuration}
-              animationEasing="ease-out"
-            />
-            <Line
-              type="monotone"
-              dataKey="inflationAdjustedEndingBalance"
-              name={inflationSeries.name}
-              stroke={inflationSeries.color}
-              strokeWidth={inflationSeries.strokeWidth}
-              strokeDasharray={inflationSeries.strokeDasharray}
-              dot={false}
-              activeDot={{ r: 3 }}
-              isAnimationActive={!prefersReducedMotion}
-              animationDuration={lineAnimationDuration}
-              animationEasing="ease-out"
-            />
-          </LineChart>
-        </ResponsiveContainer>
+              <Line
+                type="monotone"
+                dataKey="inflationAdjustedEndingBalance"
+                name={inflationSeries.name}
+                stroke={inflationSeries.color}
+                strokeWidth={inflationSeries.strokeWidth}
+                strokeDasharray={inflationSeries.strokeDasharray}
+                dot={false}
+                activeDot={{ r: 3 }}
+                isAnimationActive={!prefersReducedMotion}
+                animationDuration={lineAnimationDuration}
+                animationEasing="ease-out"
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        ) : (
+          <ChartPlaceholder aria-hidden="true" />
+        )}
       </ChartViewport>
     </ChartWrapper>
   );
@@ -500,6 +506,17 @@ const ChartViewport = styled.div<{ $dragging: boolean }>`
   *:focus-visible {
     outline: none;
   }
+`;
+
+const ChartPlaceholder = styled.div`
+  width: 100%;
+  height: 100%;
+  border-radius: ${theme.radii.md};
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.82), rgba(248, 250, 252, 0.92)),
+    repeating-linear-gradient(to right, transparent 0 58px, rgba(148, 163, 184, 0.08) 58px 59px),
+    repeating-linear-gradient(to bottom, transparent 0 54px, rgba(148, 163, 184, 0.08) 54px 55px);
+  border: 1px solid ${theme.colors.border};
 `;
 
 const LegendRow = styled.div`

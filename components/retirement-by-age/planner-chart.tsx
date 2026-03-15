@@ -14,6 +14,7 @@ import styled from "styled-components";
 
 import { formatCurrency } from "@/lib/calculator/format";
 import type { PlannerYearEntry } from "@/lib/retirement-benchmarks/planner";
+import { useHasMounted } from "@/lib/use-has-mounted";
 import { theme } from "@/styles/theme";
 
 // ---------------------------------------------------------------------------
@@ -143,6 +144,7 @@ export function PlannerChart({
   showAdjusted,
   currentAge,
 }: PlannerChartProps) {
+  const hasMounted = useHasMounted();
   const rows = buildChartRows(currentPath, adjustedPath, benchmarkCurve, showAdjusted);
 
   if (rows.length === 0) {
@@ -169,79 +171,80 @@ export function PlannerChart({
       </LegendRow>
 
       <ChartViewport>
-        <ResponsiveContainer width="100%" height="100%" minHeight={280}>
-          <LineChart data={rows} margin={{ top: 12, right: 8, left: 0, bottom: 8 }}>
-            <CartesianGrid
-              stroke={theme.colors.chartGrid}
-              strokeDasharray="3 6"
-              vertical={false}
-            />
-            <XAxis
-              dataKey="age"
-              tickLine={false}
-              axisLine={false}
-              tickMargin={10}
-              tick={{ fill: theme.colors.mutedTextStrong, fontSize: 12 }}
-            />
-            <YAxis
-              tickLine={false}
-              axisLine={false}
-              tickMargin={10}
-              width={66}
-              tick={{ fill: theme.colors.mutedTextStrong, fontSize: 12 }}
-              tickFormatter={(value) => compactCurrency.format(value)}
-            />
-            <Tooltip
-              content={<PlannerTooltip />}
-              cursor={{ stroke: theme.colors.chartCursor, strokeWidth: 1 }}
-            />
-            <ReferenceLine
-              x={currentAge}
-              stroke={theme.colors.chartEvent}
-              strokeDasharray="4 4"
-              strokeWidth={1.2}
-            />
+        {hasMounted ? (
+          <ResponsiveContainer width="100%" height="100%" minHeight={280}>
+            <LineChart data={rows} margin={{ top: 12, right: 8, left: 0, bottom: 8 }}>
+              <CartesianGrid
+                stroke={theme.colors.chartGrid}
+                strokeDasharray="3 6"
+                vertical={false}
+              />
+              <XAxis
+                dataKey="age"
+                tickLine={false}
+                axisLine={false}
+                tickMargin={10}
+                tick={{ fill: theme.colors.mutedTextStrong, fontSize: 12 }}
+              />
+              <YAxis
+                tickLine={false}
+                axisLine={false}
+                tickMargin={10}
+                width={66}
+                tick={{ fill: theme.colors.mutedTextStrong, fontSize: 12 }}
+                tickFormatter={(value) => compactCurrency.format(value)}
+              />
+              <Tooltip
+                content={<PlannerTooltip />}
+                cursor={{ stroke: theme.colors.chartCursor, strokeWidth: 1 }}
+              />
+              <ReferenceLine
+                x={currentAge}
+                stroke={theme.colors.chartEvent}
+                strokeDasharray="4 4"
+                strokeWidth={1.2}
+              />
 
-            {/* Benchmark path – dashed lighter blue */}
-            <Line
-              type="linear"
-              dataKey="benchmarkTarget"
-              name="Benchmark"
-              stroke={BENCHMARK_COLOR}
-              strokeWidth={2}
-              strokeDasharray="8 6"
-              dot={false}
-              activeDot={{ r: 4, fill: BENCHMARK_COLOR }}
-              animationDuration={300}
-            />
+              <Line
+                type="linear"
+                dataKey="benchmarkTarget"
+                name="Benchmark"
+                stroke={BENCHMARK_COLOR}
+                strokeWidth={2}
+                strokeDasharray="8 6"
+                dot={false}
+                activeDot={{ r: 4, fill: BENCHMARK_COLOR }}
+                animationDuration={300}
+              />
 
-            {/* Current path – solid dark */}
-            <Line
-              type="monotone"
-              dataKey="currentBalance"
-              name="Current path"
-              stroke={CURRENT_COLOR}
-              strokeWidth={2.4}
-              dot={false}
-              activeDot={{ r: 3 }}
-              animationDuration={300}
-            />
-
-            {/* Improved path – solid green */}
-            {showAdjusted && (
               <Line
                 type="monotone"
-                dataKey="adjustedBalance"
-                name="Improved path"
-                stroke={IMPROVED_COLOR}
-                strokeWidth={2.2}
+                dataKey="currentBalance"
+                name="Current path"
+                stroke={CURRENT_COLOR}
+                strokeWidth={2.4}
                 dot={false}
                 activeDot={{ r: 3 }}
                 animationDuration={300}
               />
-            )}
-          </LineChart>
-        </ResponsiveContainer>
+
+              {showAdjusted && (
+                <Line
+                  type="monotone"
+                  dataKey="adjustedBalance"
+                  name="Improved path"
+                  stroke={IMPROVED_COLOR}
+                  strokeWidth={2.2}
+                  dot={false}
+                  activeDot={{ r: 3 }}
+                  animationDuration={300}
+                />
+              )}
+            </LineChart>
+          </ResponsiveContainer>
+        ) : (
+          <ChartPlaceholder aria-hidden="true" />
+        )}
       </ChartViewport>
     </ChartWrapper>
   );
@@ -258,6 +261,7 @@ const ChartWrapper = styled.div`
 
 const ChartViewport = styled.div`
   width: 100%;
+  min-width: 0;
   min-height: 280px;
   height: clamp(280px, 50vw, 340px);
 
@@ -265,6 +269,17 @@ const ChartViewport = styled.div`
   *:focus-visible {
     outline: none;
   }
+`;
+
+const ChartPlaceholder = styled.div`
+  width: 100%;
+  height: 100%;
+  border-radius: ${theme.radii.md};
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.82), rgba(248, 250, 252, 0.92)),
+    repeating-linear-gradient(to right, transparent 0 58px, rgba(148, 163, 184, 0.08) 58px 59px),
+    repeating-linear-gradient(to bottom, transparent 0 54px, rgba(148, 163, 184, 0.08) 54px 55px);
+  border: 1px solid ${theme.colors.border};
 `;
 
 const LegendRow = styled.div`
