@@ -411,12 +411,22 @@ const benchmarks: RetirementBenchmark[] = [
 
 const benchmarkLookup = new Map<number, RetirementBenchmark>(benchmarks.map((benchmark) => [benchmark.age, benchmark]));
 
+export const MIN_RETIREMENT_PLANNER_AGE = 18;
+export const MAX_RETIREMENT_PLANNER_AGE = 70;
+
 export function getAllRetirementBenchmarks(): RetirementBenchmark[] {
   return benchmarks;
 }
 
 export function getRetirementBenchmarkAges(): number[] {
   return benchmarks.map((benchmark) => benchmark.age);
+}
+
+export function getSupportedRetirementPlannerAges(): number[] {
+  return Array.from(
+    { length: MAX_RETIREMENT_PLANNER_AGE - MIN_RETIREMENT_PLANNER_AGE + 1 },
+    (_, index) => MIN_RETIREMENT_PLANNER_AGE + index,
+  );
 }
 
 export function getRetirementBenchmarkByAge(age: number): RetirementBenchmark | undefined {

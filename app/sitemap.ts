@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 
 import { getAllGuides, getGuideDateObject, getGuideModifiedDate } from "@/lib/guides/guides";
-import { getRetirementBenchmarkAges } from "@/lib/retirement-benchmarks/benchmarks";
+import { getSupportedRetirementPlannerAges } from "@/lib/retirement-benchmarks/benchmarks";
 import { siteConfig } from "@/lib/site";
 
 export default function sitemap(): MetadataRoute.Sitemap {
@@ -18,7 +18,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     path: `/guides/${guide.slug}`,
     lastModified: getGuideDateObject(getGuideModifiedDate(guide)) ?? new Date(),
   }));
-  const benchmarkRoutes = getRetirementBenchmarkAges().map((age) => ({
+  const benchmarkRoutes = getSupportedRetirementPlannerAges().map((age) => ({
     path: `/retirement-by-age/${age}`,
     lastModified: new Date(),
   }));
