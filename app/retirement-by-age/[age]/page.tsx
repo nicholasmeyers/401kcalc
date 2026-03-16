@@ -7,6 +7,10 @@ import { Container } from "@/components/layout/container";
 import { Section } from "@/components/layout/section";
 import { RetirementByAgeLanding } from "@/components/retirement-by-age/retirement-by-age-landing";
 import {
+  AgeBenchmarkSupportingContent,
+  getAgeBenchmarkFaqs,
+} from "@/components/retirement-by-age/retirement-supporting-content";
+import {
   MAX_RETIREMENT_PLANNER_AGE,
   MIN_RETIREMENT_PLANNER_AGE,
   getRetirementBenchmarkAges,
@@ -93,6 +97,7 @@ export default async function RetirementByAgePlannerPage({ params }: RetirementB
   const allAges = getRetirementBenchmarkAges();
   const otherAges = allAges.filter((a) => a !== age);
   const pageUrl = `${siteConfig.url}/retirement-by-age/${age}`;
+  const faqItems = getAgeBenchmarkFaqs(age, benchmark);
 
   const webAppSchema = {
     "@context": "https://schema.org",
@@ -115,10 +120,24 @@ export default async function RetirementByAgePlannerPage({ params }: RetirementB
     ],
   };
 
+  const faqSchema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faqItems.map((faq) => ({
+      "@type": "Question",
+      name: faq.question,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: faq.answer,
+      },
+    })),
+  };
+
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webAppSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
 
       <PlannerSection>
         <Container>
@@ -126,35 +145,39 @@ export default async function RetirementByAgePlannerPage({ params }: RetirementB
         </Container>
       </PlannerSection>
 
-      {benchmark && benchmark.relatedGuides.length > 0 && (
-        <FooterSection>
-          <Container>
-            <FooterGrid>
-              <FooterColumn>
-                <FooterHeading>Related guides</FooterHeading>
-                <FooterLinkList>
-                  {benchmark.relatedGuides.map((g) => (
-                    <li key={g.href}>
-                      <FooterLink href={g.href}>{g.label}</FooterLink>
-                    </li>
-                  ))}
-                </FooterLinkList>
-              </FooterColumn>
+      <FooterSection>
+        <Container>
+          <FooterStack>
+            <AgeBenchmarkSupportingContent age={age} benchmark={benchmark} />
 
-              <FooterColumn>
-                <FooterHeading>Other age benchmarks</FooterHeading>
-                <FooterLinkList>
-                  {otherAges.map((a) => (
-                    <li key={a}>
-                      <FooterLink href={`/retirement-by-age/${a}`}>Age {a} benchmark planner</FooterLink>
-                    </li>
-                  ))}
-                </FooterLinkList>
-              </FooterColumn>
-            </FooterGrid>
-          </Container>
-        </FooterSection>
-      )}
+            {benchmark && benchmark.relatedGuides.length > 0 ? (
+              <FooterGrid>
+                <FooterColumn>
+                  <FooterHeading>Related guides</FooterHeading>
+                  <FooterLinkList>
+                    {benchmark.relatedGuides.map((g) => (
+                      <li key={g.href}>
+                        <FooterLink href={g.href}>{g.label}</FooterLink>
+                      </li>
+                    ))}
+                  </FooterLinkList>
+                </FooterColumn>
+
+                <FooterColumn>
+                  <FooterHeading>Other age benchmarks</FooterHeading>
+                  <FooterLinkList>
+                    {otherAges.map((a) => (
+                      <li key={a}>
+                        <FooterLink href={`/retirement-by-age/${a}`}>Age {a} benchmark planner</FooterLink>
+                      </li>
+                    ))}
+                  </FooterLinkList>
+                </FooterColumn>
+              </FooterGrid>
+            ) : null}
+          </FooterStack>
+        </Container>
+      </FooterSection>
     </>
   );
 }
@@ -174,6 +197,12 @@ const PlannerSection = styled(Section)`
 
 const FooterSection = styled(Section)`
   padding-top: 10px;
+  padding-bottom: 88px;
+`;
+
+const FooterStack = styled.div`
+  display: grid;
+  gap: 24px;
 `;
 
 const FooterGrid = styled.div`
