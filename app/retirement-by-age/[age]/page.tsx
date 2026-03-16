@@ -7,8 +7,11 @@ import { Container } from "@/components/layout/container";
 import { Section } from "@/components/layout/section";
 import { RetirementByAgeLanding } from "@/components/retirement-by-age/retirement-by-age-landing";
 import {
+  MAX_RETIREMENT_PLANNER_AGE,
+  MIN_RETIREMENT_PLANNER_AGE,
   getRetirementBenchmarkAges,
   getRetirementBenchmarkByAge,
+  getSupportedRetirementPlannerAges,
 } from "@/lib/retirement-benchmarks/benchmarks";
 import { siteConfig } from "@/lib/site";
 import { theme } from "@/styles/theme";
@@ -24,7 +27,9 @@ type RetirementByAgePageProps = {
 function parseAgeParam(value: string): number | undefined {
   if (!/^\d+$/.test(value)) return undefined;
   const parsed = Number.parseInt(value, 10);
-  return Number.isInteger(parsed) && parsed >= 18 && parsed <= 70 ? parsed : undefined;
+  return Number.isInteger(parsed) && parsed >= MIN_RETIREMENT_PLANNER_AGE && parsed <= MAX_RETIREMENT_PLANNER_AGE
+    ? parsed
+    : undefined;
 }
 
 // ---------------------------------------------------------------------------
@@ -32,7 +37,7 @@ function parseAgeParam(value: string): number | undefined {
 // ---------------------------------------------------------------------------
 
 export function generateStaticParams() {
-  return getRetirementBenchmarkAges().map((age) => ({ age: String(age) }));
+  return getSupportedRetirementPlannerAges().map((age) => ({ age: String(age) }));
 }
 
 export async function generateMetadata({ params }: RetirementByAgePageProps): Promise<Metadata> {
