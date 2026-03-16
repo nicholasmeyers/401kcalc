@@ -4,6 +4,10 @@ import styled from "styled-components";
 import { Container } from "@/components/layout/container";
 import { Section } from "@/components/layout/section";
 import { RetirementByAgeLanding } from "@/components/retirement-by-age/retirement-by-age-landing";
+import {
+  RetirementByAgeSupportingContent,
+  retirementByAgeFaqs,
+} from "@/components/retirement-by-age/retirement-supporting-content";
 import { getAllRetirementBenchmarks } from "@/lib/retirement-benchmarks/benchmarks";
 import { siteConfig } from "@/lib/site";
 import { theme } from "@/styles/theme";
@@ -65,6 +69,19 @@ export default function RetirementByAgeIndexPage() {
     },
   };
 
+  const faqSchema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: retirementByAgeFaqs.map((faq) => ({
+      "@type": "Question",
+      name: faq.question,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: faq.answer,
+      },
+    })),
+  };
+
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
@@ -72,12 +89,19 @@ export default function RetirementByAgeIndexPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(webAppSchema) }}
       />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
 
       <PlannerSection>
         <Container>
           <RetirementByAgeLanding />
         </Container>
       </PlannerSection>
+
+      <SupportingSection>
+        <Container>
+          <RetirementByAgeSupportingContent />
+        </Container>
+      </SupportingSection>
     </>
   );
 }
@@ -89,4 +113,9 @@ const PlannerSection = styled(Section)`
   @media (min-width: ${theme.breakpoints.md}) {
     padding-top: 48px;
   }
+`;
+
+const SupportingSection = styled(Section)`
+  padding-top: 0;
+  padding-bottom: 88px;
 `;
