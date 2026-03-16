@@ -26,6 +26,7 @@ Custom events tracked:
 
 - [Future Roadmap](./docs/planning/FUTURE_ROADMAP.md)
 - [Growth And Monetization](./docs/planning/GROWTH_AND_MONETIZATION.md)
+- [AI Strategy](./docs/planning/AI_STRATEGY.md)
 - [Guide Images](./docs/GUIDE_IMAGES.md)
 
 ## Launch checklist
