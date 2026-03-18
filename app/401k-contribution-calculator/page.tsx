@@ -77,8 +77,8 @@ const contributionFaqs = [
     question: "Does the calculator raise my contribution limit when I turn 50 later?",
     answer:
       "No. This page intentionally freezes the employee contribution cap at the limit that applies to your current age. If you are already catch-up eligible today, that higher cap is included from the start. If you are not, the model does not step up later.",
-    href: "/methodology",
-    label: "Review the methodology",
+    href: "/retirement-by-age",
+    label: "See your retirement-by-age benchmark to explore age related limits and catch-up eligibility",
   },
   {
     question: "How is retirement income from the increase estimated?",
@@ -106,7 +106,7 @@ const contributionFaqs = [
 export const metadata: Metadata = {
   title: "401(k) Contribution Increase Calculator",
   description:
-    "Free calculator: see how much increasing your 401(k) contribution could add by retirement. Compare 1-year, 5-year, and until-retirement scenarios. Estimate paycheck impact and monthly retirement income.",
+    "Contribution increase calculator: see how much increasing your 401(k) contribution could add by retirement. Compare 1-year, 5-year, and until-retirement scenarios. Estimate paycheck impact and monthly retirement income.",
   keywords: [
     "401k contribution increase calculator",
     "increase 401k contribution",
@@ -120,7 +120,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "401(k) Contribution Increase Calculator | 401kcalc",
     description:
-      "Free calculator: measure what a higher 401(k) contribution rate could add to your retirement balance and monthly income.",
+      "Contribution increase calculator: measure what a higher 401(k) contribution rate could add to your retirement balance and monthly income.",
     url: `${siteConfig.url}/401k-contribution-calculator`,
     type: "website",
   },
@@ -128,11 +128,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "401(k) Contribution Increase Calculator",
     description:
-      "Free calculator: estimate the impact of increasing your 401(k) contribution rate. Compare scenarios and see monthly retirement income.",
-  },
-  robots: {
-    index: true,
-    follow: true,
+      "Estimate the impact of increasing your 401(k) contribution rate without rebuilding your whole retirement plan.",
   },
 };
 
@@ -145,7 +141,7 @@ export default function ContributionCalculatorPage() {
     applicationCategory: "FinanceApplication",
     url: `${siteConfig.url}/401k-contribution-calculator`,
     description:
-      "Free 401(k) contribution increase calculator. Estimate what raising your contribution rate could add by retirement. Compare 1-year, 5-year, and until-retirement scenarios. See monthly retirement income and paycheck impact.",
+      "401(k) contribution increase calculator. Estimate what raising your contribution rate could add by retirement. Compare 1-year, 5-year, and until-retirement scenarios. See monthly retirement income and paycheck impact.",
     offers: {
       "@type": "Offer",
       price: "0",
