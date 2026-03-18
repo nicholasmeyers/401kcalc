@@ -8,6 +8,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const staticRoutes = [
     { path: "", changeFrequency: "weekly" as const, priority: 1 },
     { path: "/401k-calculator", changeFrequency: "weekly" as const, priority: 0.95 },
+    { path: "/401k-contribution-calculator", changeFrequency: "weekly" as const, priority: 0.9 },
     { path: "/guides", changeFrequency: "weekly" as const, priority: 0.9 },
     { path: "/retirement-by-age", changeFrequency: "weekly" as const, priority: 0.88 },
     { path: "/methodology", changeFrequency: "monthly" as const, priority: 0.62 },

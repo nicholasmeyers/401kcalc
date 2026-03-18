@@ -21,6 +21,13 @@ const bridgeGuideCards = [
       "Contribution rate is the biggest input lever in the model. Use this guide if you want a practical starting point before testing scenarios.",
   },
   {
+    eyebrow: "Increase impact",
+    href: "/401k-contribution-calculator",
+    guide: null,
+    body:
+      "If your real question is what an extra 1% to 5% adds, use the contribution calculator to isolate that single change before running a full projection.",
+  },
+  {
     eyebrow: "Employer match",
     href: "/guides/401k-employer-match-explained",
     guide: getGuideBySlug("401k-employer-match-explained"),
@@ -89,6 +96,13 @@ const calculatorFaqs = [
       "It can show what your current plan may produce, but age-based benchmarks answer a different question: whether your balance lines up with common savings checkpoints for your stage of life. Use the benchmark planner if you want a faster directional check before or after running a full projection.",
     href: "/retirement-by-age",
     label: "Open the benchmark planner",
+  },
+  {
+    question: "What if I only want to know what a higher contribution rate adds?",
+    answer:
+      "Use the contribution calculator when you want the marginal-impact answer. It isolates the increase itself and compares keeping it for 1 year, 5 years, or until retirement without turning into a second full retirement planner.",
+    href: "/401k-contribution-calculator",
+    label: "Open the contribution calculator",
   },
   {
     question: "What does this calculator not include?",

@@ -9,8 +9,9 @@ export const siteConfig = {
 };
 
 export const navigation = [
-  { label: "Calculator", href: "/401k-calculator" },
-  { label: "Guides", href: "/guides" },
+  { label: "401k Calculator", href: "/401k-calculator" },
   { label: "Retirement by Age", href: "/retirement-by-age" },
+  { label: "Increase Contributions", href: "/401k-contribution-calculator" },
+  { label: "Guides", href: "/guides" },
   { label: "About", href: "/about" },
 ];

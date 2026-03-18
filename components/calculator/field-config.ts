@@ -8,8 +8,8 @@ export type FieldSliderConfig = {
   step: number;
 };
 
-export type CalculatorFieldConfig = {
-  field: InputField;
+export type CalculatorFieldConfig<TField extends string = InputField> = {
+  field: TField;
   label: string;
   description: string;
   kind: FieldKind;
@@ -17,7 +17,7 @@ export type CalculatorFieldConfig = {
   tooltip?: string;
 };
 
-export const retirementGoalFieldConfigs: CalculatorFieldConfig[] = [
+export const retirementGoalFieldConfigs: CalculatorFieldConfig<InputField>[] = [
   {
     field: "currentAge",
     label: "Current age",
@@ -47,7 +47,7 @@ export const retirementGoalFieldConfigs: CalculatorFieldConfig[] = [
   },
 ];
 
-export const balanceFieldConfigs: CalculatorFieldConfig[] = [
+export const balanceFieldConfigs: CalculatorFieldConfig<InputField>[] = [
   {
     field: "currentBalance",
     label: "Total 401(k) balance",
@@ -64,7 +64,7 @@ export const balanceFieldConfigs: CalculatorFieldConfig[] = [
   },
 ];
 
-export const incomeFieldConfigs: CalculatorFieldConfig[] = [
+export const incomeFieldConfigs: CalculatorFieldConfig<InputField>[] = [
   {
     field: "annualSalary",
     label: "Annual salary",
@@ -73,7 +73,7 @@ export const incomeFieldConfigs: CalculatorFieldConfig[] = [
   },
 ];
 
-export const contributionFieldConfigs: CalculatorFieldConfig[] = [
+export const contributionFieldConfigs: CalculatorFieldConfig<InputField>[] = [
   {
     field: "contributionPercent",
     label: "Contribution percent",
@@ -93,7 +93,7 @@ export const contributionFieldConfigs: CalculatorFieldConfig[] = [
   },
 ];
 
-export const rothStrategyFieldConfigs: CalculatorFieldConfig[] = [
+export const rothStrategyFieldConfigs: CalculatorFieldConfig<InputField>[] = [
   {
     field: "rothContributionPercent",
     label: "Roth contribution %",
@@ -109,7 +109,7 @@ export const rothStrategyFieldConfigs: CalculatorFieldConfig[] = [
   },
 ];
 
-export const advancedFieldConfigs: CalculatorFieldConfig[] = [
+export const advancedFieldConfigs: CalculatorFieldConfig<InputField>[] = [
   {
     field: "windfallAge",
     label: "Windfall age",
@@ -152,7 +152,7 @@ export const advancedFieldConfigs: CalculatorFieldConfig[] = [
   },
 ];
 
-export const ageBasedSpendingFieldConfigs: CalculatorFieldConfig[] = [
+export const ageBasedSpendingFieldConfigs: CalculatorFieldConfig<InputField>[] = [
   {
     field: "earlyRetirementSpendingPercent",
     label: "Early retirement spending",
@@ -188,7 +188,7 @@ export const ageBasedSpendingFieldConfigs: CalculatorFieldConfig[] = [
   },
 ];
 
-export const allFieldConfigs: CalculatorFieldConfig[] = [
+export const allFieldConfigs: CalculatorFieldConfig<InputField>[] = [
   ...retirementGoalFieldConfigs,
   ...balanceFieldConfigs,
   ...incomeFieldConfigs,

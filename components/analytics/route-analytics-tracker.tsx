@@ -7,6 +7,7 @@ import { trackEvent } from "@/lib/analytics";
 
 const guidesPrefix = "/guides/";
 const retirementByAgePrefix = "/retirement-by-age/";
+const contributionCalculatorPath = "/401k-contribution-calculator";
 
 export function RouteAnalyticsTracker() {
   const pathname = usePathname();
@@ -20,7 +21,12 @@ export function RouteAnalyticsTracker() {
     lastTrackedPathRef.current = pathname;
 
     if (pathname === "/401k-calculator") {
-      trackEvent("calculator_view");
+      trackEvent("calculator_view", { calculator_type: "full_projection" });
+      return;
+    }
+
+    if (pathname === contributionCalculatorPath) {
+      trackEvent("calculator_view", { calculator_type: "contribution_increase" });
       return;
     }
 

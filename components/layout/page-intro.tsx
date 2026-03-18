@@ -22,7 +22,7 @@ export function PageIntro({ eyebrow, title, description, children }: PageIntroPr
 }
 
 const Wrapper = styled.div`
-  max-width: 780px;
+  max-width: 850px;
   display: grid;
   gap: 14px;
 `;
@@ -39,7 +39,6 @@ const Title = styled.h1`
   font-size: clamp(2rem, 4vw, 2.8rem);
   font-weight: 650;
   line-height: 1.12;
-  text-wrap: balance;
 `;
 
 const Description = styled.p`
