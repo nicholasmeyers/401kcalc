@@ -172,7 +172,7 @@ export function PlannerChart({
 
       <ChartViewport>
         {hasMounted ? (
-          <ResponsiveContainer width="100%" height="100%" minHeight={280}>
+          <ResponsiveContainer width="100%" height={CHART_HEIGHT}>
             <LineChart data={rows} margin={{ top: 12, right: 8, left: 0, bottom: 8 }}>
               <CartesianGrid
                 stroke={theme.colors.chartGrid}
@@ -259,11 +259,12 @@ const ChartWrapper = styled.div`
   gap: 12px;
 `;
 
+const CHART_HEIGHT = 320;
+
 const ChartViewport = styled.div`
   width: 100%;
   min-width: 0;
-  min-height: 280px;
-  height: clamp(280px, 50vw, 340px);
+  height: ${CHART_HEIGHT}px;
 
   *:focus,
   *:focus-visible {

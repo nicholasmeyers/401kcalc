@@ -292,7 +292,6 @@ export default function HomePage() {
                         fill="none"
                         strokeLinecap="round"
                       />
-
                     </HeroChartSvg>
 
                     <HeroAxisLabel style={{ left: 16, bottom: 8 }}>Today</HeroAxisLabel>

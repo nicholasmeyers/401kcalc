@@ -130,7 +130,25 @@ const MAX_PROJECTION_AGE = 70;
 
 function projectPath(inputs: PlannerInputs, useEscalation: boolean): PlannerYearEntry[] {
   const years = Math.max(0, MAX_PROJECTION_AGE - inputs.currentAge);
-  if (years <= 0) return [];
+  if (years <= 0) {
+    const age = inputs.currentAge;
+    const benchmarkMultiplier = getCheckpointMultipliers(age);
+    const benchmarkTarget = benchmarkMultiplier
+      ? inputs.annualSalary * midpoint(benchmarkMultiplier)
+      : null;
+    return [
+      {
+        age,
+        balance: inputs.currentBalance,
+        adjustedBalance: inputs.currentBalance,
+        benchmarkTarget,
+        employeeContribution: 0,
+        employerContribution: 0,
+        contributionPercent: inputs.contributionPercent,
+        wasCapped: false,
+      },
+    ];
+  }
 
   const entries: PlannerYearEntry[] = [];
   let balance = inputs.currentBalance;

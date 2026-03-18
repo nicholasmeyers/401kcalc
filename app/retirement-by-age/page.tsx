@@ -15,14 +15,14 @@ import { theme } from "@/styles/theme";
 const benchmarks = getAllRetirementBenchmarks();
 
 export const metadata: Metadata = {
-  title: "Retirement Benchmark Planner by Age",
+  title: "How much should you have in your 401k?",
   description:
     "Compare your retirement savings to common age-based checkpoints, model catch-up paths, and plan your next move with the interactive benchmark planner.",
   alternates: {
     canonical: "/retirement-by-age",
   },
   openGraph: {
-    title: "Retirement Benchmark Planner by Age | 401kcalc",
+    title: "How much should you have in your 401k? | 401kcalc",
     description:
       "Interactive retirement benchmark planner. Pick your age and instantly see how your savings compare to common checkpoints.",
     url: `${siteConfig.url}/retirement-by-age`,
@@ -30,7 +30,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Retirement Benchmark Planner by Age",
+    title: "How much should you have in your 401k?",
     description: "Compare benchmarks from age 25 through 70 and model your catch-up path.",
   },
 };
@@ -48,7 +48,7 @@ export default function RetirementByAgeIndexPage() {
   const webAppSchema = {
     "@context": "https://schema.org",
     "@type": "WebApplication",
-    name: "Retirement Benchmark Planner by Age",
+    name: "How much should you have in your 401k?",
     url: `${siteConfig.url}/retirement-by-age`,
     applicationCategory: "FinanceApplication",
     operatingSystem: "Any",

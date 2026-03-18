@@ -1,14 +1,10 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useDeferredValue, useMemo, useState } from "react";
 import styled from "styled-components";
 
 import { BenchmarkPlanner } from "@/components/retirement-by-age/benchmark-planner";
 import { theme } from "@/styles/theme";
-
-// ---------------------------------------------------------------------------
-// Benchmark milestones
-// ---------------------------------------------------------------------------
 
 type Milestone = { age: number; multiple: number };
 
@@ -27,18 +23,14 @@ const MILESTONES: Milestone[] = [
 const BAR_MIN_PX = 0;
 const BAR_MAX_PX = 168;
 const MAX_MULTIPLE = 12;
+const MIN_AGE = 25;
+const MAX_AGE = 70;
+const DEFAULT_AGE = 35;
 
 function barHeight(multiple: number): number {
   const t = multiple / MAX_MULTIPLE;
   return Math.round(BAR_MIN_PX + (BAR_MAX_PX - BAR_MIN_PX) * Math.sqrt(t));
 }
-const MIN_AGE = 25;
-const MAX_AGE = 70;
-const DEFAULT_AGE = 35;
-
-// ---------------------------------------------------------------------------
-// Bar selection logic — 3 contextual bars + age 70 reference bar
-// ---------------------------------------------------------------------------
 
 type HeroBar = {
   milestone: Milestone;
@@ -106,23 +98,26 @@ function getNextMilestone(age: number): Milestone | null {
   return MILESTONES.find((m) => m.age > age) ?? null;
 }
 
-// ---------------------------------------------------------------------------
-// Component
-// ---------------------------------------------------------------------------
-
 type RetirementByAgeLandingProps = {
   initialAge?: number;
 };
 
 export function RetirementByAgeLanding({ initialAge }: RetirementByAgeLandingProps) {
   const [selectedAge, setSelectedAge] = useState(initialAge ?? DEFAULT_AGE);
+  const deferredAge = useDeferredValue(selectedAge);
 
-  const handleSliderChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      setSelectedAge(Number(e.target.value));
-    },
-    []
-  );
+  const handleSliderChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setSelectedAge(Number(e.target.value));
+  }, []);
+
+  const handleAgeInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const raw = e.target.value;
+    if (raw === "") return;
+    const parsed = Number.parseInt(raw, 10);
+    if (!Number.isNaN(parsed)) {
+      setSelectedAge(Math.min(MAX_AGE, Math.max(MIN_AGE, parsed)));
+    }
+  }, []);
 
   const handleAgeChange = useCallback((age: number) => {
     setSelectedAge(age);
@@ -138,14 +133,22 @@ export function RetirementByAgeLanding({ initialAge }: RetirementByAgeLandingPro
         <HeroColumns>
           <HeroLeft>
             <Eyebrow>Retirement by age</Eyebrow>
-            <Title>Retirement benchmark planner</Title>
+            <Title>How much should you have in your 401k at {selectedAge}?</Title>
             <Subtitle>
-              Slide to your age to see typical retirement savings milestones, then use the planner below to compare your numbers.
+              Viewing age <strong>{selectedAge}</strong> benchmarks. <br />Explore other ages or compare your savings below.
             </Subtitle>
 
             <SliderSection>
               <SliderLabel>
-                Age <SliderAge>{selectedAge}</SliderAge>
+                Your age{" "}
+                <AgeInput
+                  type="number"
+                  min={MIN_AGE}
+                  max={MAX_AGE}
+                  value={selectedAge}
+                  onChange={handleAgeInputChange}
+                  aria-label="Your age"
+                />
               </SliderLabel>
               <Slider
                 type="range"
@@ -156,6 +159,7 @@ export function RetirementByAgeLanding({ initialAge }: RetirementByAgeLandingPro
                 onChange={handleSliderChange}
                 aria-label="Select your age"
               />
+              <SliderRangeSpacer aria-hidden="true" />
               <SliderRange>
                 <span>{MIN_AGE}</span>
                 <span>{MAX_AGE}</span>
@@ -165,7 +169,7 @@ export function RetirementByAgeLanding({ initialAge }: RetirementByAgeLandingPro
             <DynamicText>
               <BenchmarkLine>
                 Typical benchmark at age {current.age}:{" "}
-                <strong>{current.multiple}&times; salary</strong>
+                <BenchmarkValue>{current.multiple}&times; salary</BenchmarkValue>
               </BenchmarkLine>
               {next && (
                 <NextLine>
@@ -177,11 +181,11 @@ export function RetirementByAgeLanding({ initialAge }: RetirementByAgeLandingPro
 
           <HeroRight>
             <BarGroup>
-              {bars.map((bar, i) => {
-                const h = barHeight(bar.milestone.multiple);
-                const delayMs = i * 40;
+              {bars.map((bar, index) => {
+                const height = barHeight(bar.milestone.multiple);
+                const delayMs = index * 40;
                 return (
-                  <BarSlot key={`bar-${i}-${bar.milestone.age}`}>
+                  <BarSlot key={`bar-${index}-${bar.milestone.age}`}>
                     {bar.isReference && <BarDivider />}
                     <BarColumn $isActive={bar.isActive}>
                       <BarTopLabel $isPast={bar.isPast} $isActive={bar.isActive}>
@@ -190,7 +194,7 @@ export function RetirementByAgeLanding({ initialAge }: RetirementByAgeLandingPro
                       <BarTrack>
                         <Bar
                           style={{
-                            height: `${h}px`,
+                            height: `${height}px`,
                             transitionDelay: `${delayMs}ms`,
                           }}
                           $isPast={bar.isPast}
@@ -209,14 +213,10 @@ export function RetirementByAgeLanding({ initialAge }: RetirementByAgeLandingPro
         </HeroColumns>
       </HeroCard>
 
-      <BenchmarkPlanner initialAge={selectedAge} onAgeChange={handleAgeChange} />
+      <BenchmarkPlanner initialAge={deferredAge} onAgeChange={handleAgeChange} />
     </Wrapper>
   );
 }
-
-// ---------------------------------------------------------------------------
-// Styles
-// ---------------------------------------------------------------------------
 
 const Wrapper = styled.div`
   display: grid;
@@ -274,10 +274,6 @@ const HeroRight = styled.div`
   align-self: center;
 `;
 
-// ---------------------------------------------------------------------------
-// Text
-// ---------------------------------------------------------------------------
-
 const Eyebrow = styled.p`
   font-size: 0.72rem;
   font-weight: 700;
@@ -300,33 +296,54 @@ const Subtitle = styled.p`
   color: ${theme.colors.mutedTextStrong};
 `;
 
-// ---------------------------------------------------------------------------
-// Slider
-// ---------------------------------------------------------------------------
-
 const SliderSection = styled.div`
   display: grid;
-  gap: 8px;
+  grid-template-columns: auto 1fr;
+  gap: 0px 10px;
   max-width: 420px;
+  align-items: center;
 `;
 
 const SliderLabel = styled.label`
-  font-size: 1rem;
+  font-size: 1.15rem;
   font-weight: 600;
   color: ${theme.colors.text};
 `;
 
-const SliderAge = styled.span`
+const SliderRangeSpacer = styled.div`
+  min-width: 0;
+`;
+
+const AgeInput = styled.input`
   font-size: 1.8rem;
   font-weight: 700;
   color: ${theme.colors.chartImproved};
   margin-left: 4px;
+  width: 3ch;
+  text-align: center;
+  background: transparent;
+  border: 2px solid ${theme.colors.border};
+  border-radius: 6px;
+  padding: 4px 2px;
+  outline: none;
+  -moz-appearance: textfield;
+
+  &::-webkit-outer-spin-button,
+  &::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  &:focus {
+    border-color: ${theme.colors.border};
+    border-bottom-color: ${theme.colors.chartImproved};
+  }
 `;
 
 const Slider = styled.input`
+  min-width: 0;
   -webkit-appearance: none;
   appearance: none;
-  width: 100%;
   height: 6px;
   border-radius: 3px;
   background: ${theme.colors.border};
@@ -373,10 +390,6 @@ const SliderRange = styled.div`
   color: ${theme.colors.mutedText};
 `;
 
-// ---------------------------------------------------------------------------
-// Dynamic text
-// ---------------------------------------------------------------------------
-
 const DynamicText = styled.div`
   display: grid;
   gap: 4px;
@@ -388,15 +401,16 @@ const BenchmarkLine = styled.p`
   line-height: 1.5;
 `;
 
+const BenchmarkValue = styled.strong`
+  color: ${theme.colors.chartImproved};
+  font-weight: 700;
+`;
+
 const NextLine = styled.p`
   font-size: 0.86rem;
   color: ${theme.colors.mutedTextStrong};
   line-height: 1.5;
 `;
-
-// ---------------------------------------------------------------------------
-// 3-bar milestone visualization
-// ---------------------------------------------------------------------------
 
 const PAST_GREEN = theme.colors.chartImproved;
 const ACTIVE_GREEN = "#22C55E";
@@ -451,8 +465,7 @@ const Bar = styled.div<{ $isPast: boolean; $isActive: boolean }>`
   background: ${({ $isActive, $isPast }) =>
     $isActive ? ACTIVE_GREEN : $isPast ? PAST_GREEN : FUTURE_GREEN};
   opacity: ${({ $isActive, $isPast }) => ($isActive ? 1 : $isPast ? 0.7 : 0.5)};
-  ${({ $isActive }) =>
-    $isActive && `box-shadow: 0 2px 8px rgba(22, 163, 74, 0.25);`}
+  ${({ $isActive }) => $isActive && `box-shadow: 0 2px 8px rgba(22, 163, 74, 0.25);`}
 `;
 
 const BarTopLabel = styled.span<{ $isPast: boolean; $isActive: boolean }>`
