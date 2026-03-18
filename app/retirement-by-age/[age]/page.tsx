@@ -54,8 +54,8 @@ export async function generateMetadata({ params }: RetirementByAgePageProps): Pr
 
   const benchmark = getRetirementBenchmarkByAge(age);
   const title = benchmark
-    ? `Retirement Benchmark Planner \u2013 Age ${age} (${benchmark.recommendedMultiple})`
-    : `Retirement Benchmark Planner \u2013 Age ${age}`;
+    ? `How much should you have in your 401k at ${age}? (${benchmark.recommendedMultiple})`
+    : `How much should you have in your 401k at ${age}?`;
 
   const description = benchmark
     ? benchmark.metaDescription
@@ -102,7 +102,7 @@ export default async function RetirementByAgePlannerPage({ params }: RetirementB
   const webAppSchema = {
     "@context": "https://schema.org",
     "@type": "WebApplication",
-    name: `Retirement Benchmark Planner \u2013 Age ${age}`,
+    name: `How much should you have in your 401k at ${age}?`,
     url: pageUrl,
     applicationCategory: "FinanceApplication",
     operatingSystem: "Any",
