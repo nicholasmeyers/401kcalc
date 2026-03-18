@@ -72,7 +72,7 @@ const Inner = styled(Container)`
 `;
 
 const Copy = styled.div`
-  max-width: 520px;
+  max-width: 320px;
   display: grid;
   gap: 8px;
 `;
@@ -94,11 +94,7 @@ const RightColumn = styled.div`
 const LinkGrid = styled.div`
   display: grid;
   gap: 18px;
-
-  @media (min-width: ${theme.breakpoints.md}) {
-    grid-template-columns: repeat(2, minmax(0, auto));
-    gap: 24px;
-  }
+  grid-template-columns: 1fr;
 `;
 
 const LinkGroup = styled.div`

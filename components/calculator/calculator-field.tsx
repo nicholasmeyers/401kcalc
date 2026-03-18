@@ -20,15 +20,14 @@ import {
   isAllowedMoneyInputCharacter,
   parseLooseNumber,
 } from "@/lib/calculator/input";
-import type { InputField } from "@/lib/calculator/types";
 import { theme } from "@/styles/theme";
 
-type CalculatorFieldProps = {
-  config: CalculatorFieldConfig;
+type CalculatorFieldProps<TField extends string> = {
+  config: CalculatorFieldConfig<TField>;
   value: string;
   error?: string;
   note?: ReactNode;
-  onValueChange: (field: InputField, nextValue: string) => void;
+  onValueChange: (field: TField, nextValue: string) => void;
 };
 
 const currencyInputPattern = "[0-9.,]*";
@@ -37,7 +36,13 @@ const ageInputPattern = "[0-9]*";
 
 const clamp = (value: number, min: number, max: number): number => Math.max(min, Math.min(value, max));
 
-export function CalculatorField({ config, value, error, note, onValueChange }: CalculatorFieldProps) {
+export function CalculatorField<TField extends string>({
+  config,
+  value,
+  error,
+  note,
+  onValueChange,
+}: CalculatorFieldProps<TField>) {
   const id = `calculator-field-${config.field}`;
   const labelId = `${id}-label`;
   const descriptionId = `${id}-description`;
