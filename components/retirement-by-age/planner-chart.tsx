@@ -277,7 +277,7 @@ const ChartPlaceholder = styled.div`
   height: 100%;
   border-radius: ${theme.radii.md};
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.82), rgba(248, 250, 252, 0.92)),
+    linear-gradient(180deg, rgba(var(--surface-rgb), 0.82), rgba(var(--surface-rgb), 0.92)),
     repeating-linear-gradient(to right, transparent 0 58px, rgba(148, 163, 184, 0.08) 58px 59px),
     repeating-linear-gradient(to bottom, transparent 0 54px, rgba(148, 163, 184, 0.08) 54px 55px);
   border: 1px solid ${theme.colors.border};
@@ -333,7 +333,7 @@ const EmptyState = styled.p`
 const TooltipCard = styled.div`
   border: 1px solid ${theme.colors.borderStrong};
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.96);
+  background: rgba(var(--surface-rgb), 0.96);
   padding: 10px 12px;
   box-shadow: 0 6px 18px rgba(15, 23, 42, 0.08);
 `;

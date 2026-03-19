@@ -220,7 +220,7 @@ const ChartViewport = styled.div`
 const ChartPlaceholder = styled.div`
   min-height: 320px;
   border-radius: ${theme.radii.lg};
-  background: linear-gradient(180deg, rgba(248, 250, 252, 0.9), rgba(255, 255, 255, 0.96));
+  background: linear-gradient(180deg, rgba(var(--surface-rgb), 0.9), rgba(var(--surface-rgb), 0.96));
   border: 1px dashed ${theme.colors.border};
 `;
 
@@ -236,7 +236,7 @@ const TooltipCard = styled.div`
   padding: 12px 14px;
   border: 1px solid ${theme.colors.elevatedBorder};
   border-radius: ${theme.radii.md};
-  background: rgba(255, 255, 255, 0.98);
+  background: rgba(var(--surface-rgb), 0.98);
   box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
 `;
 

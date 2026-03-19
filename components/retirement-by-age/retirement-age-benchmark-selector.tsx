@@ -204,10 +204,10 @@ const Card = styled.div<{ $layout: "compact" | "full"; $styleVariant: "default" 
     linear-gradient(
       180deg,
       ${({ $styleVariant }) =>
-          $styleVariant === "planner" ? "rgba(255, 255, 255, 0.98)" : "rgba(255, 255, 255, 0.98)"}
+          $styleVariant === "planner" ? "rgba(var(--surface-rgb), 0.98)" : "rgba(var(--surface-rgb), 0.98)"}
         ,
       ${({ $styleVariant }) =>
-          $styleVariant === "planner" ? "rgba(250, 252, 255, 0.96)" : "rgba(248, 250, 252, 0.94)"}
+          $styleVariant === "planner" ? "rgba(var(--surface-rgb), 0.96)" : "rgba(var(--surface-rgb), 0.94)"}
     ),
     ${theme.colors.surface};
 
@@ -304,7 +304,7 @@ const AgeBadge = styled.span`
   padding-inline: 14px;
   border-radius: ${theme.radii.pill};
   border: 1px solid ${theme.colors.borderStrong};
-  background: rgba(255, 255, 255, 0.94);
+  background: rgba(var(--surface-rgb), 0.94);
   box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
   font-size: 1.05rem;
   font-weight: 700;
@@ -444,7 +444,7 @@ const VisualCard = styled.div<{ $layout: "compact" | "full"; $styleVariant: "def
         ,
       transparent 46%
     ),
-    ${({ $styleVariant }) => ($styleVariant === "planner" ? theme.colors.surfaceMuted : "rgba(255, 255, 255, 0.9)")};
+    ${({ $styleVariant }) => ($styleVariant === "planner" ? theme.colors.surfaceMuted : "rgba(var(--surface-rgb), 0.9)")};
   min-height: ${({ $layout, $styleVariant }) =>
     $layout === "compact" ? "220px" : $styleVariant === "planner" ? "265px" : "100%"};
 `;

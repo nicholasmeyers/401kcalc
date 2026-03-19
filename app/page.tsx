@@ -529,7 +529,7 @@ const HeroVisualCard = styled(SurfaceCard)`
   min-width: 0;
   background:
     radial-gradient(circle at top right, rgba(22, 163, 74, 0.06), transparent 45%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(250, 252, 255, 0.92)),
+    linear-gradient(180deg, rgba(var(--surface-rgb), 0.96), rgba(var(--surface-rgb), 0.92)),
     ${theme.colors.surface};
   border-color: ${theme.colors.elevatedBorder};
 
@@ -585,7 +585,7 @@ const HeroChartCard = styled.div`
   padding: 12px;
   border: 1px solid ${theme.colors.border};
   border-radius: ${theme.radii.md};
-  background: rgba(255, 255, 255, 0.88);
+  background: rgba(var(--surface-rgb), 0.88);
 `;
 
 const HeroLegendRow = styled.div`
@@ -621,7 +621,7 @@ const HeroChartFrame = styled.div`
   min-height: 154px;
   border-radius: ${theme.radii.md};
   background:
-    linear-gradient(180deg, rgba(248, 250, 252, 0.92), rgba(255, 255, 255, 0.96)),
+    linear-gradient(180deg, rgba(var(--surface-rgb), 0.92), rgba(var(--surface-rgb), 0.96)),
     ${theme.colors.surface};
   border: 1px solid ${theme.colors.border};
   overflow: hidden;
@@ -664,7 +664,7 @@ const HeroMetricPill = styled.span<{ $improved?: boolean }>`
   padding-inline: 12px;
   border-radius: ${theme.radii.pill};
   border: 1px solid ${({ $improved }) => ($improved ? theme.colors.successBorder : theme.colors.border)};
-  background: ${({ $improved }) => ($improved ? theme.colors.successSurface : "rgba(255, 255, 255, 0.9)")};
+  background: ${({ $improved }) => ($improved ? theme.colors.successSurface : "rgba(var(--surface-rgb), 0.9)")};
   color: ${({ $improved }) => ($improved ? theme.colors.successText : theme.colors.text)};
   font-size: 0.78rem;
   font-weight: 700;
@@ -704,7 +704,7 @@ const CalculatorSnapshotStatus = styled.span`
   min-height: 28px;
   padding-inline: 10px;
   border-radius: ${theme.radii.pill};
-  background: rgba(255, 255, 255, 0.88);
+  background: rgba(var(--surface-rgb), 0.88);
   border: 1px solid ${theme.colors.successBorder};
   color: ${theme.colors.successText};
   font-size: 0.74rem;
@@ -746,7 +746,7 @@ const HeroFeatureItem = styled.li`
   padding: 10px 12px;
   border: 1px solid ${theme.colors.border};
   border-radius: ${theme.radii.md};
-  background: rgba(255, 255, 255, 0.72);
+  background: rgba(var(--surface-rgb), 0.72);
   font-size: 0.83rem;
   line-height: 1.4;
   color: ${theme.colors.mutedTextStrong};
@@ -778,7 +778,7 @@ const HeroFeatureCheck = styled.span`
 const UtilitySection = styled(Section)`
   padding-block: 28px;
   border-top: 1px solid ${theme.colors.border};
-  background: rgba(255, 255, 255, 0.64);
+  background: rgba(var(--surface-rgb), 0.64);
 
   @media (min-width: ${theme.breakpoints.md}) {
     padding-block: 40px;
@@ -788,7 +788,7 @@ const UtilitySection = styled(Section)`
 const BenchmarkUtilitySection = styled(Section)`
   padding-block: 28px;
   border-bottom: 1px solid ${theme.colors.border};
-  background: rgba(255, 255, 255, 0.64);
+  background: rgba(var(--surface-rgb), 0.64);
 
   @media (min-width: ${theme.breakpoints.md}) {
     padding-block: 40px;
@@ -859,7 +859,7 @@ const UtilityGrid = styled.div`
 
 const UtilityCard = styled(SurfaceCard)`
   padding: 20px;
-  background: rgba(255, 255, 255, 0.8);
+  background: rgba(var(--surface-rgb), 0.8);
   display: grid;
   gap: 10px;
 `;
@@ -879,7 +879,7 @@ const UtilityBody = styled.p`
 const ContributionUtilitySection = styled(Section)`
   padding-block: 28px;
   border-top: 1px solid ${theme.colors.border};
-  background: rgba(255, 255, 255, 0.64);
+  background: rgba(var(--surface-rgb), 0.64);
 
   @media (min-width: ${theme.breakpoints.md}) {
     padding-block: 40px;
@@ -1135,7 +1135,7 @@ const ClosingCard = styled(SurfaceCard)`
   display: grid;
   gap: 16px;
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(255, 255, 255, 0.86)),
+    linear-gradient(180deg, rgba(var(--surface-rgb), 0.96), rgba(var(--surface-rgb), 0.86)),
     ${theme.colors.surface};
 `;
 

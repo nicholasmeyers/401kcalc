@@ -107,7 +107,7 @@ const TooltipBubble = styled.span<{ $open: boolean }>`
   padding: 8px 10px;
   border-radius: 10px;
   border: 1px solid ${theme.colors.elevatedBorder};
-  background: rgba(255, 255, 255, 0.98);
+  background: rgba(var(--surface-rgb), 0.98);
   color: ${theme.colors.textSecondary};
   font-size: 0.74rem;
   line-height: 1.4;
