@@ -5,12 +5,15 @@ import { ThemeProvider } from "styled-components";
 
 import { AnalyticsScript } from "@/components/analytics/analytics-script";
 import { RouteAnalyticsTracker } from "@/components/analytics/route-analytics-tracker";
+import { ThemeModeProvider } from "@/contexts/theme-context";
 import { Footer } from "@/components/layout/footer";
 import { Header } from "@/components/layout/header";
 import { StyledComponentsRegistry } from "@/lib/styled-components-registry";
 import { GlobalStyle } from "@/styles/GlobalStyle";
 import { theme } from "@/styles/theme";
 import { siteConfig } from "@/lib/site";
+
+const themeInitScript = `(function(){try{var m=localStorage.getItem("theme-mode");var d;if(m==="dark")d=true;else if(m==="light")d=false;else{var h=new Date().getHours();d=h>=17||h<8}document.documentElement.setAttribute("data-theme",d?"dark":"light")}catch(e){}})();`;
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -92,8 +95,9 @@ const webSiteSchema = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
+        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
         <AnalyticsScript />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }} />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webSiteSchema) }} />
@@ -102,10 +106,12 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <RouteAnalyticsTracker />
         <StyledComponentsRegistry>
           <ThemeProvider theme={theme}>
-            <GlobalStyle />
-            <Header />
-            <main>{children}</main>
-            <Footer />
+            <ThemeModeProvider>
+              <GlobalStyle />
+              <Header />
+              <main>{children}</main>
+              <Footer />
+            </ThemeModeProvider>
           </ThemeProvider>
         </StyledComponentsRegistry>
       </body>

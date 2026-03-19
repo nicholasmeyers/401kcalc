@@ -232,7 +232,7 @@ const HeroCard = styled(SurfaceCard)`
   ${cardBase};
   background:
     radial-gradient(circle at top right, rgba(22, 163, 74, 0.12), transparent 42%),
-    linear-gradient(180deg, #ffffff 0%, #fbfffc 100%);
+    linear-gradient(180deg, rgba(var(--surface-rgb), 1) 0%, rgba(var(--surface-rgb), 0.98) 100%);
   border-color: ${theme.colors.successBorder};
 `;
 

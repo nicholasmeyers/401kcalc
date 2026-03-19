@@ -40,17 +40,17 @@ const outcomePalettes: Record<OutcomeState, OutcomePalette> = {
 const outcomeBackgrounds: Record<OutcomeState, string> = {
   positive: `
     radial-gradient(circle at top right, rgba(22, 163, 74, 0.06), transparent 55%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(248, 252, 249, 0.94)),
+    linear-gradient(180deg, rgba(var(--surface-rgb), 0.96), rgba(var(--surface-rgb), 0.94)),
     ${theme.colors.successSurface}
   `,
   caution: `
     radial-gradient(circle at top right, rgba(245, 158, 11, 0.08), transparent 55%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(255, 251, 235, 0.94)),
+    linear-gradient(180deg, rgba(var(--surface-rgb), 0.96), rgba(255, 251, 235, 0.94)),
     ${theme.colors.warningSurface}
   `,
   negative: `
     radial-gradient(circle at top right, rgba(239, 68, 68, 0.08), transparent 55%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(254, 242, 242, 0.94)),
+    linear-gradient(180deg, rgba(var(--surface-rgb), 0.96), rgba(254, 242, 242, 0.94)),
     ${theme.colors.dangerSurface}
   `,
 };
@@ -332,7 +332,7 @@ const OutcomePill = styled.span<{ $state: OutcomeState }>`
   text-transform: uppercase;
   border: 1px solid ${(props) => outcomePalettes[props.$state].border};
   color: ${(props) => outcomePalettes[props.$state].text};
-  background: rgba(255, 255, 255, 0.88);
+  background: rgba(var(--surface-rgb), 0.88);
 `;
 
 const SectionLabel = styled.h3`

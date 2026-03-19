@@ -123,7 +123,7 @@ const TopicChipButton = styled.button<{ $active: boolean }>`
   transition: background 140ms ease, border-color 140ms ease, color 140ms ease;
 
   border: 1px solid ${({ $active }) => ($active ? theme.colors.successBorder : theme.colors.border)};
-  background: ${({ $active }) => ($active ? theme.colors.successSurface : "rgba(255, 255, 255, 0.72)")};
+  background: ${({ $active }) => ($active ? theme.colors.successSurface : "rgba(var(--surface-rgb), 0.72)")};
   color: ${({ $active }) => ($active ? theme.colors.successText : theme.colors.textSecondary)};
 
   &:hover {

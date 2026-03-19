@@ -1,8 +1,11 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import styled from "styled-components";
 
 import { Container } from "@/components/layout/container";
+import { useThemeMode } from "@/contexts/theme-context";
 import { navigation, siteConfig } from "@/lib/site";
 import { theme } from "@/styles/theme";
 
@@ -13,12 +16,21 @@ const trustLinks = [
 ];
 
 export function Footer() {
+  const { resolvedTheme } = useThemeMode();
+
   return (
     <Wrapper>
       <Inner as="div">
         <Copy>
           <LogoWrap href="/" aria-label={siteConfig.name}>
-            <Image src="/images/logo.png" alt={siteConfig.name} width={0} height={0} sizes="100vw" style={{ width: 'auto', height: 28 }} />
+            <Image
+              src={resolvedTheme === "dark" ? "/images/logo-white.png" : "/images/logo.png"}
+              alt={siteConfig.name}
+              width={0}
+              height={0}
+              sizes="100vw"
+              style={{ width: 'auto', height: 28 }}
+            />
           </LogoWrap>
           <Text>Structured tools and practical guidance for clearer retirement planning decisions.</Text>
         </Copy>

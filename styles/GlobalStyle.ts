@@ -1,8 +1,28 @@
 import { createGlobalStyle } from "styled-components";
 
-import { theme } from "@/styles/theme";
+import { darkColors, lightColors, theme } from "@/styles/theme";
+
+function cssVarBlock(colors: Record<string, string>): string {
+  return Object.entries(colors)
+    .map(([key, value]) => `--c-${key}: ${value};`)
+    .join("\n    ");
+}
 
 export const GlobalStyle = createGlobalStyle`
+  :root {
+    ${cssVarBlock(lightColors)}
+    --surface-rgb: 255, 255, 255;
+    --background-rgb: 247, 247, 247;
+    color-scheme: light;
+  }
+
+  [data-theme="dark"] {
+    ${cssVarBlock(darkColors)}
+    --surface-rgb: 26, 26, 26;
+    --background-rgb: 13, 13, 13;
+    color-scheme: dark;
+  }
+
   *,
   *::before,
   *::after {
@@ -26,6 +46,7 @@ export const GlobalStyle = createGlobalStyle`
     line-height: 1.5;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
+    transition: background 200ms ease, color 200ms ease;
   }
 
   a {
