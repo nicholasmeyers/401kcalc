@@ -31,7 +31,7 @@ const plannerHighlights = [
 const plannerBridgeCards = [
   {
     eyebrow: "Full projection",
-    title: "Run the complete 401(k) calculator",
+    title: "Run the complete 401k calculator",
     body:
       "If you want more than a checkpoint, use the full calculator to model retirement age, spending, Roth balance mix, and year-by-year drawdown.",
     href: "/401k-calculator",
@@ -39,7 +39,7 @@ const plannerBridgeCards = [
   },
   {
     eyebrow: "Contribution rate",
-    title: contributionGuide?.title ?? "How Much Should I Contribute to My 401(k)?",
+    title: contributionGuide?.title ?? "How Much Should I Contribute to My 401k?",
     body:
       contributionGuide?.excerpt ??
       "A practical guide to choosing a contribution rate you can sustain and improve over time.",
@@ -48,7 +48,7 @@ const plannerBridgeCards = [
   },
   {
     eyebrow: "Employer match",
-    title: employerMatchGuide?.title ?? "401(k) Employer Match Explained",
+    title: employerMatchGuide?.title ?? "401k Employer Match Explained",
     body:
       employerMatchGuide?.excerpt ??
       "Use this if you need help deciding how match should influence your savings target and your calculator assumptions.",
@@ -57,7 +57,7 @@ const plannerBridgeCards = [
   },
   {
     eyebrow: "Tax treatment",
-    title: rothGuide?.title ?? "Roth vs Traditional 401(k)",
+    title: rothGuide?.title ?? "Roth vs Traditional 401k",
     body:
       rothGuide?.excerpt ??
       "Benchmark pages tell you whether you may be on track. This guide helps with the separate question of where the next contribution dollar should go.",
@@ -68,7 +68,7 @@ const plannerBridgeCards = [
 
 export const retirementByAgeFaqs = [
   {
-    question: "How much should I have in my 401(k) at my age?",
+    question: "How much should I have in my 401k at my age?",
     answer:
       "There is no single number that fits everyone, but age-based salary multiples are a common way to benchmark progress. Use this planner for a directional checkpoint, then move into the full calculator to test whether your actual savings plan supports the retirement lifestyle you want.",
     href: "/401k-calculator",
@@ -89,7 +89,7 @@ export const retirementByAgeFaqs = [
     label: "Read the contribution guide",
   },
   {
-    question: "Should I use this benchmark planner or the full 401(k) calculator?",
+    question: "Should I use this benchmark planner or the full 401k calculator?",
     answer:
       "Use this page when your question is whether your balance looks directionally on track for your age. Use the full calculator when you want to test retirement age, annual spending, Roth vs Traditional balances, or step-up contributions over time.",
     href: "/401k-calculator",
@@ -194,7 +194,7 @@ export function AgeBenchmarkSupportingContent({ age, benchmark }: AgeSupportingC
   const ageGuideHref =
     benchmark?.relatedGuides[0]?.href ??
     (contributionGuide?.slug ? `/guides/${contributionGuide.slug}` : "/guides/how-much-should-i-contribute-to-my-401k");
-  const ageGuideLabel = benchmark?.relatedGuides[0]?.label ?? "How Much Should I Contribute to My 401(k)?";
+  const ageGuideLabel = benchmark?.relatedGuides[0]?.label ?? "How Much Should I Contribute to My 401k?";
 
   return (
     <ContentStack>
@@ -220,7 +220,7 @@ export function AgeBenchmarkSupportingContent({ age, benchmark }: AgeSupportingC
           <GuidanceList>
             {(benchmark?.benchmarkGuidance.slice(0, 2) ?? [
               "Use the benchmark as a directional check, not a verdict on whether you can retire successfully.",
-              "If you want a more personalized answer, run the full 401(k) calculator with your current balance, contribution rate, and target retirement age.",
+              "If you want a more personalized answer, run the full 401k calculator with your current balance, contribution rate, and target retirement age.",
             ]).map((item) => (
               <li key={item}>{item}</li>
             ))}
@@ -231,7 +231,7 @@ export function AgeBenchmarkSupportingContent({ age, benchmark }: AgeSupportingC
       <CompactGrid>
         <BridgeCard>
           <CardEyebrow>Full projection</CardEyebrow>
-          <CardTitle>Run the complete 401(k) calculator</CardTitle>
+          <CardTitle>Run the complete 401k calculator</CardTitle>
           <CardBody>
             Benchmarks answer whether you look roughly on pace. The calculator answers whether your plan may support
             your retirement lifestyle and spending target.

@@ -33,7 +33,7 @@ export default async function TwitterImage() {
         <img src={logoSrc} alt="" width={195} height={30} />
         <div style={{ display: "flex", flexDirection: "column", gap: "22px", maxWidth: "980px" }}>
           <div style={{ fontSize: "66px", fontWeight: 700, lineHeight: 1.1 }}>
-            Model your 401(k) path with confidence
+            Model your 401k path with confidence
           </div>
           <div style={{ fontSize: "33px", lineHeight: 1.3, color: "#334155" }}>
             Calculator + benchmarks + methodology in one focused planning experience.

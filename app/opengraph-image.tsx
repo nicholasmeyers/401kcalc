@@ -33,7 +33,7 @@ export default async function OpenGraphImage() {
         <img src={logoSrc} alt="" width={195} height={30} />
         <div style={{ display: "flex", flexDirection: "column", gap: "22px", maxWidth: "980px" }}>
           <div style={{ fontSize: "68px", fontWeight: 700, lineHeight: 1.08 }}>
-            401(k) retirement projections
+            401k retirement projections
           </div>
           <div style={{ fontSize: "34px", lineHeight: 1.32, color: "#334155" }}>
             Transparent assumptions, dual scenarios, and practical retirement planning guides.

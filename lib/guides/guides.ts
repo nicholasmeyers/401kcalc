@@ -34,13 +34,13 @@ export type Guide = {
 const guides: Guide[] = [
   {
     slug: "how-much-should-i-have-in-my-401k-at-30",
-    title: "How Much Should I Have in My 401(k) at 30?",
+    title: "How Much Should I Have in My 401k at 30?",
     description:
-      "Use realistic age-30 401(k) benchmarks, contribution targets, and action steps to build momentum early.",
+      "Use realistic age-30 401k benchmarks, contribution targets, and action steps to build momentum early.",
     excerpt:
-      "A practical benchmark and action plan for hitting your first serious 401(k) milestone by age 30.",
+      "A practical benchmark and action plan for hitting your first serious 401k milestone by age 30.",
     authorId: "founder",
-    category: "401(k) Milestones",
+    category: "401k Milestones",
     imageUrl: "/images/guide-images/sprout.png",
     publishedAt: "2026-03-01",
     reviewedAt: "2026-03-01",
@@ -65,7 +65,7 @@ const guides: Guide[] = [
           "Set automatic contribution increases at least once per year.",
           "Revisit your rate after any major salary change.",
         ],
-        links: [{ label: "401(k) Employer Match Explained", href: "/guides/401k-employer-match-explained" }],
+        links: [{ label: "401k Employer Match Explained", href: "/guides/401k-employer-match-explained" }],
       },
       {
         heading: "Choose tax treatment with intention",
@@ -73,7 +73,7 @@ const guides: Guide[] = [
           "Early-career savers often default without evaluating Roth vs Traditional. If your current tax bracket is relatively low, Roth contributions can be compelling because qualified withdrawals are tax-free later.",
           "If current cash flow is the main constraint, Traditional contributions can reduce taxable income now and make higher contribution rates easier to sustain.",
         ],
-        links: [{ label: "Roth vs Traditional 401(k)", href: "/guides/roth-vs-traditional-401k" }],
+        links: [{ label: "Roth vs Traditional 401k", href: "/guides/roth-vs-traditional-401k" }],
       },
       {
         heading: "Run scenarios instead of guessing",
@@ -81,19 +81,19 @@ const guides: Guide[] = [
           "Use a projection tool to compare your current contribution rate with a slightly higher one. The gap over 30-plus years is often much larger than expected.",
           "Model at least two scenarios: your current path and an improved path with a modest increase. Then commit to the version you can maintain.",
         ],
-        links: [{ label: "Model your plan with the 401(k) calculator", href: "/401k-calculator" }],
+        links: [{ label: "Model your plan with the 401k calculator", href: "/401k-calculator" }],
       },
     ],
   },
   {
     slug: "how-much-should-i-have-in-my-401k-at-40",
-    title: "How Much Should I Have in My 401(k) at 40?",
+    title: "How Much Should I Have in My 401k at 40?",
     description:
-      "Understand age-40 retirement savings targets and the most effective ways to close gaps in your 401(k).",
+      "Understand age-40 retirement savings targets and the most effective ways to close gaps in your 401k.",
     excerpt:
-      "A focused framework for checking your 401(k) progress at 40 and improving your plan without overreacting.",
+      "A focused framework for checking your 401k progress at 40 and improving your plan without overreacting.",
     authorId: "founder",
-    category: "401(k) Milestones",
+    category: "401k Milestones",
     imageUrl: "/images/guide-images/chart.svg",
     publishedAt: "2026-03-02",
     reviewedAt: "2026-03-02",
@@ -125,7 +125,7 @@ const guides: Guide[] = [
           "By this stage, many households benefit from diversifying future tax exposure. A blend of Traditional and Roth savings can create better withdrawal flexibility in retirement.",
           "Revisit tax assumptions annually instead of locking in a one-time decision from years ago.",
         ],
-        links: [{ label: "How to decide Roth vs Traditional 401(k)", href: "/guides/roth-vs-traditional-401k" }],
+        links: [{ label: "How to decide Roth vs Traditional 401k", href: "/guides/roth-vs-traditional-401k" }],
       },
       {
         heading: "Turn your benchmark gap into a concrete action plan",
@@ -139,13 +139,13 @@ const guides: Guide[] = [
   },
   {
     slug: "how-much-should-i-have-in-my-401k-at-50",
-    title: "How Much Should I Have in My 401(k) at 50?",
+    title: "How Much Should I Have in My 401k at 50?",
     description:
-      "Evaluate your age-50 401(k) progress, close savings gaps, and use catch-up years effectively.",
+      "Evaluate your age-50 401k progress, close savings gaps, and use catch-up years effectively.",
     excerpt:
-      "How to assess your 401(k) at 50, prioritize the right levers, and strengthen your final accumulation decade.",
+      "How to assess your 401k at 50, prioritize the right levers, and strengthen your final accumulation decade.",
     authorId: "founder",
-    category: "401(k) Milestones",
+    category: "401k Milestones",
     imageUrl: "/images/guide-images/make-plan.png",
     publishedAt: "2026-03-03",
     reviewedAt: "2026-03-03",
@@ -156,7 +156,7 @@ const guides: Guide[] = [
       {
         heading: "A common age-50 reference range is 5x to 6x salary",
         paragraphs: [
-          "Around age 50, many planners use a benchmark near 5x to 6x salary saved. Your exact target depends on retirement age, desired spending, and expected non-401(k) income.",
+          "Around age 50, many planners use a benchmark near 5x to 6x salary saved. Your exact target depends on retirement age, desired spending, and expected non-401k income.",
           "Being below that range is not a dead end. It means your next decade decisions around contribution rate and retirement timing become especially important.",
         ],
       },
@@ -171,7 +171,7 @@ const guides: Guide[] = [
           "Prioritize full employer match before optional investing accounts.",
           "Treat salary increases as an opportunity to raise deferral rates.",
         ],
-        links: [{ label: "401(k) Contribution Limits for 2026", href: "/guides/401k-contribution-limits" }],
+        links: [{ label: "401k Contribution Limits for 2026", href: "/guides/401k-contribution-limits" }],
       },
       {
         heading: "Stress-test retirement timing and spending assumptions",
@@ -187,19 +187,19 @@ const guides: Guide[] = [
           "Portfolio risk still matters, but sequence-of-returns risk starts becoming more relevant as retirement gets closer. A strategy that is too aggressive can create avoidable downside if a major decline hits late in your working years.",
           "Use your allocation as part of the plan, not as a substitute for contribution discipline.",
         ],
-        links: [{ label: "How Much Should I Have in My 401(k) at 60?", href: "/guides/how-much-should-i-have-in-my-401k-at-60" }],
+        links: [{ label: "How Much Should I Have in My 401k at 60?", href: "/guides/how-much-should-i-have-in-my-401k-at-60" }],
       },
     ],
   },
   {
     slug: "how-much-should-i-have-in-my-401k-at-60",
-    title: "How Much Should I Have in My 401(k) at 60?",
+    title: "How Much Should I Have in My 401k at 60?",
     description:
-      "Assess your age-60 401(k) readiness with practical benchmarks, withdrawal-aware planning, and final pre-retirement checks.",
+      "Assess your age-60 401k readiness with practical benchmarks, withdrawal-aware planning, and final pre-retirement checks.",
     excerpt:
       "A practical age-60 readiness review to tighten your retirement plan before distribution decisions begin.",
     authorId: "founder",
-    category: "401(k) Milestones",
+    category: "401k Milestones",
     imageUrl: "/images/guide-images/senior-beach.png",
     publishedAt: "2026-03-04",
     reviewedAt: "2026-03-04",
@@ -220,7 +220,7 @@ const guides: Guide[] = [
           "A large balance is only meaningful if it supports your expected withdrawal needs. Model how long the portfolio lasts under conservative returns and different retirement start dates.",
           "Run scenarios with higher-than-expected inflation to verify that your plan is resilient, not just optimistic.",
         ],
-        links: [{ label: "Project withdrawals with the 401(k) calculator", href: "/401k-calculator" }],
+        links: [{ label: "Project withdrawals with the 401k calculator", href: "/401k-calculator" }],
       },
       {
         heading: "Tax planning becomes a central retirement lever",
@@ -228,7 +228,7 @@ const guides: Guide[] = [
           "By 60, account-type diversification can reduce future tax friction. Households with only pre-tax savings often have fewer withdrawal options when managing taxable income in retirement.",
           "If your plan allows Roth contributions, evaluate whether shifting some new savings to Roth improves long-term flexibility.",
         ],
-        links: [{ label: "Roth vs Traditional 401(k) decision guide", href: "/guides/roth-vs-traditional-401k" }],
+        links: [{ label: "Roth vs Traditional 401k decision guide", href: "/guides/roth-vs-traditional-401k" }],
       },
       {
         heading: "Final pre-retirement checklist",
@@ -241,17 +241,17 @@ const guides: Guide[] = [
           "Coordinate pension, Social Security, and 401(k) timing assumptions.",
           "Re-run projections annually until retirement begins.",
         ],
-        links: [{ label: "401(k) Employer Match Explained", href: "/guides/401k-employer-match-explained" }],
+        links: [{ label: "401k Employer Match Explained", href: "/guides/401k-employer-match-explained" }],
       },
     ],
   },
   {
     slug: "roth-vs-traditional-401k",
-    title: "Roth vs Traditional 401(k): How to Choose",
+    title: "Roth vs Traditional 401k: How to Choose",
     description:
-      "A practical framework for deciding between Roth and Traditional 401(k) contributions based on tax timing and flexibility.",
+      "A practical framework for deciding between Roth and Traditional 401k contributions based on tax timing and flexibility.",
     excerpt:
-      "How to choose between Roth and Traditional 401(k) contributions without guesswork or tax myths.",
+      "How to choose between Roth and Traditional 401k contributions without guesswork or tax myths.",
     authorId: "founder",
     category: "Tax Strategy",
     imageUrl: "/images/guide-images/vector-plan.png",
@@ -298,8 +298,8 @@ const guides: Guide[] = [
           "Review your setup at least once per year.",
         ],
         links: [
-          { label: "401(k) Employer Match Explained", href: "/guides/401k-employer-match-explained" },
-          { label: "401(k) Contribution Limits for 2026", href: "/guides/401k-contribution-limits" },
+          { label: "401k Employer Match Explained", href: "/guides/401k-employer-match-explained" },
+          { label: "401k Contribution Limits for 2026", href: "/guides/401k-contribution-limits" },
         ],
       },
       {
@@ -308,7 +308,7 @@ const guides: Guide[] = [
           "Beginning in 2026, workers age 50 and older with prior-year FICA wages above $145,000 generally must make catch-up contributions as Roth. That means the catch-up dollars no longer reduce taxable income today, even if the rest of your 401(k) contributions are Traditional.",
           "If you are near or above that threshold, review your pay stub and W-2 assumptions rather than assuming you still control the tax treatment of every contribution dollar.",
         ],
-        links: [{ label: "401(k) Contribution Limits for 2026", href: "/guides/401k-contribution-limits" }],
+        links: [{ label: "401k Contribution Limits for 2026", href: "/guides/401k-contribution-limits" }],
       },
       {
         heading: "Model both choices before you commit",
@@ -316,15 +316,15 @@ const guides: Guide[] = [
           "Use projections to compare the long-term outcome of different contribution splits under conservative assumptions. Scenario analysis usually surfaces the right default faster than debating edge cases.",
           "Focus on the plan you can sustain for the next decade, not the one that is theoretically perfect for one tax year.",
         ],
-        links: [{ label: "Compare scenarios in the 401(k) calculator", href: "/401k-calculator" }],
+        links: [{ label: "Compare scenarios in the 401k calculator", href: "/401k-calculator" }],
       },
     ],
   },
   {
     slug: "401k-employer-match-explained",
-    title: "401(k) Employer Match Explained",
+    title: "401k Employer Match Explained",
     description:
-      "Learn how 401(k) match formulas, vesting schedules, and payroll timing rules affect your total compensation.",
+      "Learn how 401k match formulas, vesting schedules, and payroll timing rules affect your total compensation.",
     excerpt:
       "A straightforward breakdown of employer match mechanics so you can avoid leaving compensation behind.",
     authorId: "founder",
@@ -355,7 +355,7 @@ const guides: Guide[] = [
           "100% match on the first 4%: contribute 4% to receive a 4% employer contribution.",
           "25% match on the first 8%: contribute 8% to receive a 2% employer contribution.",
         ],
-        links: [{ label: "How Much Should I Contribute to My 401(k)?", href: "/guides/how-much-should-i-contribute-to-my-401k" }],
+        links: [{ label: "How Much Should I Contribute to My 401k?", href: "/guides/how-much-should-i-contribute-to-my-401k" }],
       },
       {
         heading: "Pay-period rules and true-up provisions matter",
@@ -383,19 +383,19 @@ const guides: Guide[] = [
           "Review vesting schedule if a job change is possible.",
         ],
         links: [
-          { label: "Roth vs Traditional 401(k)", href: "/guides/roth-vs-traditional-401k" },
-          { label: "Use the 401(k) calculator", href: "/401k-calculator" },
+          { label: "Roth vs Traditional 401k", href: "/guides/roth-vs-traditional-401k" },
+          { label: "Use the 401k calculator", href: "/401k-calculator" },
         ],
       },
     ],
   },
   {
     slug: "401k-contribution-limits",
-    title: "401(k) Contribution Limits for 2026",
+    title: "401k Contribution Limits for 2026",
     description:
-      "2026 401(k) contribution limits, catch-up amounts, super catch-up for ages 60 to 63, and the new Roth catch-up rule.",
+      "2026 401k contribution limits, catch-up amounts, super catch-up for ages 60 to 63, and the new Roth catch-up rule.",
     excerpt:
-      "The 2026 401(k) limits, catch-up amounts, and paycheck planning math in plain English.",
+      "The 2026 401k limits, catch-up amounts, and paycheck planning math in plain English.",
     authorId: "founder",
     category: "Tax Strategy",
     imageUrl: "/images/guide-images/close-up-100-dollar-bill.png",
@@ -410,7 +410,7 @@ const guides: Guide[] = [
     ],
     content: [
       {
-        heading: "2026 401(k) limits at a glance",
+        heading: "2026 401k limits at a glance",
         paragraphs: [
           "The standard 401(k) elective deferral limit for 2026 is $24,500. If you are 50 or older by year-end, you can contribute more through catch-up contributions.",
           "The biggest new detail is the higher super catch-up for workers ages 60 through 63. That group can contribute more than the standard age-50-plus catch-up amount in 2026.",
@@ -432,7 +432,7 @@ const guides: Guide[] = [
           "Employer match counts toward the $72,000 total annual additions limit.",
           "Catch-up contributions sit on top of the $72,000 limit.",
         ],
-        links: [{ label: "401(k) Employer Match Explained", href: "/guides/401k-employer-match-explained" }],
+        links: [{ label: "401k Employer Match Explained", href: "/guides/401k-employer-match-explained" }],
       },
       {
         heading: "The new Roth catch-up rule matters for higher earners",
@@ -445,7 +445,7 @@ const guides: Guide[] = [
           "The wage test uses prior-year FICA wages.",
           "Check whether your employer plan supports Roth contributions before assuming catch-up flexibility.",
         ],
-        links: [{ label: "Roth vs Traditional 401(k)", href: "/guides/roth-vs-traditional-401k" }],
+        links: [{ label: "Roth vs Traditional 401k", href: "/guides/roth-vs-traditional-401k" }],
       },
       {
         heading: "Turn the annual limit into a paycheck target",
@@ -466,19 +466,19 @@ const guides: Guide[] = [
           "Use the calculator to project your contribution rate, then confirm with payroll whether your match is per-paycheck or includes a year-end true-up. A steady contribution schedule is often safer than front-loading if the match rules are unclear.",
         ],
         links: [
-          { label: "How Much Should I Contribute to My 401(k)?", href: "/guides/how-much-should-i-contribute-to-my-401k" },
-          { label: "Run scenarios in the 401(k) calculator", href: "/401k-calculator" },
+          { label: "How Much Should I Contribute to My 401k?", href: "/guides/how-much-should-i-contribute-to-my-401k" },
+          { label: "Run scenarios in the 401k calculator", href: "/401k-calculator" },
         ],
       },
     ],
   },
   {
     slug: "how-much-should-i-contribute-to-my-401k",
-    title: "How Much Should I Contribute to My 401(k)?",
+    title: "How Much Should I Contribute to My 401k?",
     description:
-      "How much to contribute to your 401(k), from match-first minimums to stronger long-term savings targets.",
+      "How much to contribute to your 401k, from match-first minimums to stronger long-term savings targets.",
     excerpt:
-      "A practical guide to choosing a 401(k) contribution percentage that fits your budget and goals.",
+      "A practical guide to choosing a 401k contribution percentage that fits your budget and goals.",
     authorId: "founder",
     category: "Contribution Strategy",
     imageUrl: "/images/guide-images/hundos.png",
@@ -504,7 +504,7 @@ const guides: Guide[] = [
           "Common long-term target: around 15% of salary including match.",
           "Late starters often need a higher rate than early starters.",
         ],
-        links: [{ label: "401(k) Employer Match Explained", href: "/guides/401k-employer-match-explained" }],
+        links: [{ label: "401k Employer Match Explained", href: "/guides/401k-employer-match-explained" }],
       },
       {
         heading: "Use ranges instead of looking for one magic number",
@@ -518,8 +518,8 @@ const guides: Guide[] = [
           "15%+: often necessary for people who started late or want a more aggressive catch-up plan.",
         ],
         links: [
-          { label: "How Much Should I Have in My 401(k) at 30?", href: "/guides/how-much-should-i-have-in-my-401k-at-30" },
-          { label: "How Much Should I Have in My 401(k) at 50?", href: "/guides/how-much-should-i-have-in-my-401k-at-50" },
+          { label: "How Much Should I Have in My 401k at 30?", href: "/guides/how-much-should-i-have-in-my-401k-at-30" },
+          { label: "How Much Should I Have in My 401k at 50?", href: "/guides/how-much-should-i-have-in-my-401k-at-50" },
         ],
       },
       {
@@ -533,7 +533,7 @@ const guides: Guide[] = [
           "10% of $80,000 salary = $8,000 per year.",
           "15% of $80,000 salary = $12,000 per year.",
         ],
-        links: [{ label: "401(k) calculator", href: "/401k-calculator" }],
+        links: [{ label: "401k calculator", href: "/401k-calculator" }],
       },
       {
         heading: "Increase contributions when life changes, not just when you feel motivated",
@@ -542,20 +542,20 @@ const guides: Guide[] = [
           "Many savers increase by 1 to 2 percentage points per year until they reach their target. If you are getting close to the annual contribution limit, confirm the current limits and adjust your percentage so you do not cap out early and miss employer match later in the year.",
         ],
         links: [
-          { label: "401(k) Contribution Limits for 2026", href: "/guides/401k-contribution-limits" },
-          { label: "How Much Should I Have in My 401(k) at 30?", href: "/guides/how-much-should-i-have-in-my-401k-at-30" },
-          { label: "How Much Should I Have in My 401(k) at 40?", href: "/guides/how-much-should-i-have-in-my-401k-at-40" },
+          { label: "401k Contribution Limits for 2026", href: "/guides/401k-contribution-limits" },
+          { label: "How Much Should I Have in My 401k at 30?", href: "/guides/how-much-should-i-have-in-my-401k-at-30" },
+          { label: "How Much Should I Have in My 401k at 40?", href: "/guides/how-much-should-i-have-in-my-401k-at-40" },
         ],
       },
     ],
   },
   {
     slug: "what-to-do-with-your-401k-when-you-leave-a-job",
-    title: "What to Do With Your 401(k) When You Leave a Job",
+    title: "What to Do With Your 401k When You Leave a Job",
     description:
-      "Your 401(k) options after leaving a job: roll over to a new 401(k), roll to an IRA, leave it, or cash out.",
+      "Your 401k options after leaving a job: roll over to a new 401k, roll to an IRA, leave it, or cash out.",
     excerpt:
-      "A clear rollover-vs-IRA-vs-leave-it decision guide for your old 401(k).",
+      "A clear rollover-vs-IRA-vs-leave-it decision guide for your old 401k.",
     authorId: "founder",
     category: "Life Events",
     imageUrl: "/images/guide-images/vector-plan.png",
@@ -573,10 +573,10 @@ const guides: Guide[] = [
         heading: "For most people, a direct rollover is the cleanest default",
         paragraphs: [
           "Moving your old 401(k) into your new employer's plan or an IRA keeps your retirement savings consolidated and under your control. A direct rollover, also called trustee-to-trustee transfer, avoids withholding, taxes, and penalties.",
-          "For many people, the main decision is new employer 401(k) versus IRA. A new employer plan can be cleaner if you want to preserve backdoor Roth flexibility, while an IRA often wins on investment choice and convenience.",
+          "For many people, the main decision is new employer 401k versus IRA. A new employer plan can be cleaner if you want to preserve backdoor Roth flexibility, while an IRA often wins on investment choice and convenience.",
         ],
         bullets: [
-          "Roll to new 401(k): often best if you value backdoor Roth flexibility or like the new plan.",
+          "Roll to new 401k: often best if you value backdoor Roth flexibility or like the new plan.",
           "Roll to IRA: often best if you want wider investment choices and easier account control.",
           "Use a direct rollover whenever possible.",
         ],
@@ -587,7 +587,7 @@ const guides: Guide[] = [
           "You can leave your balance in your former employer's plan if the plan allows it. That can work if you like the investment options and fees, but you will have multiple accounts to manage.",
           "There are a few legitimate reasons to leave it behind temporarily. Consider vesting if you have unvested employer match, and consider age-55 withdrawal rules if you separate from service in or after the year you turn 55.",
         ],
-        links: [{ label: "401(k) Employer Match Explained", href: "/guides/401k-employer-match-explained" }],
+        links: [{ label: "401k Employer Match Explained", href: "/guides/401k-employer-match-explained" }],
       },
       {
         heading: "Cashing out is almost always costly",
@@ -613,20 +613,20 @@ const guides: Guide[] = [
           "Confirm vesting and loan status before leaving.",
           "Ask whether the old plan allows direct rollover by check or electronic transfer.",
           "Use a direct rollover to avoid taxes and penalties.",
-          "If you may use backdoor Roth, consider rolling to the new 401(k) instead of an IRA.",
+          "If you may use backdoor Roth, consider rolling to the new 401k instead of an IRA.",
           "Confirm the money arrived and was actually invested in the new account.",
         ],
-        links: [{ label: "Self-Employed 401(k): Solo 401(k) vs SEP IRA", href: "/guides/self-employed-401k-vs-sep-ira" }],
+        links: [{ label: "Self-Employed 401k: Solo 401k vs SEP IRA", href: "/guides/self-employed-401k-vs-sep-ira" }],
       },
     ],
   },
   {
     slug: "self-employed-401k-vs-sep-ira",
-    title: "Self-Employed 401(k): Solo 401(k) vs SEP IRA",
+    title: "Self-Employed 401k: Solo 401k vs SEP IRA",
     description:
-      "Solo 401(k) vs SEP IRA for self-employed workers, freelancers, contractors, and side-income earners.",
+      "Solo 401k vs SEP IRA for self-employed workers, freelancers, contractors, and side-income earners.",
     excerpt:
-      "How to choose between a Solo 401(k) and SEP IRA, plus when SIMPLE IRA belongs in the conversation.",
+      "How to choose between a Solo 401k and SEP IRA, plus when SIMPLE IRA belongs in the conversation.",
     authorId: "founder",
     category: "Life Events",
     imageUrl: "/images/guide-images/savings.png",
@@ -648,10 +648,10 @@ const guides: Guide[] = [
         ],
       },
       {
-        heading: "Solo 401(k): usually strongest when you have no employees",
+        heading: "Solo 401k: usually strongest when you have no employees",
         paragraphs: [
           "A Solo 401(k) lets you contribute as both employee and employer. In 2026, that means up to $24,500 of employee deferrals, plus employer contributions, up to the overall annual additions limit of $72,000 before catch-up amounts are counted.",
-          "That structure often makes the Solo 401(k) the most powerful option for self-employed people with no employees. It can also offer Roth contributions, which SEP-IRAs do not.",
+          "That structure often makes the Solo 401k the most powerful option for self-employed people with no employees. It can also offer Roth contributions, which SEP-IRAs do not.",
         ],
         bullets: [
           "Elective deferrals use the same annual limit as a workplace 401(k).",
@@ -659,7 +659,7 @@ const guides: Guide[] = [
           "Roth employee contributions may be available depending on the provider.",
           "Generally best when you have no common-law employees.",
         ],
-        links: [{ label: "401(k) Contribution Limits for 2026", href: "/guides/401k-contribution-limits" }],
+        links: [{ label: "401k Contribution Limits for 2026", href: "/guides/401k-contribution-limits" }],
       },
       {
         heading: "SEP-IRA: simpler, but with fewer planning levers",
@@ -672,19 +672,19 @@ const guides: Guide[] = [
         heading: "Related option: SIMPLE IRA",
         paragraphs: [
           "A SIMPLE IRA can also fit small businesses that want lower administrative complexity and do not need the highest contribution limits. It is usually less powerful than a Solo 401(k) for a one-person business, but it can be easier to understand and maintain.",
-          "If your main goal is maximum savings flexibility, the Solo 401(k) usually wins. If your goal is low friction, a SIMPLE IRA or SEP-IRA may be worth considering.",
+          "If your main goal is maximum savings flexibility, the Solo 401k usually wins. If your goal is low friction, a SIMPLE IRA or SEP-IRA may be worth considering.",
         ],
-        links: [{ label: "Roth vs Traditional 401(k)", href: "/guides/roth-vs-traditional-401k" }],
+        links: [{ label: "Roth vs Traditional 401k", href: "/guides/roth-vs-traditional-401k" }],
       },
       {
         heading: "Think about deadlines, employees, and coordination with other plans",
         paragraphs: [
-          "If you also have a workplace 401(k), remember that your employee deferral limit is shared across 401(k) plans. You cannot make a full employee deferral to both a day-job 401(k) and a Solo 401(k) in the same year.",
-          "Also think ahead about plan setup deadlines and whether you may add employees in the future. A Solo 401(k) becomes more complicated once you are no longer truly solo.",
+          "If you also have a workplace 401(k), remember that your employee deferral limit is shared across 401k plans. You cannot make a full employee deferral to both a day-job 401k and a Solo 401k in the same year.",
+          "Also think ahead about plan setup deadlines and whether you may add employees in the future. A Solo 401k becomes more complicated once you are no longer truly solo.",
         ],
         links: [
-          { label: "401(k) calculator", href: "/401k-calculator" },
-          { label: "401(k) Contribution Limits for 2026", href: "/guides/401k-contribution-limits" },
+          { label: "401k calculator", href: "/401k-calculator" },
+          { label: "401k Contribution Limits for 2026", href: "/guides/401k-contribution-limits" },
         ],
       },
     ],
@@ -722,7 +722,7 @@ const guides: Guide[] = [
           "If you have other pre-tax IRA balances (Traditional, SEP, SIMPLE), the IRS treats all IRAs as one when taxing the conversion. You cannot convert only the non-deductible portion; a portion of the conversion is taxed based on the ratio of pre-tax to total IRA assets.",
           "That often means paying more tax than expected. For example, if you already have $60,000 of pre-tax IRA money and make a new $7,500 non-deductible contribution, only about 11% of a $7,500 conversion would be tax-free. To avoid that problem, some people roll pre-tax IRA balances into a 401(k) before doing the backdoor conversion, leaving only the new non-deductible contribution in the IRA.",
         ],
-        links: [{ label: "What to Do With Your 401(k) When You Leave a Job", href: "/guides/what-to-do-with-your-401k-when-you-leave-a-job" }],
+        links: [{ label: "What to Do With Your 401k When You Leave a Job", href: "/guides/what-to-do-with-your-401k-when-you-leave-a-job" }],
       },
       {
         heading: "Execute in the right order",
@@ -739,10 +739,10 @@ const guides: Guide[] = [
       {
         heading: "When it makes sense",
         paragraphs: [
-          "The backdoor Roth is most useful when you have maxed out 401(k) and HSA, want additional Roth exposure, and have no pre-tax IRA balances (or can move them to a 401(k)).",
+          "The backdoor Roth is most useful when you have maxed out your 401(k) contributions and HSA, want additional Roth exposure, and have no pre-tax IRA balances (or can move them to a 401k).",
           "If you have significant pre-tax IRA money, the pro-rata tax may outweigh the benefit. It is usually worth pausing before you proceed if you have SEP or SIMPLE IRA balances, uncertain tax reporting, or a recent rollover that changed your IRA mix.",
         ],
-        links: [{ label: "Roth vs Traditional 401(k)", href: "/guides/roth-vs-traditional-401k" }],
+        links: [{ label: "Roth vs Traditional 401k", href: "/guides/roth-vs-traditional-401k" }],
       },
       {
         heading: "Tax law can change",

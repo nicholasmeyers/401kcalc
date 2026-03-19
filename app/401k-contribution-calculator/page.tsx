@@ -36,7 +36,7 @@ const bridgeCards = [
   {
     eyebrow: "Full projection",
     href: "/401k-calculator",
-    title: "Open the full 401(k) calculator",
+    title: "Open the full 401k calculator",
     body:
       "Combine this increase with your current balance, spending goals, and broader plan assumptions.",
   },
@@ -50,7 +50,7 @@ const bridgeCards = [
   {
     eyebrow: "Contribution guide",
     href: contributionGuide?.slug ? `/guides/${contributionGuide.slug}` : "/guides/how-much-should-i-contribute-to-my-401k",
-    title: contributionGuide?.title ?? "How Much Should I Contribute to My 401(k)?",
+    title: contributionGuide?.title ?? "How Much Should I Contribute to My 401k?",
     body:
       contributionGuide?.excerpt ??
       "Practical guidance for choosing a savings rate you can keep long enough for compounding to matter.",
@@ -58,7 +58,7 @@ const bridgeCards = [
   {
     eyebrow: "Employer match",
     href: employerMatchGuide?.slug ? `/guides/${employerMatchGuide.slug}` : "/guides/401k-employer-match-explained",
-    title: employerMatchGuide?.title ?? "401(k) Employer Match Explained",
+    title: employerMatchGuide?.title ?? "401k Employer Match Explained",
     body:
       employerMatchGuide?.excerpt ??
       "If you may still be leaving match dollars on the table, solve that first before optimizing the next 1% to 5%.",
@@ -67,7 +67,7 @@ const bridgeCards = [
 
 const contributionFaqs = [
   {
-    question: "Does this calculator use my current 401(k) balance?",
+    question: "Does this calculator use my current 401k balance?",
     answer:
       "No. This calculator isolates the increase itself and treats the extra dollars like a separate stream of contributions starting from zero. That keeps the result focused on what the change alone adds.",
     href: "/401k-calculator",
@@ -104,9 +104,9 @@ const contributionFaqs = [
 ];
 
 export const metadata: Metadata = {
-  title: "401(k) Contribution Increase Calculator",
+  title: "401k Contribution Increase Calculator",
   description:
-    "Contribution increase calculator: see how much increasing your 401(k) contribution could add by retirement. Compare 1-year, 5-year, and until-retirement scenarios. Estimate paycheck impact and monthly retirement income.",
+    "Contribution increase calculator: see how much increasing your 401k contribution could add by retirement. Compare 1-year, 5-year, and until-retirement scenarios. Estimate paycheck impact and monthly retirement income.",
   keywords: [
     "401k contribution increase calculator",
     "increase 401k contribution",
@@ -118,17 +118,17 @@ export const metadata: Metadata = {
     canonical: "/401k-contribution-calculator",
   },
   openGraph: {
-    title: "401(k) Contribution Increase Calculator | 401kcalc",
+    title: "401k Contribution Increase Calculator | 401kcalc",
     description:
-      "Contribution increase calculator: measure what a higher 401(k) contribution rate could add to your retirement balance and monthly income.",
+      "Contribution increase calculator: measure what a higher 401k contribution rate could add to your retirement balance and monthly income.",
     url: `${siteConfig.url}/401k-contribution-calculator`,
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "401(k) Contribution Increase Calculator",
+    title: "401k Contribution Increase Calculator",
     description:
-      "Estimate the impact of increasing your 401(k) contribution rate without rebuilding your whole retirement plan.",
+      "Estimate the impact of increasing your 401k contribution rate without rebuilding your whole retirement plan.",
   },
 };
 
@@ -136,12 +136,12 @@ export default function ContributionCalculatorPage() {
   const softwareApplicationSchema = {
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
-    name: "401(k) Contribution Increase Calculator",
+    name: "401k Contribution Increase Calculator",
     operatingSystem: "Web",
     applicationCategory: "FinanceApplication",
     url: `${siteConfig.url}/401k-contribution-calculator`,
     description:
-      "401(k) contribution increase calculator. Estimate what raising your contribution rate could add by retirement. Compare 1-year, 5-year, and until-retirement scenarios. See monthly retirement income and paycheck impact.",
+      "401k contribution increase calculator. Estimate what raising your contribution rate could add by retirement. Compare 1-year, 5-year, and until-retirement scenarios. See monthly retirement income and paycheck impact.",
     offers: {
       "@type": "Offer",
       price: "0",
@@ -170,7 +170,7 @@ export default function ContributionCalculatorPage() {
       {
         "@type": "ListItem",
         position: 2,
-        name: "401(k) Contribution Increase Calculator",
+        name: "401k Contribution Increase Calculator",
         item: `${siteConfig.url}/401k-contribution-calculator`,
       },
     ],
@@ -200,7 +200,7 @@ export default function ContributionCalculatorPage() {
           <IntroStack>
             <PageIntro
               eyebrow="Increase Contributions"
-              title="What raising your 401(k) contribution could add"
+              title="What raising your 401k contribution could add"
               description="See how an extra 1%, 2%, 3% ... 10% of salary could compound into real monthly retirement income."
             />
           </IntroStack>
@@ -251,7 +251,7 @@ export default function ContributionCalculatorPage() {
             </ContentBlock>
 
             <ContentBlock>
-              <SectionTitle as="h2">401(k) contribution increase calculator FAQ</SectionTitle>
+              <SectionTitle as="h2">401k contribution increase calculator FAQ</SectionTitle>
               <SectionSubtitle>
                 Assumptions and tradeoffs most likely to come up while using this page.
               </SectionSubtitle>

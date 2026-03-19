@@ -47,7 +47,7 @@ export default async function GuideOpengraphImage({ params }: OpengraphImageProp
   const logoSrc = `data:image/png;base64,${logoData.toString("base64")}`;
 
   const title = guide.title.length > 70 ? `${guide.title.slice(0, 67)}...` : guide.title;
-  const category = guide.category ?? "401(k) Planning";
+  const category = guide.category ?? "401k Planning";
 
   return new ImageResponse(
     (

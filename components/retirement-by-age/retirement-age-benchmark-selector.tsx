@@ -37,7 +37,7 @@ export function RetirementAgeBenchmarkSelector({
   layout = "compact",
   styleVariant = "default",
   showVisualHeader,
-  description = "See common 401(k) savings benchmarks by age, then jump into the full calculator or age-specific guide.",
+  description = "See common 401k savings benchmarks by age, then jump into the full calculator or age-specific guide.",
   showCalculatorLink = false,
   calculatorHref = "/401k-calculator",
   secondaryCtaMode = "guideOrCalculator",
@@ -77,7 +77,7 @@ export function RetirementAgeBenchmarkSelector({
         <TextStack>
           <Eyebrow>Retirement by age</Eyebrow>
           <Heading as={headingAs} $layout={layout}>
-            How much should you have in your 401(k) at {selection.selectedAge}?
+            How much should you have in your 401k at {selection.selectedAge}?
           </Heading>
           <Description>{description}</Description>
         </TextStack>

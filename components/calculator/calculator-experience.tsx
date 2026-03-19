@@ -47,7 +47,7 @@ const fieldMessageMap: Record<string, string> = {
     "Life expectancy must be at or after retirement age.",
   "currentBalance must be >= 0.": "Balance cannot be negative.",
   "currentRothBalance must be >= 0.": "Roth balance cannot be negative.",
-  "currentRothBalance cannot exceed currentBalance.": "Roth balance cannot exceed your total 401(k) balance.",
+  "currentRothBalance cannot exceed currentBalance.": "Roth balance cannot exceed your total 401k balance.",
   "annualSalary must be >= 0.": "Salary cannot be negative.",
   "contributionPercent must be between 0 and 100.": "Contribution rate must be between 0% and 100%.",
   "rothContributionPercent must be between 0 and 100.": "Roth percentage must be between 0% and 100%.",

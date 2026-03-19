@@ -46,13 +46,13 @@ export function GuidesHeroWithTopics({ guides, categories }: GuidesHeroWithTopic
             <HeroContent>
               <PageIntro
                 eyebrow="Guides"
-                title="Simple guides for common 401(k) decisions"
+                title="Simple guides for common 401k decisions"
                 description="Learn how savings checkpoints by age, tax choices, and major life events affect your retirement plan."
               />
               <HeroImage>
                 <Image
                   src="/images/guide-images/guides-hero.svg"
-                  alt="401(k) savings growth illustration"
+                  alt="401k savings growth illustration"
                   width={160}
                   height={140}
                   style={{ width: "100%", height: "auto" }}
@@ -60,8 +60,8 @@ export function GuidesHeroWithTopics({ guides, categories }: GuidesHeroWithTopic
               </HeroImage>
             </HeroContent>
             <TopicOverview>
-              <TopicItemButton type="button" onClick={() => handleTopicClick("401(k) Milestones")}>
-                <TopicItemTitle>401(k) Milestones</TopicItemTitle>
+              <TopicItemButton type="button" onClick={() => handleTopicClick("401k Milestones")}>
+                <TopicItemTitle>401k Milestones</TopicItemTitle>
                 <TopicItemDescription>
                   Savings checkpoints by age, how to judge your progress, and what to do if you&apos;re behind.
                 </TopicItemDescription>

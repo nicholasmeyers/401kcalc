@@ -70,7 +70,7 @@ const calculatorHighlights = [
 
 const calculatorFaqs = [
   {
-    question: "How much should I contribute to my 401(k)?",
+    question: "How much should I contribute to my 401k?",
     answer:
       "There is no single percentage that fits everyone, but the most useful starting point is usually the highest rate you can sustain while still capturing the full employer match. From there, compare scenarios with higher savings rates and annual step-ups to see how much they improve your retirement-income outlook.",
     href: "/guides/how-much-should-i-contribute-to-my-401k",
@@ -84,7 +84,7 @@ const calculatorFaqs = [
     label: "See employer match examples",
   },
   {
-    question: "Does this calculator support Roth 401(k) contributions?",
+    question: "Does this calculator support Roth 401k contributions?",
     answer:
       "Yes. You can model both current Roth balances and a Roth contribution split, which helps compare taxable and tax-free retirement income. If you are deciding between Roth and Traditional contributions, use the calculator alongside the tax-treatment guide rather than relying on a default split.",
     href: "/guides/roth-vs-traditional-401k",
@@ -114,14 +114,14 @@ const calculatorFaqs = [
 ];
 
 export const metadata: Metadata = {
-  title: "401(k) Retirement Calculator",
+  title: "401k Retirement Calculator",
   description:
-    "Estimate how much your 401(k) could grow and whether your annual retirement spending goal may last through life expectancy.",
+    "Estimate how much your 401k could grow and whether your annual retirement spending goal may last through life expectancy.",
   alternates: {
     canonical: "/401k-calculator",
   },
   openGraph: {
-    title: "401(k) Retirement Calculator | 401kcalc",
+    title: "401k Retirement Calculator | 401kcalc",
     description:
       "Test assumptions and estimate projected balance and retirement spending longevity.",
     url: `${siteConfig.url}/401k-calculator`,
@@ -129,7 +129,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "401(k) Retirement Calculator",
+    title: "401k Retirement Calculator",
     description:
       "Estimate projected balance and whether savings may last through retirement spending years.",
   },
@@ -139,12 +139,12 @@ export default function CalculatorPage() {
   const softwareApplicationSchema = {
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
-    name: "401(k) Retirement Calculator",
+    name: "401k Retirement Calculator",
     operatingSystem: "Web",
     applicationCategory: "FinanceApplication",
     url: `${siteConfig.url}/401k-calculator`,
     description:
-      "Interactive 401(k) calculator that estimates projected balance and retirement spending longevity based on your assumptions.",
+      "Interactive 401k calculator that estimates projected balance and retirement spending longevity based on your assumptions.",
     offers: {
       "@type": "Offer",
       price: "0",
@@ -178,7 +178,7 @@ export default function CalculatorPage() {
       {
         "@type": "ListItem",
         position: 2,
-        name: "401(k) Calculator",
+        name: "401k Calculator",
         item: `${siteConfig.url}/401k-calculator`,
       },
     ],
@@ -207,7 +207,7 @@ export default function CalculatorPage() {
         <Container>
           <PageIntro
             eyebrow="Calculator"
-            title="401(k) Calculator"
+            title="401k Calculator"
             description="Enter your assumptions to estimate projected balance and whether your annual retirement spending goal may last through retirement."
           >
             <MethodologyLink href="/methodology">How these estimates are calculated {"\u2192"}</MethodologyLink>
@@ -227,7 +227,7 @@ export default function CalculatorPage() {
         <Container>
           <SupportingContentStack>
             <SectionHeader>
-              <SectionTitle>How this 401(k) calculator supports planning decisions</SectionTitle>
+              <SectionTitle>How this 401k calculator supports planning decisions</SectionTitle>
               <SectionSubtitle>
                 Use the interactive model for the numbers, then use the sections below to choose better assumptions,
                 interpret the result, and jump into the next question that usually comes up.
@@ -269,7 +269,7 @@ export default function CalculatorPage() {
 
             <FaqBlock>
               <BridgeHeader>
-                <SectionTitle as="h2">401(k) calculator FAQ</SectionTitle>
+                <SectionTitle as="h2">401k calculator FAQ</SectionTitle>
                 <SectionSubtitle>
                   Focused answers for the questions most people have while entering assumptions or interpreting their
                   result.

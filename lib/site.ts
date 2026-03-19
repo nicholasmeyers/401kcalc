@@ -3,7 +3,7 @@ export const siteConfig = {
   legalName: "401kcalc",
   title: "401k Calculator and Retirement Planning Guides",
   description:
-    "Model your 401(k) growth with clear assumptions, then make better long-term retirement decisions with practical guides.",
+    "Model your 401k growth with clear assumptions, then make better long-term retirement decisions with practical guides.",
   url: "https://www.401kcalc.com",
   defaultSocialImagePath: "/opengraph-image",
 };

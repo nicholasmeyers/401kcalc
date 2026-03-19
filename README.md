@@ -1,6 +1,6 @@
 # 401kcalc
 
-Next.js 15 + TypeScript retirement planning site with a 401(k) calculator, guides, and benchmark content.
+Next.js 15 + TypeScript retirement planning site with a 401k calculator, guides, and benchmark content.
 
 ## Local development
 
