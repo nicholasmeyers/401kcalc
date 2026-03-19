@@ -14,24 +14,24 @@ const guides = getAllGuides();
 const categories = getGuideCategories();
 
 export const metadata: Metadata = {
-  title: "401(k) Retirement Planning Guides",
+  title: "401k Retirement Planning Guides",
   description:
-    "Decision-first 401(k) guides on age-based savings milestones, Roth vs Traditional strategy, and employer match optimization.",
+    "Decision-first 401k guides on age-based savings milestones, Roth vs Traditional strategy, and employer match optimization.",
   alternates: {
     canonical: "/guides",
   },
   openGraph: {
-    title: "401(k) Guides | 401kcalc",
+    title: "401k Guides | 401kcalc",
     description:
-      "Explore practical 401(k) guides built to support contribution strategy, tax choices, and retirement planning confidence.",
+      "Explore practical 401k guides built to support contribution strategy, tax choices, and retirement planning confidence.",
     url: `${siteConfig.url}/guides`,
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "401(k) Retirement Planning Guides",
+    title: "401k Retirement Planning Guides",
     description:
-      "Explore practical 401(k) guides on savings milestones, tax strategy, and employer match optimization.",
+      "Explore practical 401k guides on savings milestones, tax strategy, and employer match optimization.",
   },
 };
 
@@ -48,10 +48,10 @@ export default function GuidesPage() {
   const collectionPageSchema = {
     "@context": "https://schema.org",
     "@type": "CollectionPage",
-    name: "401(k) Retirement Planning Guides",
+    name: "401k Retirement Planning Guides",
     url: `${siteConfig.url}/guides`,
     description:
-      "Decision-first 401(k) guides on age-based savings milestones, Roth vs Traditional strategy, and employer match optimization.",
+      "Decision-first 401k guides on age-based savings milestones, Roth vs Traditional strategy, and employer match optimization.",
     isPartOf: {
       "@type": "WebSite",
       name: siteConfig.name,
@@ -90,9 +90,9 @@ export default function GuidesPage() {
           <CalculatorCard>
             <CalculatorTitle>Ready to turn guidance into a plan?</CalculatorTitle>
             <CalculatorBody>
-              Use the <strong>401(k) calculator</strong> to test contribution, return, and timeline assumptions based on the strategies from these guides.
+              Use the <strong>401k calculator</strong> to test contribution, return, and timeline assumptions based on the strategies from these guides.
             </CalculatorBody>
-            <ButtonLink href="/401k-calculator">Go to 401(k) Calculator</ButtonLink>
+            <ButtonLink href="/401k-calculator">Go to 401k Calculator</ButtonLink>
           </CalculatorCard>
         </Container>
       </CalculatorSection>

@@ -112,7 +112,7 @@ export function CalculatorForm({
       </Section>
 
       <Section>
-        <SectionLabel>Current 401(k) Balances</SectionLabel>
+        <SectionLabel>Current 401k Balances</SectionLabel>
         <FieldStack>
           {renderFieldList(balanceFieldConfigs)}
           {totalBalanceDisplay ? (
@@ -125,7 +125,7 @@ export function CalculatorForm({
                   <DerivedSeparator>&middot;</DerivedSeparator>
                 </>
               ) : null}
-              <span>Total 401(k): {totalBalanceDisplay.total}</span>
+              <span>Total 401k: {totalBalanceDisplay.total}</span>
             </DerivedRow>
           ) : null}
         </FieldStack>

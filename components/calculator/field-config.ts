@@ -50,17 +50,17 @@ export const retirementGoalFieldConfigs: CalculatorFieldConfig<InputField>[] = [
 export const balanceFieldConfigs: CalculatorFieldConfig<InputField>[] = [
   {
     field: "currentBalance",
-    label: "Total 401(k) balance",
-    description: "Total current 401(k) balance across all accounts.",
+    label: "Total 401k balance",
+    description: "Total current 401k balance across all accounts.",
     kind: "currency",
   },
   {
     field: "currentRothBalance",
-    label: "Roth 401(k) balance",
-    description: "Portion of total that is already in a Roth 401(k).",
+    label: "Roth 401k balance",
+    description: "Portion of total that is already in a Roth 401k.",
     kind: "currency",
     tooltip:
-      "If part of your existing 401(k) is in a Roth account, enter that amount here. The rest is treated as traditional (pre-tax).",
+      "If part of your existing 401k is in a Roth account, enter that amount here. The rest is treated as traditional (pre-tax).",
   },
 ];
 
@@ -97,7 +97,7 @@ export const rothStrategyFieldConfigs: CalculatorFieldConfig<InputField>[] = [
   {
     field: "rothContributionPercent",
     label: "Roth contribution %",
-    description: "What percentage of your 401(k) contributions go to Roth instead of traditional.",
+    description: "What percentage of your 401k contributions go to Roth instead of traditional.",
     kind: "percent",
     slider: {
       min: 0,

@@ -9,7 +9,7 @@ import { siteConfig } from "@/lib/site";
 import { theme } from "@/styles/theme";
 
 export const metadata: Metadata = {
-  title: "401(k) Calculator Methodology",
+  title: "401k Calculator Methodology",
   description:
     "How 401kcalc estimates retirement balances, contribution limits, and retirement spending using editable assumptions.",
   alternates: {
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "401(k) Calculator Methodology",
+    title: "401k Calculator Methodology",
     description: "Clear explanation of projection assumptions and calculation logic.",
   },
 };
@@ -67,7 +67,7 @@ export default function MethodologyPage() {
   const methodologySchema = {
     "@context": "https://schema.org",
     "@type": "WebPage",
-    name: "401(k) Calculator Methodology",
+    name: "401k Calculator Methodology",
     url: `${siteConfig.url}/methodology`,
     description:
       "How 401kcalc estimates retirement balances, contribution limits, and spending sustainability using editable assumptions.",

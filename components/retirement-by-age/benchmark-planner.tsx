@@ -347,7 +347,7 @@ export function BenchmarkPlanner({ initialAge, onAgeChange }: BenchmarkPlannerPr
           </Field>
 
           <Field>
-            <Label htmlFor="bp-balance">Current 401(k) balance</Label>
+            <Label htmlFor="bp-balance">Current 401k balance</Label>
             <InputWrapper>
               <InputPrefix>$</InputPrefix>
               <Input
@@ -596,7 +596,7 @@ export function BenchmarkPlanner({ initialAge, onAgeChange }: BenchmarkPlannerPr
               Run a complete projection with spending goals, inflation, and withdrawal modeling &mdash; pre-filled with your numbers.
             </CtaText>
             <CtaLink href={calculatorUrl}>
-              Open 401(k) calculator with these inputs &rarr;
+              Open 401k calculator with these inputs &rarr;
             </CtaLink>
           </CalculatorCta>
         </>

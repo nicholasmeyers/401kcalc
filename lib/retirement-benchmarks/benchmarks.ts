@@ -62,15 +62,15 @@ const benchmarks: RetirementBenchmark[] = [
     ],
     relatedGuides: [
       {
-        label: "How Much Should I Have in My 401(k) at 30?",
+        label: "How Much Should I Have in My 401k at 30?",
         href: "/guides/how-much-should-i-have-in-my-401k-at-30",
       },
       {
-        label: "401(k) Employer Match Explained",
+        label: "401k Employer Match Explained",
         href: "/guides/401k-employer-match-explained",
       },
       {
-        label: "Roth vs Traditional 401(k): How to Choose",
+        label: "Roth vs Traditional 401k: How to Choose",
         href: "/guides/roth-vs-traditional-401k",
       },
     ],
@@ -117,15 +117,15 @@ const benchmarks: RetirementBenchmark[] = [
     ],
     relatedGuides: [
       {
-        label: "How Much Should I Have in My 401(k) at 30?",
+        label: "How Much Should I Have in My 401k at 30?",
         href: "/guides/how-much-should-i-have-in-my-401k-at-30",
       },
       {
-        label: "How Much Should I Have in My 401(k) at 40?",
+        label: "How Much Should I Have in My 401k at 40?",
         href: "/guides/how-much-should-i-have-in-my-401k-at-40",
       },
       {
-        label: "401(k) Employer Match Explained",
+        label: "401k Employer Match Explained",
         href: "/guides/401k-employer-match-explained",
       },
     ],
@@ -172,15 +172,15 @@ const benchmarks: RetirementBenchmark[] = [
     ],
     relatedGuides: [
       {
-        label: "How Much Should I Have in My 401(k) at 40?",
+        label: "How Much Should I Have in My 401k at 40?",
         href: "/guides/how-much-should-i-have-in-my-401k-at-40",
       },
       {
-        label: "Roth vs Traditional 401(k): How to Choose",
+        label: "Roth vs Traditional 401k: How to Choose",
         href: "/guides/roth-vs-traditional-401k",
       },
       {
-        label: "401(k) Employer Match Explained",
+        label: "401k Employer Match Explained",
         href: "/guides/401k-employer-match-explained",
       },
     ],
@@ -223,19 +223,19 @@ const benchmarks: RetirementBenchmark[] = [
       "Prioritize stable contribution percentage over irregular lump sums.",
       "Use bonus periods to step up annual savings targets.",
       "Compare retirement at multiple ages to quantify timing tradeoffs.",
-      "Coordinate 401(k) strategy with broader household cash-flow planning.",
+      "Coordinate 401k strategy with broader household cash-flow planning.",
     ],
     relatedGuides: [
       {
-        label: "How Much Should I Have in My 401(k) at 40?",
+        label: "How Much Should I Have in My 401k at 40?",
         href: "/guides/how-much-should-i-have-in-my-401k-at-40",
       },
       {
-        label: "How Much Should I Have in My 401(k) at 50?",
+        label: "How Much Should I Have in My 401k at 50?",
         href: "/guides/how-much-should-i-have-in-my-401k-at-50",
       },
       {
-        label: "Roth vs Traditional 401(k): How to Choose",
+        label: "Roth vs Traditional 401k: How to Choose",
         href: "/guides/roth-vs-traditional-401k",
       },
     ],
@@ -282,15 +282,15 @@ const benchmarks: RetirementBenchmark[] = [
     ],
     relatedGuides: [
       {
-        label: "How Much Should I Have in My 401(k) at 50?",
+        label: "How Much Should I Have in My 401k at 50?",
         href: "/guides/how-much-should-i-have-in-my-401k-at-50",
       },
       {
-        label: "How Much Should I Have in My 401(k) at 60?",
+        label: "How Much Should I Have in My 401k at 60?",
         href: "/guides/how-much-should-i-have-in-my-401k-at-60",
       },
       {
-        label: "Roth vs Traditional 401(k): How to Choose",
+        label: "Roth vs Traditional 401k: How to Choose",
         href: "/guides/roth-vs-traditional-401k",
       },
     ],
@@ -337,15 +337,15 @@ const benchmarks: RetirementBenchmark[] = [
     ],
     relatedGuides: [
       {
-        label: "How Much Should I Have in My 401(k) at 50?",
+        label: "How Much Should I Have in My 401k at 50?",
         href: "/guides/how-much-should-i-have-in-my-401k-at-50",
       },
       {
-        label: "How Much Should I Have in My 401(k) at 60?",
+        label: "How Much Should I Have in My 401k at 60?",
         href: "/guides/how-much-should-i-have-in-my-401k-at-60",
       },
       {
-        label: "Roth vs Traditional 401(k): How to Choose",
+        label: "Roth vs Traditional 401k: How to Choose",
         href: "/guides/roth-vs-traditional-401k",
       },
     ],
@@ -392,15 +392,15 @@ const benchmarks: RetirementBenchmark[] = [
     ],
     relatedGuides: [
       {
-        label: "How Much Should I Have in My 401(k) at 60?",
+        label: "How Much Should I Have in My 401k at 60?",
         href: "/guides/how-much-should-i-have-in-my-401k-at-60",
       },
       {
-        label: "Roth vs Traditional 401(k): How to Choose",
+        label: "Roth vs Traditional 401k: How to Choose",
         href: "/guides/roth-vs-traditional-401k",
       },
       {
-        label: "401(k) Employer Match Explained",
+        label: "401k Employer Match Explained",
         href: "/guides/401k-employer-match-explained",
       },
     ],

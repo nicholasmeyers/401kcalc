@@ -12,16 +12,16 @@ Guides without `imageUrl` fall back to a **dynamic OG image** (title, category, 
 
 | Guide | Image |
 |-------|-------|
-| How Much Should I Have in My 401(k) at 30? | `sprout.png` |
-| How Much Should I Have in My 401(k) at 40? | `chart.svg` |
-| How Much Should I Have in My 401(k) at 50? | `make-plan.png` |
-| How Much Should I Have in My 401(k) at 60? | `senior-beach.png` |
-| Roth vs Traditional 401(k): How to Choose | `vector-plan.png` |
-| 401(k) Employer Match Explained | `dollars-stacks.png` |
-| 401(k) Contribution Limits for 2026 | `close-up-100-dollar-bill.png` |
-| How Much Should I Contribute to My 401(k)? | `hundos.png` |
-| What to Do With Your 401(k) When You Leave a Job | `vector-plan.png` |
-| Self-Employed 401(k): Solo 401(k) vs SEP IRA | `savings.png` |
+| How Much Should I Have in My 401k at 30? | `sprout.png` |
+| How Much Should I Have in My 401k at 40? | `chart.svg` |
+| How Much Should I Have in My 401k at 50? | `make-plan.png` |
+| How Much Should I Have in My 401k at 60? | `senior-beach.png` |
+| Roth vs Traditional 401k: How to Choose | `vector-plan.png` |
+| 401k Employer Match Explained | `dollars-stacks.png` |
+| 401k Contribution Limits for 2026 | `close-up-100-dollar-bill.png` |
+| How Much Should I Contribute to My 401k? | `hundos.png` |
+| What to Do With Your 401k When You Leave a Job | `vector-plan.png` |
+| Self-Employed 401k: Solo 401k vs SEP IRA | `savings.png` |
 | Backdoor Roth IRA: How It Works | `vector-plan.png` |
 
 ## Image location and display

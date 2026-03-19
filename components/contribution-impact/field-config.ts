@@ -29,7 +29,7 @@ export const contributionFieldConfigs: CalculatorFieldConfig<ContributionImpactF
   {
     field: "contributionPercent",
     label: "Current contribution %",
-    description: "Your current employee 401(k) contribution rate.",
+    description: "Your current employee 401k contribution rate.",
     kind: "percent",
     slider: {
       min: 0,

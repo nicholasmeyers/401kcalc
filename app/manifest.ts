@@ -5,7 +5,7 @@ export default function manifest(): MetadataRoute.Manifest {
     name: "401kcalc",
     short_name: "401kcalc",
     description:
-      "Model your 401(k) growth with transparent assumptions, year-by-year retirement drawdown simulation, and practical planning guides.",
+      "Model your 401k growth with transparent assumptions, year-by-year retirement drawdown simulation, and practical planning guides.",
     start_url: "/",
     display: "standalone",
     background_color: "#F7F7F7",

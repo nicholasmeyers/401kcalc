@@ -34,13 +34,13 @@ export const metadata: Metadata = {
     apple: "/images/logo-icon-large.png",
   },
   title: {
-    default: "401(k) Calculator and Retirement Planning Guides",
+    default: "401k Calculator and Retirement Planning Guides",
     template: "%s | 401kcalc",
   },
   description: siteConfig.description,
   applicationName: siteConfig.name,
   keywords: [
-    "401(k) calculator",
+    "401k calculator",
     "retirement calculator",
     "retirement planning",
     "401k projection",

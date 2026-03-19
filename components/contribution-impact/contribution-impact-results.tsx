@@ -52,7 +52,7 @@ export function ContributionImpactResults({ result }: ContributionImpactResultsP
         ) : null}
         <PrimaryCopy>
           {result.additionalAnnualContribution > 0
-            ? "From the increase alone — your existing 401(k) balance is not included."
+            ? "From the increase alone — your existing 401k balance is not included."
             : "This increase does not add new contribution room at the current salary and IRS cap."}
         </PrimaryCopy>
 
@@ -121,7 +121,7 @@ export function ContributionImpactResults({ result }: ContributionImpactResultsP
         <ChartHeader>
           <ChartTitle>How your increase compounds</ChartTitle>
           <ChartSubtitle>
-            Only the extra dollars from your increase — not your full 401(k).
+            Only the extra dollars from your increase — not your full 401k.
           </ChartSubtitle>
         </ChartHeader>
         <ContributionImpactChart data={result.chartRows} />
@@ -132,7 +132,7 @@ export function ContributionImpactResults({ result }: ContributionImpactResultsP
           Ready to see the full picture? Layer this increase onto your current balance, Roth strategy, and full retirement plan.
         </ActionText>
         <ActionRow>
-          <ButtonLink href="/401k-calculator">Open Full 401(k) Calculator</ButtonLink>
+          <ButtonLink href="/401k-calculator">Open Full 401k Calculator</ButtonLink>
           <ButtonLink href={`/retirement-by-age/${benchmarkAge}`} variant="secondary">
             Check Your Age Benchmark
           </ButtonLink>

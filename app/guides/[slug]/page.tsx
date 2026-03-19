@@ -272,7 +272,7 @@ export default async function GuideDetailPage({ params }: GuidePageProps) {
                 Open the calculator and test the exact assumptions from this guide. A small change in contribution rate or retirement age can have a meaningful
                 long-term impact.
               </CtaText>
-              <ButtonLink href="/401k-calculator">Open 401(k) Calculator</ButtonLink>
+              <ButtonLink href="/401k-calculator">Open 401k Calculator</ButtonLink>
             </CalculatorCta>
           </BodyCard>
         </Container>

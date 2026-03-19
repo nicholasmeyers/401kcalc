@@ -116,7 +116,7 @@ export function AgeCheckpointCalculator({ age, recommendedMultiple }: AgeCheckpo
           </Field>
 
           <Field>
-            <Label htmlFor="ck-balance">Current 401(k) balance</Label>
+            <Label htmlFor="ck-balance">Current 401k balance</Label>
             <InputWrapper>
               <InputPrefix>$</InputPrefix>
               <Input
@@ -228,7 +228,7 @@ function ResultsPanel({ result, age }: { result: CheckpointResult; age: number }
         </StatRow>
 
         <StatRow>
-          <StatLabel>Your current 401(k)</StatLabel>
+          <StatLabel>Your current 401k</StatLabel>
           <StatValue>{formatCurrency(currentBalance)}</StatValue>
         </StatRow>
 

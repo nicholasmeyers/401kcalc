@@ -33,7 +33,7 @@ const calculatorUtilityPoints = [
 const benchmarkUtilityPoints = [
   {
     title: "Age-based savings checkpoints",
-    body: "See how your current 401(k) balance compares to common savings benchmarks for your age group.",
+    body: "See how your current 401k balance compares to common savings benchmarks for your age group.",
   },
   {
     title: "Projected savings path",
@@ -70,7 +70,7 @@ const contributionUtilityPoints = [
 
 const toolPickerCards = [
   {
-    title: "401(k) Calculator",
+    title: "401k Calculator",
     body: "Plan your full retirement — balance, contributions, and income.",
     href: "/401k-calculator",
     label: "Open calculator",
@@ -92,7 +92,7 @@ const toolPickerCards = [
 const heroFeatureChecks = [
   "Standard assumptions",
   "Your & employer contributions",
-  "401(k) + Roth balances",
+  "401k + Roth balances",
   "Inflation + IRS age limits",
   "Future windfalls",
 ];
@@ -129,24 +129,24 @@ const featuredGuides = [...getAllGuides()]
   .slice(0, 3);
 
 export const metadata: Metadata = {
-  title: "401(k) Calculator for Retirement Projections",
+  title: "401k Calculator for Retirement Projections",
   description:
-    "Model your 401(k) growth, compare retirement scenarios, and make clearer long-term planning decisions with transparent assumptions.",
+    "Model your 401k growth, compare retirement scenarios, and make clearer long-term planning decisions with transparent assumptions.",
   alternates: {
     canonical: "/",
   },
   openGraph: {
-    title: "401(k) Calculator for Retirement Projections | 401kcalc",
+    title: "401k Calculator for Retirement Projections | 401kcalc",
     description:
-      "Run transparent 401(k) projections, compare outcomes, and explore practical retirement planning guides.",
+      "Run transparent 401k projections, compare outcomes, and explore practical retirement planning guides.",
     url: siteConfig.url,
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "401(k) Calculator for Retirement Projections",
+    title: "401k Calculator for Retirement Projections",
     description:
-      "Project your 401(k), compare assumptions, and use practical retirement planning guides.",
+      "Project your 401k, compare assumptions, and use practical retirement planning guides.",
   },
 };
 
@@ -167,9 +167,9 @@ export default function HomePage() {
   const webPageSchema = {
     "@context": "https://schema.org",
     "@type": "WebPage",
-    name: "401(k) Calculator for Retirement Projections",
+    name: "401k Calculator for Retirement Projections",
     description:
-      "Model your 401(k) growth, compare retirement scenarios, and make clearer long-term planning decisions with transparent assumptions.",
+      "Model your 401k growth, compare retirement scenarios, and make clearer long-term planning decisions with transparent assumptions.",
     url: siteConfig.url,
     isPartOf: { "@type": "WebSite", url: siteConfig.url, name: siteConfig.name },
     publisher: {
@@ -191,12 +191,12 @@ export default function HomePage() {
             <HeroContent>
               <HeroText>
                 <PageIntro
-                  eyebrow="401(k) Planning"
-                  title="See how today’s 401(k) choices can shape your retirement income."
+                  eyebrow="401k Planning"
+                  title="See how today’s 401k choices can shape your retirement income."
                   description="401kcalc helps you model long-term outcomes with assumptions you can inspect, adjust, and compare in minutes."
                 >
                   <HeroActions>
-                    <ButtonLink href="/401k-calculator">Open 401(k) Calculator</ButtonLink>
+                    <ButtonLink href="/401k-calculator">Open 401k Calculator</ButtonLink>
                     <ButtonLink href="/retirement-by-age" variant="secondary">
                       Retirement by Age
                     </ButtonLink>
@@ -249,7 +249,7 @@ export default function HomePage() {
               </UtilityCard>
             ))}
           </UtilityGrid>
-          <UtilityLink href="/401k-calculator">Open 401(k) Calculator &rarr;</UtilityLink>
+          <UtilityLink href="/401k-calculator">Open 401k Calculator &rarr;</UtilityLink>
         </Container>
       </UtilitySection>
 
@@ -355,7 +355,7 @@ export default function HomePage() {
 
       <ContributionUtilitySection>
         <Container>
-          <SectionTitle>See what increasing your 401(k) could actually add</SectionTitle>
+          <SectionTitle>See what increasing your 401k could actually add</SectionTitle>
           <SectionSubtitle>
             See how an extra 1%–5% of salary could turn into real monthly retirement income.          </SectionSubtitle>
           <ContributionUtilityLayout>
@@ -387,7 +387,7 @@ export default function HomePage() {
         <Container>
           <SectionTitle>Choose the right starting point</SectionTitle>
           <SectionSubtitle>
-            Three tools for three different questions about your 401(k).
+            Three tools for three different questions about your 401k.
           </SectionSubtitle>
           <ToolPickerGrid>
             {toolPickerCards.map((card) => (
@@ -458,12 +458,12 @@ export default function HomePage() {
       <ClosingSection>
         <Container>
           <ClosingCard>
-            <ClosingTitle>Ready to run your 401(k) scenario?</ClosingTitle>
+            <ClosingTitle>Ready to run your 401k scenario?</ClosingTitle>
             <ClosingBody>
               Start with your current numbers, then adjust contribution rate, retirement age, and assumptions to compare outcomes clearly.
             </ClosingBody>
             <ClosingActions>
-              <ButtonLink href="/401k-calculator">Go to 401(k) Calculator</ButtonLink>
+              <ButtonLink href="/401k-calculator">Go to 401k Calculator</ButtonLink>
               <ButtonLink href="/401k-contribution-calculator" variant="secondary">
                 Increase Contributions
               </ButtonLink>
