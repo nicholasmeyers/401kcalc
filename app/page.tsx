@@ -49,6 +49,46 @@ const benchmarkUtilityPoints = [
   },
 ];
 
+const contributionUtilityPoints = [
+  {
+    title: "See what your increase alone adds",
+    body: "See what the increase alone adds — without rebuilding your full retirement plan.",
+  },
+  {
+    title: "See how consistency compounds over time",
+    body: "Compare keeping the increase for 1 year, 5 years, or until retirement.",
+  },
+  {
+    title: "Turn savings into monthly income",
+    body: "Translate the added balance into a concrete monthly income estimate.",
+  },
+  {
+    title: "Understand the take-home impact today",
+    body: "See the estimated take-home impact today alongside the long-term upside.",
+  },
+];
+
+const toolPickerCards = [
+  {
+    title: "401(k) Calculator",
+    body: "Plan your full retirement — balance, contributions, and income.",
+    href: "/401k-calculator",
+    label: "Open calculator",
+  },
+  {
+    title: "Retirement by Age",
+    body: "See how your savings compare to benchmarks at your age.",
+    href: "/retirement-by-age",
+    label: "Check benchmarks",
+  },
+  {
+    title: "Increase Contributions",
+    body: "See what raising your savings rate alone could add by retirement.",
+    href: "/401k-contribution-calculator",
+    label: "Explore impact",
+  },
+];
+
 const heroFeatureChecks = [
   "Standard assumptions",
   "Your & employer contributions",
@@ -158,10 +198,10 @@ export default function HomePage() {
                   <HeroActions>
                     <ButtonLink href="/401k-calculator">Open 401(k) Calculator</ButtonLink>
                     <ButtonLink href="/retirement-by-age" variant="secondary">
-                      Retirement Age Benchmarks
+                      Retirement by Age
                     </ButtonLink>
-                    <ButtonLink href="/guides" variant="secondary">
-                      Browse Guides
+                    <ButtonLink href="/401k-contribution-calculator" variant="secondary">
+                      Increase Contributions
                     </ButtonLink>
                   </HeroActions>
                 </PageIntro>
@@ -313,6 +353,56 @@ export default function HomePage() {
         </Container>
       </BenchmarkUtilitySection>
 
+      <ContributionUtilitySection>
+        <Container>
+          <SectionTitle>See what increasing your 401(k) could actually add</SectionTitle>
+          <SectionSubtitle>
+            See how an extra 1%–5% of salary could turn into real monthly retirement income.          </SectionSubtitle>
+          <ContributionUtilityLayout>
+            <ContributionUtilityGrid>
+              {contributionUtilityPoints.map((point) => (
+                <UtilityCard key={point.title}>
+                  <UtilityTitle>{point.title}</UtilityTitle>
+                  <UtilityBody>{point.body}</UtilityBody>
+                </UtilityCard>
+              ))}
+            </ContributionUtilityGrid>
+
+            <ContributionTeaser>
+              <ContributionTeaserLabel>Example</ContributionTeaserLabel>
+              <ContributionTeaserValue>+2% could add about $500/month in retirement income, </ContributionTeaserValue>
+              <ContributionTeaserNote>
+                That’s from one small change.
+              </ContributionTeaserNote>
+              <ContributionTeaserNote>
+                Based on a 30-year-old earning $85,000 with a 7% return. Your result will differ.
+              </ContributionTeaserNote>
+            </ContributionTeaser>
+          </ContributionUtilityLayout>
+          <UtilityLink href="/401k-contribution-calculator"> Explore your contribution increase impact &rarr;</UtilityLink>
+        </Container>
+      </ContributionUtilitySection>
+
+      <ToolPickerSection>
+        <Container>
+          <SectionTitle>Choose the right starting point</SectionTitle>
+          <SectionSubtitle>
+            Three tools for three different questions about your 401(k).
+          </SectionSubtitle>
+          <ToolPickerGrid>
+            {toolPickerCards.map((card) => (
+              <ToolPickerCard key={card.href}>
+                <ToolPickerTitle>{card.title}</ToolPickerTitle>
+                <ToolPickerBody>{card.body}</ToolPickerBody>
+                <ButtonLink href={card.href} variant="secondary">
+                  {card.label}
+                </ButtonLink>
+              </ToolPickerCard>
+            ))}
+          </ToolPickerGrid>
+        </Container>
+      </ToolPickerSection>
+
       <TrustSection>
         <Container>
           <SectionTitle>Built for trust and transparency</SectionTitle>
@@ -374,6 +464,9 @@ export default function HomePage() {
             </ClosingBody>
             <ClosingActions>
               <ButtonLink href="/401k-calculator">Go to 401(k) Calculator</ButtonLink>
+              <ButtonLink href="/401k-contribution-calculator" variant="secondary">
+                Increase Contributions
+              </ButtonLink>
               <ButtonLink href="/guides" variant="secondary">
                 Read Planning Guides
               </ButtonLink>
@@ -781,6 +874,108 @@ const UtilityBody = styled.p`
   margin: 0;
   font-size: 0.94rem;
   line-height: 1.68;
+`;
+
+const ContributionUtilitySection = styled(Section)`
+  padding-block: 28px;
+  border-top: 1px solid ${theme.colors.border};
+  background: rgba(255, 255, 255, 0.64);
+
+  @media (min-width: ${theme.breakpoints.md}) {
+    padding-block: 40px;
+  }
+`;
+
+const ContributionUtilityLayout = styled.div`
+  margin-top: 32px;
+  display: grid;
+  gap: 18px;
+
+  @media (min-width: ${theme.breakpoints.lg}) {
+    grid-template-columns: minmax(0, 1fr) 280px;
+    align-items: start;
+    gap: 24px;
+  }
+`;
+
+const ContributionUtilityGrid = styled.div`
+  display: grid;
+  gap: 14px;
+
+  @media (min-width: ${theme.breakpoints.md}) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+`;
+
+const ContributionTeaser = styled(SurfaceCard)`
+  padding: 20px;
+  display: grid;
+  gap: 8px;
+  background:
+    radial-gradient(circle at top right, rgba(22, 163, 74, 0.08), transparent 50%),
+    ${theme.colors.surface};
+  border-color: ${theme.colors.successBorder};
+`;
+
+const ContributionTeaserLabel = styled.span`
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: ${theme.colors.successText};
+`;
+
+const ContributionTeaserValue = styled.p`
+  margin: 0;
+  font-size: clamp(1.1rem, 2vw, 1.3rem);
+  font-weight: 660;
+  line-height: 1.3;
+`;
+
+const ContributionTeaserNote = styled.p`
+  margin: 0;
+  font-size: 0.78rem;
+  line-height: 1.55;
+  color: ${theme.colors.mutedText};
+`;
+
+const ToolPickerSection = styled(Section)`
+  padding-block: 28px;
+  border-bottom: 1px solid ${theme.colors.border};
+
+  @media (min-width: ${theme.breakpoints.md}) {
+    padding-block: 40px;
+  }
+`;
+
+const ToolPickerGrid = styled.div`
+  margin-top: 32px;
+  display: grid;
+  gap: 14px;
+
+  @media (min-width: ${theme.breakpoints.md}) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+`;
+
+const ToolPickerCard = styled(SurfaceCard)`
+  padding: 22px;
+  display: grid;
+  gap: 12px;
+  align-content: start;
+`;
+
+const ToolPickerTitle = styled.h3`
+  margin: 0;
+  font-size: 1.06rem;
+  font-weight: 640;
+`;
+
+const ToolPickerBody = styled.p`
+  margin: 0;
+  font-size: 0.92rem;
+  line-height: 1.65;
+  color: ${theme.colors.mutedTextStrong};
 `;
 
 const TrustSection = styled(Section)`
